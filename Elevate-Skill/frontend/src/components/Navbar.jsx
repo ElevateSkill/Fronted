@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, Zap, ChevronDown, Code2, Palette, BrainCircuit, Rocket } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Navbar({ isDark, setIsDark }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,10 +20,10 @@ export default function Navbar({ isDark, setIsDark }) {
   }, []);
 
   const navLinks = [
-    { name: 'Home', href: '#' },
+    { name: 'Home', href: '#home' },
     { 
       name: 'Courses', 
-      href: '#', 
+      href: '#courses', 
       isMega: true,
       subItems: [
         { title: 'Web Development', desc: 'React, Node, and scalable architectures.', icon: <Code2 className="text-[#15c8fb]" /> },
@@ -31,8 +32,10 @@ export default function Navbar({ isDark, setIsDark }) {
         { title: 'Cloud Systems', desc: 'Docker, K8s, and AWS deployment.', icon: <Rocket className="text-[#17c966]" /> },
       ] 
     },
-    { name: 'Categories', href: '#' },
-    { name: 'Support', href: '#' },
+    { name: 'Services', href: '#services' },
+    { name: 'About', href: '/about' },
+    { name: 'Reviews', href: '#stories' },
+    { name: 'Contact', href: '#contact' },
   ];
 
     const toggleTheme = () => {
@@ -95,9 +98,12 @@ export default function Navbar({ isDark, setIsDark }) {
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
-            <button className="px-8 py-3 bg-[#15c8fb] text-white font-black text-[10px] tracking-[0.2em] rounded-sm shadow-xl shadow-[#15c8fb]/20 hover:brightness-110 active:scale-95 transition-all uppercase">
+            {/* <button className="px-8 py-3 bg-[#15c8fb] text-white font-black text-[10px] tracking-[0.2em] rounded-sm shadow-xl shadow-[#15c8fb]/20 hover:brightness-110 active:scale-95 transition-all uppercase">
               Member Portal
-            </button>
+            </button> */}
+            <Link to="/register" className="px-6 py-2 bg-[#15c8fb] text-white font-black text-[10px] tracking-[0.2em] rounded-sm shadow-xl shadow-[#15c8fb]/20 hover:brightness-110 active:scale-95 transition-all uppercase">
+              Member Portal
+            </Link>
           </div>
         </div>
 
