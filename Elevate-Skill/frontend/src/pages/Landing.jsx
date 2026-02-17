@@ -34,7 +34,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="relative h-screen w-full overflow-hidden transition-colors duration-500 font-sans dark:bg-charcoal bg-slate-50">
+    <div id="home" className="relative h-screen w-full overflow-hidden transition-colors duration-500 font-sans dark:bg-charcoal bg-slate-50">
       
       {/* --- BACKGROUND ENGINE --- */}
       <AnimatePresence mode='wait'>
