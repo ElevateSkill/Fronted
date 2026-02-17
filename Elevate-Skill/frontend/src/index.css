@@ -1,8 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-charcoal: #121212;
-  --color-indigo: #6366F1;
-  --color-slate: #94A3B8;
-  --color-surface: #1E1E1E;
+  --color-charcoal: #0a0a0a;
+  --color-surface: #121212;
+  --color-cyan-primary: #15c8fb;
+  --color-green-accent: #17c966;
 }
+
+/* Base transitions so the background swap is smooth, not jerky */
+@layer base {
+  html {
+    transition: background-color 0.5s ease;
+  }
+  
+  /* When the 'dark' class is NOT present (Light Mode) */
+  body {
+    @apply bg-white text-slate-900;
+  }
+
+  /* When the 'dark' class IS present (Dark Mode) */
+  .dark body {
+    @apply bg-charcoal text-white;
+  }
+}
+
+@custom-variant dark (&:where(.dark, .dark *));

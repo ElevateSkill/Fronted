@@ -1,36 +1,41 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
-
-// Layout
 import Layout from "./components/Layout";
+import MainView from "./pages/MainView"; // The multi-section page
+import About from "./pages/About";
 
-// Pages
-import Landing from "./pages/Landing";
-import Services from "./pages/Service";
-import Stories from "./pages/Stories";
-import FAQ from "./pages/FAQ";
-import Contact from "./pages/Contact";
+
+// auth
+import Login from "./pages/auth/Login";
+import Register from "./pages/Login";
+
+
+// scroll to top on route change
+import ScrollToTop from "./components/ScrollToTop";
 
 export default function App() {
   const [isDark, setIsDark] = useState(true);
 
   return (
     <BrowserRouter>
-      <Routes>
-        {/* The Layout wraps all these routes */}
-        <Route path="/" element={<Layout isDark={isDark} setIsDark={setIsDark} />}>
-          
-          {/* Default page (Home) */}
-          <Route index element={<Landing />} />
-          
-          {/* Other pages */}
-          <Route path="services" element={<Services />} />
-          <Route path="stories" element={<Stories />} />
-          <Route path="faq" element={<FAQ />} />
-          <Route path="contact" element={<Contact />} />
-          
-        </Route>
-      </Routes>
+      <ScrollToTop />
+        <Routes>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+
+          {/* Everything inside here shares the Navbar and Footer */}
+          <Route path="/" element={<Layout isDark={isDark} setIsDark={setIsDark} />}>
+            
+            {/* This renders the Landing + Services + Stories + FAQ together */}
+            <Route index element={<MainView />} />
+            
+            {/* This renders JUST the About page */}
+            
+          </Route>
+          <Route path="/about" element={<About />} />
+
+        </Routes>
+
     </BrowserRouter>
   );
 }
