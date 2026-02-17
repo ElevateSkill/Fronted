@@ -44,7 +44,7 @@ const courses = [
 
 export default function Services() {
   return (
-    <div className="w-full transition-colors duration-500 dark:bg-charcoal bg-white">
+    <div id="services" className="w-full transition-colors duration-500 dark:bg-charcoal bg-white">
       
       {/* --- TOP SERVICES SECTION (Screenshot 2 Style) --- */}
       <section className="max-w-7xl mx-auto px-6 py-24 text-center">
