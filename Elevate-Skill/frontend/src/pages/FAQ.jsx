@@ -29,8 +29,8 @@ export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
-    <div className="min-h-screen py-32 px-6 transition-colors duration-500 dark:bg-charcoal bg-slate-50">
-      <div className="max-w-4xl mx-auto">
+    <div id="faq" className="min-h-screen py-32 px-6 transition-colors duration-500 dark:bg-charcoal bg-slate-50">
+      <div className="px-4 py-12 rounded-[3rem] dark:bg-white/5 bg-white border border-slate-200 dark:border-white/10 max-w-5xl mx-auto">
         
         {/* --- HEADER --- */}
         <div className="text-center mb-20">
