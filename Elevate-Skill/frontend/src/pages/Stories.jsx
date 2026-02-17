@@ -65,7 +65,7 @@ export default function Stories() {
   }, [isPaused, nextSlide]);
 
   return (
-    <div className="min-h-screen pt-32 pb-20 px-6 transition-colors duration-500 dark:bg-charcoal bg-slate-50 overflow-hidden">
+    <div id="stories" className="min-h-screen pt-32 pb-20 px-6 transition-colors duration-500 dark:bg-charcoal bg-slate-50 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         
         {/* --- HEADER --- */}
