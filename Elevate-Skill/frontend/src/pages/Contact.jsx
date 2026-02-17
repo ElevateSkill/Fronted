@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Send, MessageSquare, Clock } from 'lucide-react';
 
 export default function Contact() {
   return (
-    <div className="min-h-screen pt-24 pb-12 transition-colors duration-500 dark:bg-charcoal bg-white">
+    <div id="contact" className="min-h-screen pt-24 pb-12 transition-colors duration-500 dark:bg-charcoal bg-white">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* --- SECTION HEADER --- */}
