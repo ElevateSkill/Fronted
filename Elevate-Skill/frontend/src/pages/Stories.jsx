@@ -5,6 +5,8 @@ import {
   CheckCircle2, Star, Quote, ExternalLink 
 } from 'lucide-react';
 
+import video_editing from '../assets/video/video_editing.mp4';
+
 const testimonials = [
   {
     id: "1",
@@ -77,7 +79,7 @@ export default function VideoSuccessStories() {
                 <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 bg-black shadow-2xl">
                   <iframe 
                     className="w-full h-full"
-                    src={`${item.video}?controls=0&rel=0&modestbranding=1`}
+                    src={video_editing}
                     title="YouTube video player"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
