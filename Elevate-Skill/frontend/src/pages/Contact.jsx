@@ -1,137 +1,142 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, MessageSquare, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Clock, Globe, ArrowRight, ShieldCheck } from 'lucide-react';
 
 export default function Contact() {
-  return (
-    <div id="contact" className="min-h-screen pt-24 pb-12 transition-colors duration-500 dark:bg-charcoal bg-white">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        {/* --- SECTION HEADER --- */}
-        <div className="mb-16 text-center lg:text-left">
-          {/* <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-[#17c966] font-mono tracking-[0.3em] text-sm mb-4 uppercase"
-          >
-            Get In Touch
-          </motion.h2> */}
-          <motion.h3 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl md:text-7xl font-black tracking-tighter dark:text-white text-slate-900 leading-none"
-          >
-            LET'S START A <br /> 
-            <span className="dark:text-white/20 text-slate-300 italic">CONVERSATION</span>
-          </motion.h3 >
-        </div>
+  const primaryColor = "#1C7EC6";
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+  return (
+    <div id="contact" className="min-h-screen bg-[#05070a] text-white selection:bg-[#1C7EC6] selection:text-white overflow-hidden">
+      
+      {/* --- BACKGROUND DECORATION --- */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#1C7EC6]/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#1C7EC6]/5 blur-[150px] rounded-full pointer-events-none" />
+
+      <div className="max-w-[1400px] mx-auto px-6 pt-32 pb-24 relative z-10">
+        
+        {/* --- HERO HEADER --- */}
+        {/* <div className="mb-24">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3 mb-6"
+          >
+            <div className="h-[2px] w-12 bg-[#1C7EC6]" />
+            <span className="text-[#1C7EC6] font-black uppercase tracking-[0.4em] text-xs">Reach Out</span>
+          </motion.div>
+        </div> */}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
           
-          {/* --- LEFT SIDE: INFO CARDS --- */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
-              
+          {/* --- LEFT: BIG INFO SECTION --- */}
+          <div className="lg:col-span-5 space-y-12">
+            <p className="text-xl md:text-2xl text-slate-400 font-medium leading-relaxed max-w-md">
+              Have a complex project or a simple question? We're here to bridge the gap between your vision and reality.
+            </p>
+
+            <div className="space-y-8">
               {[
-                { icon: <Mail />, title: "Email Us", detail: "support@bromine.com", color: "#15c8fb" },
-                { icon: <Phone />, title: "Call Us", detail: "+1 (555) 000-0000", color: "#17c966" },
-                { icon: <MapPin />, title: "Headquarters", detail: "123 Tech Avenue, Silicon Valley", color: "#15c8fb" },
-                { icon: <Clock />, title: "Availability", detail: "Mon - Fri, 9am - 6pm EST", color: "#17c966" }
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -30 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  viewport={{ once: true }}
-                  className="p-8 rounded-2xl border border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/5 backdrop-blur-sm group hover:border-[#15c8fb]/50 transition-all shadow-sm"
+                { icon: <Mail />, title: "Inquiries", value: "hello@bromine.com" },
+                { icon: <Phone />, title: "Assistance", value: "+1 (888) 234 5678" },
+                { icon: <MapPin />, title: "Location", value: "777 Digital Way, San Francisco" }
+              ].map((item, index) => (
+                <motion.div 
+                  key={index}
+                  whileHover={{ x: 10 }}
+                  className="flex items-center gap-8 group cursor-pointer"
                 >
-                  <div className="flex items-start gap-6">
-                    <div className={`p-4 rounded-xl bg-white dark:bg-charcoal shadow-lg text-[${item.color}] group-hover:scale-110 transition-transform`}>
-                      {React.cloneElement(item.icon, { size: 24, strokeWidth: 2.5 })}
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-white/40 mb-1">{item.title}</h4>
-                      <p className="text-lg font-bold text-slate-900 dark:text-white">{item.detail}</p>
-                    </div>
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#1C7EC6] group-hover:bg-[#1C7EC6] group-hover:text-white transition-all duration-500 shadow-2xl">
+                    {React.cloneElement(item.icon, { size: 28 })}
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">{item.title}</h4>
+                    <p className="text-xl font-bold tracking-tight">{item.value}</p>
                   </div>
                 </motion.div>
               ))}
             </div>
+
+            {/* Social Trust Badge */}
+            <div className="pt-12 border-t border-white/5 flex items-center gap-6">
+               <div className="flex -space-x-3">
+                  {[1,2,3].map(i => (
+                    <img key={i} src={`https://i.pravatar.cc/100?u=${i}`} className="w-10 h-10 rounded-full border-2 border-[#05070a]" alt="user" />
+                  ))}
+               </div>
+               <p className="text-xs font-bold text-slate-500 uppercase tracking-tighter">
+                 Joined by <span className="text-white">500+ Companies</span> worldwide
+               </p>
+            </div>
           </div>
 
-          {/* --- RIGHT SIDE: THE FORM --- */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="lg:col-span-7 bg-white dark:bg-surface border border-slate-200 dark:border-white/10 rounded-[2rem] p-8 md:p-12 shadow-2xl relative overflow-hidden"
-          >
-            {/* Subtle Gradient Glow in Corner */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#15c8fb]/5 blur-[80px] -z-10" />
-
-            <form className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <label className="text-xs font-black tracking-widest uppercase dark:text-white/60 text-slate-500 ml-1">Full Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="John Doe"
-                    className="w-full bg-slate-50 dark:bg-charcoal border border-slate-200 dark:border-white/5 rounded-xl px-6 py-4 outline-none focus:border-[#15c8fb] focus:ring-1 focus:ring-[#15c8fb] transition-all dark:text-white text-slate-900"
-                  />
+          {/* --- RIGHT: PREMIUM FORM --- */}
+          <div className="lg:col-span-7">
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[3rem] p-10 md:p-16 relative shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+            >
+              <form className="space-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="relative group">
+                    <input type="text" className="w-full bg-transparent border-b-2 border-white/10 py-4 outline-none focus:border-[#1C7EC6] transition-colors peer text-lg font-bold" placeholder=" " />
+                    <label className="absolute left-0 top-4 text-slate-500 pointer-events-none transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#1C7EC6] peer-placeholder-shown:top-4">FULL NAME</label>
+                  </div>
+                  <div className="relative group">
+                    <input type="email" className="w-full bg-transparent border-b-2 border-white/10 py-4 outline-none focus:border-[#1C7EC6] transition-colors peer text-lg font-bold" placeholder=" " />
+                    <label className="absolute left-0 top-4 text-slate-500 pointer-events-none transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#1C7EC6] peer-placeholder-shown:top-4">EMAIL ADDRESS</label>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-black tracking-widest uppercase dark:text-white/60 text-slate-500 ml-1">Email Address</label>
-                  <input 
-                    type="email" 
-                    placeholder="john@example.com"
-                    className="w-full bg-slate-50 dark:bg-charcoal border border-slate-200 dark:border-white/5 rounded-xl px-6 py-4 outline-none focus:border-[#15c8fb] focus:ring-1 focus:ring-[#15c8fb] transition-all dark:text-white text-slate-900"
-                  />
+
+                <div className="space-y-4">
+                  <span className="text-[10px] font-black text-slate-500 tracking-widest uppercase">Service Required</span>
+                  <div className="flex flex-wrap gap-3">
+                    {['Development', 'Design', 'Strategy', 'Other'].map(tag => (
+                      <button key={tag} type="button" className="px-6 py-2 rounded-full border border-white/10 text-xs font-bold hover:bg-[#1C7EC6] hover:border-[#1C7EC6] transition-all">
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-black tracking-widest uppercase dark:text-white/60 text-slate-500 ml-1">Inquiry Type</label>
-                <select className="w-full bg-slate-50 dark:bg-charcoal border border-slate-200 dark:border-white/5 rounded-xl px-6 py-4 outline-none focus:border-[#15c8fb] dark:text-white text-slate-900 appearance-none">
-                  <option>General Inquiry</option>
-                  <option>Course Support</option>
-                  <option>Business Partnership</option>
-                </select>
-              </div>
+                <div className="relative group">
+                  <textarea rows="4" className="w-full bg-transparent border-b-2 border-white/10 py-4 outline-none focus:border-[#1C7EC6] transition-colors peer text-lg font-bold resize-none" placeholder=" "></textarea>
+                  <label className="absolute left-0 top-4 text-slate-500 pointer-events-none transition-all peer-focus:-top-4 peer-focus:text-xs peer-focus:text-[#1C7EC6] peer-placeholder-shown:top-4">MESSAGE</label>
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-black tracking-widest uppercase dark:text-white/60 text-slate-500 ml-1">Your Message</label>
-                <textarea 
-                  rows="5"
-                  placeholder="How can we help you today?"
-                  className="w-full bg-slate-50 dark:bg-charcoal border border-slate-200 dark:border-white/5 rounded-xl px-6 py-4 outline-none focus:border-[#15c8fb] focus:ring-1 focus:ring-[#15c8fb] transition-all dark:text-white text-slate-900 resize-none"
-                ></textarea>
-              </div>
-
-              <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="w-full bg-[#15c8fb] text-white font-black py-5 rounded-xl flex items-center justify-center gap-3 shadow-xl shadow-[#15c8fb]/20 hover:brightness-110 transition-all uppercase tracking-[0.2em] text-sm"
-              >
-                Send Message <Send size={18} />
-              </motion.button>
-            </form>
-          </motion.div>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-6">
+                  <div className="flex items-center gap-3 text-slate-500">
+                    <ShieldCheck size={20} className="text-[#1C7EC6]" />
+                    <span className="text-[10px] font-bold uppercase tracking-tighter">Encrypted & Secure</span>
+                  </div>
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="w-full md:w-auto px-12 py-6 bg-[#1C7EC6] text-white font-black rounded-2xl shadow-2xl shadow-[#1C7EC6]/30 flex items-center justify-center gap-4 group"
+                  >
+                    SEND MESSAGE <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
 
         </div>
       </div>
 
-      {/* --- FOOTER MAP ACCENT (Abstract Style) --- */}
-      <div className="mt-24 h-[300px] w-full bg-slate-100 dark:bg-white/5 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20 dark:opacity-10 grayscale invert dark:invert-0">
-          <img 
-            src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?q=80&w=2000" 
-            alt="Map"
-            className="w-full h-full object-cover"
-          />
+      {/* --- FOOTER DECOR --- */}
+      <div className="w-full h-[400px] relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-[#05070a] to-transparent z-10" />
+        <img 
+          src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2000" 
+          className="w-full h-full object-cover opacity-20 grayscale" 
+          alt="tech background"
+        />
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+            <div className="flex items-center gap-4 text-white/10 font-black text-9xl select-none tracking-tighter">
+                BROMINE <Globe size={100} className="animate-spin-slow" /> 2026
+            </div>
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-charcoal via-transparent to-transparent" />
       </div>
     </div>
   );
