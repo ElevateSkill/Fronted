@@ -42,103 +42,70 @@ export default function Landing() {
 
   return (
     <div id="home" className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-700">
-      
-      {/* --- BACKGROUND DYNAMICS --- */}
+      {/* --- FULLSCREEN IMAGE WITH OVERLAY --- */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 opacity-30 dark:opacity-100 bg-[radial-gradient(circle_at_30%_30%,#3C83F615_0%,transparent_50%)]" />
-        <motion.div 
-            animate={{ 
-                scale: [1, 1.2, 1],
-                rotate: [0, 90, 0] 
-            }}
-            transition={{ duration: 20, repeat: Infinity }}
-            className="absolute -top-[10%] -right-[10%] w-[60%] h-[60%] bg-[#f89f29]/5 blur-[120px] rounded-full" 
+        <motion.img
+          key={current}
+          src={slides[current].url}
+          alt="hero"
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 1 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full h-full object-cover absolute inset-0"
+          style={{ zIndex: 1 }}
         />
+        {/* Subtle dark overlay for readability */}
+        <div className="absolute inset-0 bg-black/40 dark:bg-black/60" style={{zIndex:2}} />
       </div>
 
-      {/* --- CONTENT GRID --- */}
-      <div className="relative z-20 max-w-7xl mx-auto px-6 h-screen flex items-center">
-        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
-          
-          {/* TEXT CONTENT */}
-          <div className="text-left order-2 lg:order-1">
-            <div className="relative mb-8">
-                <motion.span 
-                    key={current + "am"}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className="block text-sm font-black text-[#f89f29] mb-2 tracking-widest font-serif"
-                >
-                    {slides[current].amharicTitle}
-                </motion.span>
-                <motion.h1
-                    key={current + "title"}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-[clamp(2.5rem,6vw,5rem)] font-black tracking-tight text-slate-900 dark:text-white leading-[1.05]"
-                >
-                    {slides[current].title} <br />
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3C83F6] to-blue-600">
-                    {slides[current].highlight}
-                    </span>
-                </motion.h1>
-            </div>
+      {/* --- OVERLAID CONTENT --- */}
+      <div className="relative z-20 flex flex-col justify-center items-center h-screen w-full px-6">
+  {/* REMOVED: bg-transparent, rounded-xl, p-8, shadow-xl, backdrop-blur-md */}
+  {/* KEPT: max-w-2xl, w-full, text-center, mx-auto to maintain layout alignment */}
+  <div className="max-w-4xl w-full text-center mx-auto"> 
+    <motion.h1
+      key={current + "title"}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      className="text-[clamp(2.5rem,6vw,5rem)] font-black tracking-tight text-slate-900 dark:text-white leading-[1.05] mb-4"
+    >
+      {slides[current].title} <br />
+      
+      <motion.span
+        key={current + "am"}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="block font-black text-slate-50 text-[#f89f29] mt-4 tracking-widest font-serif"
+      >
+        {slides[current].amharicTitle}
+      </motion.span>
+    </motion.h1>
 
-            <motion.p
-              key={current + "sub"}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-base md:text-lg font-medium max-w-xl leading-relaxed mb-10 text-slate-500 dark:text-slate-400"
-            >
-              {slides[current].subtitle}
-            </motion.p>
+    <motion.p
+      key={current + "sub"}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.4 }}
+      className="max-w-xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-10 text-slate-700 dark:text-slate-200"
+    >
+      {slides[current].subtitle}
+    </motion.p>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-wrap items-center gap-6"
-            >
-
-              <button className="flex items-center gap-3 text-slate-900 dark:text-white font-black text-xs tracking-widest uppercase hover:opacity-70 transition-all group">
-                <PlayCircle size={24} className="text-[#3C83F6] group-hover:scale-110 transition-transform" />
-                WATCH
-              </button>
-            </motion.div>
-          </div>
-
-          {/* DYNAMIC IMAGE DISPLAY */}
-          <div className="relative order-1 lg:order-2 hidden sm:block h-[300px] lg:h-[500px]">
-            <AnimatePresence mode='wait'>
-              <motion.div
-                key={current}
-                initial={{ opacity: 0, scale: 0.8, rotateY: 30, x: 100 }}
-                animate={{ opacity: 1, scale: 1, rotateY: -10, x: 0 }}
-                exit={{ opacity: 0, scale: 1.1, rotateY: -30, x: -100 }}
-                transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute inset-0 perspective-1000"
-              >
-                <div className="w-full h-full dark:bg-white/5 backdrop-blur-xl rounded-[3rem] border border-white/20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)] overflow-hidden">
-                  <img 
-                    src={slides[current].url} 
-                    alt="preview" 
-                    className="w-full h-full object-cover rounded-4xl]"
-                  />
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
-
-      {/* CSS For Perspective */}
-      <style jsx>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-      `}</style>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.6 }}
+      className="flex justify-center"
+    >
+      <button className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group bg-[#3C83F6] px-8 py-4 rounded-full shadow-2xl shadow-blue-500/20">
+        <PlayCircle size={24} className="text-white group-hover:rotate-12 transition-transform" />
+        WATCH NOW
+      </button>
+    </motion.div>
+  </div>
+</div>
     </div>
   );
 }
