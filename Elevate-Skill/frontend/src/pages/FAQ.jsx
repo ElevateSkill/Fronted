@@ -29,28 +29,18 @@ export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
-    <div id="faq" className="min-h-screen py-32 px-6 transition-colors duration-500 dark:bg-charcoal bg-slate-50">
-      <div className="px-4 py-12 rounded-[3rem] dark:bg-white/5 bg-white border border-slate-200 dark:border-white/10 max-w-5xl mx-auto">
+    <div id="faq" className="min-h-screen pt-32 px-6 transition-colors duration-500 dark:bg-charcoal bg-slate-50">
+      <div className="pt-12 dark:bg-white/5 bg-white border border-slate-200 dark:border-white/10 max-w-5xl mx-auto">
         
         {/* --- HEADER --- */}
         <div className="text-center mb-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#15c8fb]/10 text-[#15c8fb] text-xs font-black tracking-widest uppercase mb-6"
-          >
-            <HelpCircle size={16} /> Knowledge Base
-          </motion.div>
           <h2 className="text-5xl md:text-7xl font-black tracking-tighter dark:text-white text-slate-900 mb-6">
-            GOT <span className="text-[#17c966]">QUESTIONS?</span>
+            GOT <span className="text-[#f89f29]">QUESTIONS?</span>
           </h2>
-          <p className="text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto font-medium">
-            Everything you need to know about the platform and your learning journey.
-          </p>
         </div>
 
         {/* --- ACCORDION SECTION --- */}
-        <div className="space-y-4">
+        <div className="space-y-4 mx-4">
           {faqData.map((item, index) => (
             <motion.div
               key={index}
@@ -108,23 +98,23 @@ export default function FAQ() {
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="mt-24 p-12 rounded-[3rem] dark:bg-white/5 bg-white border border-slate-200 dark:border-white/10 text-center relative overflow-hidden group"
+          className="mt-24 p-12 dark:bg-white/5 bg-white border border-slate-200 dark:border-white/10 text-center relative overflow-hidden group"
         >
           {/* Background Decorative Glow */}
-          <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#17c966]/10 blur-[80px] rounded-full group-hover:bg-[#15c8fb]/10 transition-colors duration-700" />
+          <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#17c966]/10 blur-[80px] group-hover:bg-[#15c8fb]/10 transition-colors duration-700" />
           
           <div className="relative z-10">
             <h4 className="text-3xl font-black dark:text-white text-slate-900 mb-4 uppercase italic">
               Still have a question?
             </h4>
-            <p className="text-slate-500 dark:text-slate-400 mb-10 max-w-md mx-auto font-medium">
+            {/* <p className="text-slate-500 dark:text-slate-400 mb-10 max-w-md mx-auto font-medium">
               Our support team and community are online 24/7 to help you move forward.
-            </p>
+            </p> */}
             
             <div className="flex flex-wrap justify-center gap-4">
               <motion.button 
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 px-8 py-4 bg-[#15c8fb] text-white font-black text-xs tracking-widest rounded-2xl uppercase shadow-lg shadow-[#15c8fb]/20"
+                className="flex items-center gap-3 px-8 py-4 bg-[#f89f29] text-white font-black text-xs tracking-widest rounded-2xl uppercase shadow-lg shadow-[#15c8fb]/20"
               >
                 <MessageCircle size={18} /> Support Chat
               </motion.button>
@@ -133,14 +123,7 @@ export default function FAQ() {
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-3 px-8 py-4 dark:bg-white/10 bg-slate-100 dark:text-white text-slate-900 font-black text-xs tracking-widest rounded-2xl uppercase border border-transparent dark:hover:border-white/20 hover:border-slate-300 transition-all"
               >
-                <Discord size={18} /> Join Discord
-              </motion.button>
-
-              <motion.button 
-                whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 px-8 py-4 dark:bg-white/10 bg-slate-100 dark:text-white text-slate-900 font-black text-xs tracking-widest rounded-2xl uppercase border border-transparent dark:hover:border-white/20 hover:border-slate-300 transition-all"
-              >
-                <Github size={18} /> Documentation
+                Join Discord
               </motion.button>
             </div>
           </div>
