@@ -52,14 +52,14 @@ export default function UserDashboard() {
   const [passwordForm, setPasswordForm] = useState({ current: '', newPass: '', confirm: '' });
   const [notifications, setNotifications] = useState({ email: true, sms: false, push: true });
 
-  const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '' });
+  const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '', amount: '', comment: '' });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
 
   const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
   const handlePaymentSubmit = () => {
-    if (!paymentForm.full_name || !paymentForm.email || !paymentForm.phone) { showToast('Please fill in all fields', 'error'); return; }
+    if (!paymentForm.full_name || !paymentForm.email || !paymentForm.phone || !paymentForm.amount) { showToast('Please fill in all required fields', 'error'); return; }
     if (!uploadedFile) { showToast('Please upload payment proof', 'error'); return; }
     setPaymentSubmitted(true);
     showToast('Payment proof submitted! Pending admin approval.');
@@ -271,7 +271,18 @@ export default function UserDashboard() {
                         <input value={paymentForm.phone} onChange={e => setPaymentForm(p => ({ ...p, phone: e.target.value }))} placeholder="Phone" className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white text-xs focus:outline-none focus:border-[#f89f29]/50 placeholder:text-gray-400" />
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="relative">
+                      <span className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-wider block mb-1">Amount Paid (ETB)</span>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 dark:text-white/30">Birr</span>
+                        <input value={paymentForm.amount} onChange={e => setPaymentForm(p => ({ ...p, amount: e.target.value }))} type="number" placeholder="0.00" className="w-full pl-12 pr-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white text-xs focus:outline-none focus:border-[#f89f29]/50 placeholder:text-gray-400" />
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <span className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-wider block mb-1">Comment <span className="text-gray-500 dark:text-white/20 font-normal normal-case tracking-normal">(optional)</span></span>
+                      <textarea value={paymentForm.comment} onChange={e => setPaymentForm(p => ({ ...p, comment: e.target.value }))} rows={2} placeholder="Any additional notes..." className="w-full px-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg text-gray-900 dark:text-white text-xs focus:outline-none focus:border-[#f89f29]/50 placeholder:text-gray-400 resize-none" />
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
                       <label className="flex-1 flex items-center gap-2 px-3 py-2 border-2 border-dashed border-gray-200 dark:border-white/10 rounded-lg cursor-pointer hover:border-[#f89f29]/50 transition-all bg-gray-50 dark:bg-white/5 group">
                         <Upload size={16} className="text-gray-300 dark:text-white/20 group-hover:text-[#f89f29] transition-colors" />
                         <span className="text-xs text-gray-400 dark:text-white/40 group-hover:text-gray-600 dark:group-hover:text-white/60">{uploadedFile ? uploadedFile.name : 'Upload proof (PDF, image)'}</span>
