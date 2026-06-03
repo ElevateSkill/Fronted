@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   KeyRound, Mail, ArrowRight, 
   Github, Chrome, ShieldCheck, 
@@ -8,18 +8,64 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+const slides = [
+  {
+    url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2070",
+    title: "Airspace",
+    subtitle: "Autonomous systems & drone engineering",
+    gradient: "from-blue-600/30 via-transparent to-cyan-600/30",
+    color: "#15c8fb"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2070",
+    title: "Graphics",
+    subtitle: "Visual computing & real-time rendering",
+    gradient: "from-purple-600/30 via-transparent to-pink-600/30",
+    color: "#f89f29"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=2070",
+    title: "Web Dev",
+    subtitle: "Full-stack systems & modern architectures",
+    gradient: "from-green-600/30 via-transparent to-teal-600/30",
+    color: "#17c966"
+  },
+  {
+    url: "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?q=80&w=2070",
+    title: "IoT",
+    subtitle: "Connected devices & embedded intelligence",
+    gradient: "from-amber-600/30 via-transparent to-red-600/30",
+    color: "#f89f29"
+  }
+];
+
 export default function Login() {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrent(prev => (prev + 1) % slides.length), 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen flex transition-colors duration-500 dark:bg-[#050505] bg-[#f8fafc] text-slate-900 dark:text-zinc-100 overflow-hidden font-sans">
       
-      {/* --- LEFT PANEL: BIOMETRIC AUTH VISUAL --- */}
+      {/* --- LEFT PANEL: IMAGE SLIDER --- */}
       <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden border-r border-slate-200 dark:border-white/5">
-        <img 
-          src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070" 
-          alt="Secure Tech" 
-          className="absolute inset-0 w-full h-full object-cover grayscale opacity-20"
-        />
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#15c8fb]/10 via-transparent to-[#17c966]/10" />
+        <AnimatePresence mode="popLayout">
+          <motion.img
+            key={current}
+            src={slides[current].url}
+            alt={slides[current].title}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </AnimatePresence>
+        <div className={`absolute inset-0 bg-gradient-to-br ${slides[current].gradient} z-[1]`} />
+        <div className="absolute inset-0 bg-black/50 z-[2]" />
         
         <div className="relative z-10 p-16 flex flex-col justify-between w-full">
           <motion.div 
@@ -27,23 +73,61 @@ export default function Login() {
             animate={{ opacity: 1 }}
             className="flex items-center gap-3"
           >
-            <div className="w-10 h-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl flex items-center justify-center shadow-2xl">
-              <Terminal size={20} className="text-[#17c966]" />
+            <div className="w-10 h-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center shadow-2xl">
+              <Terminal size={20} className="text-[#15c8fb]" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] opacity-60">Auth_Protocol_v4.2</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/60">Auth_Protocol_v4.2</span>
           </motion.div>
 
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#17c966]/10 border border-[#17c966]/20 rounded-full">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur border border-white/20 rounded-full"
+            >
               <ShieldCheck size={12} className="text-[#17c966]" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-[#17c966]">Secured Session</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-white/90">Secured Session</span>
+            </motion.div>
+
+            <AnimatePresence mode="wait">
+              <motion.h2
+                key={current + "title"}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.4 }}
+                className="text-6xl font-black uppercase tracking-tighter leading-none"
+              >
+                <span className="text-white">{slides[current].title}</span>
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/70">Terminal.</span>
+              </motion.h2>
+            </AnimatePresence>
+
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={current + "sub"}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="text-base text-white/70 font-medium max-w-sm"
+              >
+                {slides[current].subtitle}. Please provide your credentials to resume your engineering progression. All sessions are encrypted via SHA-256.
+              </motion.p>
+            </AnimatePresence>
+
+            {/* Slide Dots */}
+            <div className="flex items-center gap-2">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${i === current ? 'w-8 bg-white' : 'w-1.5 bg-white/30 hover:bg-white/50'}`}
+                />
+              ))}
             </div>
-            <h2 className="text-6xl font-black uppercase tracking-tighter leading-none">
-              Access <br /> <span className="text-[#15c8fb]">Terminal.</span>
-            </h2>
-            <p className="text-lg text-slate-500 dark:text-zinc-400 font-medium max-w-sm">
-              Please provide your credentials to resume your engineering progression. All sessions are encrypted via SHA-256.
-            </p>
           </div>
 
           <div className="flex items-center gap-6">
@@ -51,7 +135,7 @@ export default function Login() {
               <Fingerprint size={32} className="text-white opacity-40 animate-pulse" />
             </div>
             <div className="space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Identity Node</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Identity Node</p>
               <p className="text-sm font-mono text-[#15c8fb]">0x82...BF92</p>
             </div>
           </div>
