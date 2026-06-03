@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, ChevronDown, Code2, Palette, BrainCircuit, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo-elevate.jpg';
+import logoSvg from '../assets/logo-elevate.svg';
+import logoJpg from '../assets/logo.jpg';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -85,12 +86,18 @@ export default function Navbar() {
       <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
         
         {/* LOGO */}
-        <Link to="/" className="relative z-[71] flex items-center gap-2 group">
-          <img 
-            src={logo} 
-            className={`h-10 sm:h-12 w-auto rounded-lg transition-all duration-500 ${isDark ? 'brightness-110 contrast-125' : 'mix-blend-multiply'}`} 
-            alt='ELEVATE' 
-          />
+        <Link to="/" className="relative z-[71] flex items-center gap-3 group">
+          <div className="relative">
+            <img 
+              src={logoJpg} 
+              className="h-10 sm:h-12 w-auto rounded-xl shadow-lg shadow-black/10 dark:shadow-white/5 object-cover" 
+              alt='ELEVATE' 
+            />
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#f89f29] rounded-full border-2 border-white dark:border-black" />
+          </div>
+          <span className="hidden sm:block text-sm font-black tracking-tight text-gray-900 dark:text-white">
+            Elevate<span className="text-[#15c8fb]">Skill</span>
+          </span>
         </Link>
 
         {/* DESKTOP NAV */}
