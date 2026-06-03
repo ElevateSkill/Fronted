@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <defs>
+    <linearGradient id="elevateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#15c8fb" />
+      <stop offset="100%" stop-color="#f89f29" />
+    </linearGradient>
+  </defs>
+  <g>
+    <rect x="4" y="10" width="40" height="40" rx="10" fill="url(#elevateGradient)" />
+    <path d="M14 38 L24 18 L34 38 M18 30 L30 30" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+    <text x="54" y="38" font-family="'Arial Black', 'Helvetica', sans-serif" font-weight="900" font-size="22" letter-spacing="2" fill="currentColor">ELEVATE</text>
+  </g>
+</svg>
