@@ -121,7 +121,7 @@ export default function Services() {
                       <img 
                         src={partner.logo} 
                         alt={`${partner.name} logo`} 
-                        className="h-auto max-h-full max-w-full object-contain filter dark:grayscale-0 dark:brightness-  transition-all group-hover:grayscale-0 group-hover:brightness-100 group-hover:invert-0 opacity-40 dark:opacity-20 group-hover:opacity-100" 
+                        className="h-auto max-h-full max-w-full object-contain filter dark:brightness-75 transition-all group-hover:brightness-100 opacity-40 dark:opacity-30 group-hover:opacity-100 drop-shadow-lg" 
                       />
                     </motion.div>
                   ))}
@@ -160,7 +160,7 @@ export default function Services() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center lg:items-end gap-5 bg-white/50 dark:bg-white/5 p-6 rounded-3xl backdrop-blur-md border border-white/20"
+            className="flex flex-col items-center lg:items-end gap-5 bg-white/50 dark:bg-white/5 p-6 rounded-3xl backdrop-blur-md border border-white/20 shadow-2xl shadow-black/5 dark:shadow-white/5"
           >
             <div className="flex justify-between">
                 <div className="flex -space-x-3">
@@ -197,10 +197,10 @@ export default function Services() {
               transition={{ delay: idx * 0.1 }}
               viewport={{ once: true, margin: "-100px" }}
               layout
-              className={`group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 border-2 ${
+               className={`group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 border-2 ${
                 activeService === service.id 
                 ? 'bg-white dark:bg-[#111] border-[#3C83F6] shadow-2xl shadow-blue-500/10' 
-                : 'bg-white/70 dark:bg-white/[0.03] border-transparent hover:border-slate-200 dark:hover:border-white/10'
+                : 'bg-white/70 dark:bg-white/[0.03] border-transparent hover:border-slate-200 dark:hover:border-white/10 shadow-xl shadow-black/5 dark:shadow-white/5'
               }`}
             >
               {/* Image Header */}

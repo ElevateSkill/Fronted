@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   Play, Volume2, Maximize, Settings, 
   CheckCircle2, Star, Quote, ExternalLink 
 } from 'lucide-react';
-
-import video_editing from '../assets/video/video_editing.mp4';
 
 const testimonials = [
   {
@@ -39,24 +37,34 @@ const testimonials = [
 
 export default function VideoSuccessStories() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] py-8 px-6 font-sans">
-      <div className="max-w-7xl mx-auto">
+    <div className="relative bg-gray-50 dark:bg-[#050505] py-16 md:py-24 px-6 overflow-hidden">
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#3C83F6]/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
         
         {/* --- SECTION HEADER --- */}
-        <div className="text-center mb-32">
+        <div className="text-center mb-16">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-3 mb-6"
+            className="flex items-center justify-center gap-3 mb-4"
           >
-            <span className="w-12 h-[2px] bg-[#f89f29]" />
-            <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-sm">Testimonials</span>
-            <span className="w-12 h-[2px] bg-[#f89f29]" />
+            <span className="h-[2px] w-12 bg-[#f89f29]" />
+            <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs">Success Stories</span>
+            <span className="h-[2px] w-12 bg-[#f89f29]" />
           </motion.div>
+          <h2 className="text-4xl sm:text-5xl font-black dark:text-white text-gray-900 tracking-tight">
+            Trusted by{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f89f29] to-[#3C83F6]">Thousands</span>
+          </h2>
+          <p className="text-gray-500 dark:text-white/40 text-sm mt-3 max-w-xl mx-auto">
+            Hear from our community of engineers and designers who transformed their careers.
+          </p>
         </div>
 
         {/* --- ZIG-ZAG LIST --- */}
-        <div className="space-y-40">
+        <div className="space-y-24 md:space-y-32">
           {testimonials.map((item, index) => (
             <motion.div 
               key={item.id}
@@ -64,7 +72,7 @@ export default function VideoSuccessStories() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.8 }}
-              className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12 lg:gap-24`}
+              className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-10 lg:gap-20`}
             >
               
               {/* --- VIDEO PART --- */}
@@ -76,10 +84,10 @@ export default function VideoSuccessStories() {
                 />
                 
                 {/* Video Frame */}
-                <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-white/10 bg-black shadow-2xl">
+                <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-black/50 shadow-2xl">
                   <iframe 
                     className="w-full h-full"
-                    src={video_editing}
+                    src={item.video}
                     title="YouTube video player"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -108,29 +116,28 @@ export default function VideoSuccessStories() {
               </div>
 
               {/* --- DESCRIPTION PART --- */}
-              <div className="w-full lg:w-1/2 space-y-8">
-                <div className="space-y-4">
-                  <h3 className="text-3xl md:text-5xl font-black text-white leading-tight">
+              <div className="w-full lg:w-1/2 space-y-6">
+                <div className="space-y-3">
+                  <h3 className="text-3xl md:text-4xl font-black dark:text-white text-gray-900 leading-tight">
                     {item.name}
                   </h3>
-                  <p className="text-[#f89f29] font-bold tracking-[0.2em] text-sm uppercase">
-                    {item.role}
+                  <p className="text-[#f89f29] font-bold tracking-[0.2em] text-xs uppercase">
+                    {item.role} · {item.company}
                   </p>
                 </div>
-                      {/* color = #2c67b6,  #f89f29, #944063, #3d208e */}
-                <p className="text-xl md:text-2xl text-white/60 leading-relaxed italic">
+                <p className="text-base md:text-lg text-gray-600 dark:text-white/60 leading-relaxed italic">
                   "{item.story}"
                 </p>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center pt-6">
+                <div className="flex items-center gap-2 pt-4">
                   <button 
-                    className="flex items-center justify-center gap-3 px-8 py-4 rounded-full font-black text-xs tracking-widest text-white transition-all hover:scale-105"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-xs tracking-widest text-white transition-all hover:brightness-110 shadow-xl"
                     style={{ backgroundColor: item.color }}
                   >
-                    FULL CASE STUDY <ExternalLink size={16} />
+                    FULL CASE STUDY <ExternalLink size={14} />
                   </button>
-                  <div className="flex items-center gap-3 px-6 text-white/40 font-bold text-xs">
-                    VERIFIED TESTIMONIAL
+                  <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-gray-200 dark:bg-white/5 text-gray-500 dark:text-white/40 font-bold text-[10px] uppercase tracking-wider border border-gray-200 dark:border-white/10">
+                    VERIFIED
                   </div>
                 </div>
               </div>
@@ -140,22 +147,21 @@ export default function VideoSuccessStories() {
         </div>
 
         {/* --- BOTTOM CTA --- */}
-        <div className="mt-40 p-12 bg-gradient-to-br from-[#3C83F6]/20 to-[#f89f29]/20 border border-white/10 text-center">
-          <h4 className="text-3xl md:text-5xl font-black text-white mb-6">Want to be our next story?</h4>
-          <p className="text-white/50 text-lg mb-10 max-w-2xl mx-auto">
-            Join 24,000+ engineers and designers who have already transformed their careers through our elite curriculum.
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-24 p-10 md:p-14 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-3xl text-center shadow-2xl shadow-black/5 dark:shadow-white/5"
+        >
+          <h4 className="text-2xl md:text-4xl font-black dark:text-white text-gray-900 mb-3">Want to be our next story?</h4>
+          <p className="text-gray-500 dark:text-white/40 text-sm mb-8 max-w-xl mx-auto">
+            Join 24,000+ engineers and designers who have already transformed their careers.
           </p>
-          <button className="px-12 py-6 bg-white text-black font-black rounded-full hover:bg-[#3C83F6] hover:text-white transition-all tracking-tighter text-lg">
-            START YOUR JOURNEY NOW
+          <button className="px-10 py-4 bg-gradient-to-r from-[#f89f29] to-[#3C83F6] text-white font-black text-xs rounded-2xl hover:brightness-110 transition-all uppercase tracking-wider shadow-2xl">
+            Start Your Journey Now
           </button>
-        </div>
+        </motion.div>
 
-      </div>
-
-      {/* Decorative Accents */}
-      <div className="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
-        <div className="absolute top-[20%] left-[-10%] w-[40%] h-[40%] bg-[#3C83F6]/10 blur-[150px] rounded-full" />
-        <div className="absolute bottom-[20%] right-[-10%] w-[40%] h-[40%] bg-[#f89f29]/10 blur-[150px] rounded-full" />
       </div>
     </div>
   );

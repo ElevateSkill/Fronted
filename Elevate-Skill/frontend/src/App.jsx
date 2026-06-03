@@ -7,8 +7,12 @@ import About from "./pages/About";
 
 // auth
 import Login from "./pages/auth/Login";
-import Register from "./pages/Login";
+import Register from "./pages/auth/Register";
 
+
+// dashboards
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import UserDashboard from "./pages/user/UserDashboard";
 
 // scroll to top on route change
 import ScrollToTop from "./components/ScrollToTop";
@@ -22,6 +26,8 @@ export default function App() {
         <Routes>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
 
           {/* Everything inside here shares the Navbar and Footer */}
           <Route path="/" element={<Layout isDark={isDark} setIsDark={setIsDark} />}>
