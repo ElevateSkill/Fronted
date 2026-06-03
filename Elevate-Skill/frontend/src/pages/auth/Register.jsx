@@ -7,6 +7,7 @@ import {
   UserPlus, ArrowRight, TriangleAlert, Sparkles, BookOpen
 } from 'lucide-react';
 import logoSvg from '../../assets/logo-elevate.svg';
+import logoJpg from '../../assets/logo.jpg';
 
 export default function Register() {
   const [form, setForm] = useState({ 
@@ -70,7 +71,8 @@ export default function Register() {
         
         <div className="relative z-10 p-16 flex flex-col justify-between w-full">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
-            <img src={logoSvg} alt="Elevate Skill" className="h-9 brightness-0 invert" />
+            <img src={logoJpg} alt="Elevate Skill" className="h-10 w-10 rounded-xl object-cover shadow-xl shadow-black/30 ring-2 ring-white/10" />
+            <span className="text-sm font-black text-white tracking-tight">Elevate<span className="text-[#15c8fb]">Skill</span></span>
           </motion.div>
 
           <div className="space-y-8">
@@ -115,7 +117,10 @@ export default function Register() {
         >
           {/* Logo */}
           <div className="flex justify-center mb-7">
-            <img src={logoSvg} alt="Elevate Skill" className="h-8 dark:brightness-0 dark:invert" />
+            <div className="flex items-center gap-3">
+              <img src={logoJpg} alt="Elevate Skill" className="h-9 w-9 rounded-lg object-cover shadow-md shadow-black/10" />
+              <span className="text-lg font-black tracking-tight text-gray-900 dark:text-white">Elevate<span className="text-[#15c8fb]">Skill</span></span>
+            </div>
           </div>
 
           <div className="text-center mb-7">
