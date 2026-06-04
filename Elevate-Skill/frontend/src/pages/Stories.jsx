@@ -4,36 +4,31 @@ import {
   Play, Volume2, Maximize, Settings, 
   CheckCircle2, Star, Quote, ExternalLink 
 } from 'lucide-react';
+import { loadData } from '../data/dataStore';
 
-const testimonials = [
+const defaultTestimonials = [
   {
-    id: "1",
-    name: "DAWIT MEKONNEN",
-    role: "Senior Fullstack Engineer",
-    company: "Addis Tech Hub",
-    video: "https://www.youtube.com/embed/aqz-KE-bpKQ", // Sample Coding/Tech Video
+    id: "1", name: "DAWIT MEKONNEN", role: "Senior Fullstack Engineer",
+    company: "Addis Tech Hub", video: "https://www.youtube.com/embed/aqz-KE-bpKQ",
     story: "The transition from finance to tech seemed impossible until I joined. The project-based approach taught me how to architect complex systems. I doubled my salary in six months.",
     color: "#3C83F6"
   },
   {
-    id: "2",
-    name: "SELAWAWIT BEKELE",
-    role: "UI/UX Lead",
-    company: "Creative Flow Agency",
-    video: "https://www.youtube.com/embed/c9Wg6A_9f4U", // Sample Design Video
+    id: "2", name: "SELAWAWIT BEKELE", role: "UI/UX Lead",
+    company: "Creative Flow Agency", video: "https://www.youtube.com/embed/c9Wg6A_9f4U",
     story: "Most courses focus on tools, but here I learned the psychology of design. The feedback from world-class mentors helped me build a portfolio that landed me a lead role.",
     color: "#f89f29"
   },
   {
-    id: "3",
-    name: "ABENEZER LEMMA",
-    role: "AI Researcher",
-    company: "Neural Systems",
-    video: "https://www.youtube.com/embed/aircAruvnKk", // Sample AI Video
+    id: "3", name: "ABENEZER LEMMA", role: "AI Researcher",
+    company: "Neural Systems", video: "https://www.youtube.com/embed/aircAruvnKk",
     story: "While others were talking about AI, we were building LLM integrations. The curriculum is consistently six months ahead of the industry standards.",
     color: "#3C83F6"
   }
 ];
+
+const stored = loadData('testimonials');
+const testimonials = stored.length ? stored : defaultTestimonials;
 
 export default function VideoSuccessStories() {
   return (

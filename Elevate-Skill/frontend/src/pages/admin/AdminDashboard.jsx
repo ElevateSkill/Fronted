@@ -16,6 +16,7 @@ import {
 import gr1 from '../../assets/gr1.jpg';
 import gr3 from '../../assets/gr3.jpg';
 import grad2 from '../../assets/grad2.jpg';
+import { loadData, saveData } from '../../data/dataStore';
 
 const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
@@ -87,6 +88,14 @@ export default function AdminDashboard() {
     localStorage.setItem('admin-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  useEffect(() => {
+    saveData('heroSlides', heroSlides);
+    saveData('courses', courses);
+    saveData('testimonials', testimonials);
+    saveData('posts', posts);
+    saveData('announcements', announcements);
+  }, [heroSlides, courses, testimonials, posts, announcements]);
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mediaOpen, setMediaOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -101,13 +110,13 @@ export default function AdminDashboard() {
 
   const [registrations, setRegistrations] = useState(initialRegistrations);
   const [users, setUsers] = useState(initialUsers);
-  const [courses, setCourses] = useState(initialCourses);
-  const [posts, setPosts] = useState(initialPosts);
-  const [testimonials, setTestimonials] = useState(initialTestimonials);
+  const [courses, setCourses] = useState(() => loadData('courses'));
+  const [posts, setPosts] = useState(() => loadData('posts'));
+  const [testimonials, setTestimonials] = useState(() => loadData('testimonials'));
   const [photos, setPhotos] = useState(initialPhotos);
   const [galleryAlbums, setGalleryAlbums] = useState(initialGalleryAlbums);
-  const [announcements, setAnnouncements] = useState(initialAnnouncements);
-  const [heroSlides, setHeroSlides] = useState(initialHeroSlides);
+  const [announcements, setAnnouncements] = useState(() => loadData('announcements'));
+  const [heroSlides, setHeroSlides] = useState(() => loadData('heroSlides').length ? loadData('heroSlides') : initialHeroSlides);
 
   const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
   const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', price: '', status: 'Active' });

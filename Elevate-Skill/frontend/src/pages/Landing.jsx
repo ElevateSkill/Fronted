@@ -6,53 +6,58 @@ import heroMain from '../assets/elevat.jpg';
 import slide1 from '../assets/gr1.jpg';
 import slide2 from '../assets/gr3.jpg';
 import slide3 from '../assets/grad2.jpg';
+import { loadData } from '../data/dataStore';
 
-const slides = [
-  {
-    url: heroMain,
-    title: "ELEVATE",
-    highlight: "YOUR SKILL",
-    amharicTitle: "ክህሎትህን ከፍ አድርግ",
-    subtitle: "Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.",
-    cta: "GET STARTED",
-    ctaIcon: <Sparkles size={20} />,
-    color: "#15c8fb",
-    gradient: "from-cyan-600/30 via-transparent to-orange-600/30"
-  },
-  {
-    url: slide1,
-    title: "YOUR",
-    highlight: "JOURNEY",
-    amharicTitle: "የወደፊት ጉዞ",
-    subtitle: "From beginner to senior architect. Structured paths that adapt to your pace and goals.",
-    cta: "EXPLORE PATHS",
-    ctaIcon: <ArrowRight size={20} />,
-    color: "#f89f29",
-    gradient: "from-amber-600/30 via-transparent to-red-600/30"
-  },
-  {
-    url: slide2,
-    title: "MASTER",
-    highlight: "CRAFT",
-    amharicTitle: "ጥበቡን ይለማመዱ",
-    subtitle: "Industry-driven curriculum with real mentors. Code, design, deploy — master the full stack.",
-    cta: "WATCH NOW",
-    ctaIcon: <PlayCircle size={20} />,
-    color: "#17c966",
-    gradient: "from-green-600/30 via-transparent to-teal-600/30"
-  },
-  {
-    url: slide3,
-    title: "BUILD",
-    highlight: "FUTURE",
-    amharicTitle: "የወደፊቱን ይገንቡ",
-    subtitle: "Real-world projects, expert mentorship, and a community that pushes you forward.",
-    cta: "JOIN NOW",
-    ctaIcon: <ArrowRight size={20} />,
-    color: "#8b5cf6",
-    gradient: "from-violet-600/30 via-transparent to-pink-600/30"
+const localImages = { heroMain, slide1, slide2, slide3 };
+
+function buildSlides() {
+  const stored = loadData('heroSlides');
+  if (stored && stored.length > 0) {
+    return stored.map((s, i) => ({
+      url: s.image?.startsWith('data:') || s.image?.startsWith('http') ? s.image : localImages[`slide${(i % 3) + 1}`] || heroMain,
+      title: s.title || 'ELEVATE',
+      highlight: s.highlight || 'YOUR SKILL',
+      amharicTitle: s.amharicTitle || '',
+      subtitle: s.subtitle || '',
+      cta: s.cta || 'GET STARTED',
+      ctaIcon: <Sparkles size={20} />,
+      color: s.color || '#15c8fb',
+      gradient: 'from-cyan-600/30 via-transparent to-orange-600/30'
+    }));
   }
-];
+  return [
+    {
+      url: heroMain, title: "ELEVATE", highlight: "YOUR SKILL",
+      amharicTitle: "ክህሎትህን ከፍ አድርግ",
+      subtitle: "Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.",
+      cta: "GET STARTED", ctaIcon: <Sparkles size={20} />, color: "#15c8fb",
+      gradient: "from-cyan-600/30 via-transparent to-orange-600/30"
+    },
+    {
+      url: slide1, title: "YOUR", highlight: "JOURNEY",
+      amharicTitle: "የወደፊት ጉዞ",
+      subtitle: "From beginner to senior architect. Structured paths that adapt to your pace and goals.",
+      cta: "EXPLORE PATHS", ctaIcon: <ArrowRight size={20} />, color: "#f89f29",
+      gradient: "from-amber-600/30 via-transparent to-red-600/30"
+    },
+    {
+      url: slide2, title: "MASTER", highlight: "CRAFT",
+      amharicTitle: "ጥበቡን ይለማመዱ",
+      subtitle: "Industry-driven curriculum with real mentors. Code, design, deploy — master the full stack.",
+      cta: "WATCH NOW", ctaIcon: <PlayCircle size={20} />, color: "#17c966",
+      gradient: "from-green-600/30 via-transparent to-teal-600/30"
+    },
+    {
+      url: slide3, title: "BUILD", highlight: "FUTURE",
+      amharicTitle: "የወደፊቱን ይገንቡ",
+      subtitle: "Real-world projects, expert mentorship, and a community that pushes you forward.",
+      cta: "JOIN NOW", ctaIcon: <ArrowRight size={20} />, color: "#8b5cf6",
+      gradient: "from-violet-600/30 via-transparent to-pink-600/30"
+    }
+  ];
+}
+
+const slides = buildSlides();
 
 export default function Landing() {
   const [current, setCurrent] = useState(0);

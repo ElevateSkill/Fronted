@@ -1,61 +1,37 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Code2, Palette, BrainCircuit, Rocket, Users, Clock, Star, ArrowRight, ChevronRight } from 'lucide-react';
+import { loadData } from '../data/dataStore';
 
-const courses = [
+const defaultCourses = [
   {
-    title: 'Full-Stack Web Development',
-    category: 'Development',
+    title: 'Full-Stack Web Development', category: 'Development',
     desc: 'Master React, Node.js, and scalable architectures. Build production-ready applications from scratch.',
-    icon: <Code2 size={28} />,
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
-    students: 1245,
-    duration: '16 weeks',
-    lessons: 48,
-    level: 'Beginner to Advanced',
-    color: '#3C83F6',
-    price: '500 ETB'
+    icon: <Code2 size={28} />, image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
+    students: 1245, duration: '16 weeks', lessons: 48, level: 'Beginner to Advanced', color: '#3C83F6', price: '500 ETB'
   },
   {
-    title: 'UI/UX Design Mastery',
-    category: 'Design',
+    title: 'UI/UX Design Mastery', category: 'Design',
     desc: 'Prototyping, user-centric systems, and design thinking. Create interfaces that users love.',
-    icon: <Palette size={28} />,
-    image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600',
-    students: 989,
-    duration: '12 weeks',
-    lessons: 36,
-    level: 'All Levels',
-    color: '#f89f29',
-    price: '450 ETB'
+    icon: <Palette size={28} />, image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600',
+    students: 989, duration: '12 weeks', lessons: 36, level: 'All Levels', color: '#f89f29', price: '450 ETB'
   },
   {
-    title: 'AI & Machine Learning',
-    category: 'AI',
+    title: 'AI & Machine Learning', category: 'AI',
     desc: 'LLMs, Neural Networks, and practical AI. Build real-world intelligent systems.',
-    icon: <BrainCircuit size={28} />,
-    image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600',
-    students: 1312,
-    duration: '20 weeks',
-    lessons: 52,
-    level: 'Intermediate',
-    color: '#17c966',
-    price: '600 ETB'
+    icon: <BrainCircuit size={28} />, image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600',
+    students: 1312, duration: '20 weeks', lessons: 52, level: 'Intermediate', color: '#17c966', price: '600 ETB'
   },
   {
-    title: 'Cloud & DevOps Engineering',
-    category: 'Infrastructure',
+    title: 'Cloud & DevOps Engineering', category: 'Infrastructure',
     desc: 'Docker, Kubernetes, AWS, and CI/CD pipelines. Deploy and scale applications with confidence.',
-    icon: <Rocket size={28} />,
-    image: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=600',
-    students: 756,
-    duration: '14 weeks',
-    lessons: 40,
-    level: 'Intermediate',
-    color: '#15c8fb',
-    price: '550 ETB'
+    icon: <Rocket size={28} />, image: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=600',
+    students: 756, duration: '14 weeks', lessons: 40, level: 'Intermediate', color: '#15c8fb', price: '550 ETB'
   }
 ];
+
+const stored = loadData('courses');
+const courses = stored.length ? stored : defaultCourses;
 
 export default function Courses() {
   return (
