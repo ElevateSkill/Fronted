@@ -11,11 +11,15 @@ import {
   AlertTriangle, Info, RefreshCw, CheckCheck, Ban,
   Maximize2, Grid, List, Heart, Share2, Play,
   UserCheck, UserX, UserCog, Shield, Award,
-  ChevronLeft, ChevronRight as ChevronRightIcon, SlidersHorizontal, Zap
+  ChevronLeft, ChevronRight as ChevronRightIcon, SlidersHorizontal, Zap, EyeOff
 } from 'lucide-react';
+import gr1 from '../../assets/gr1.jpg';
+import gr3 from '../../assets/gr3.jpg';
+import grad2 from '../../assets/grad2.jpg';
 
 const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
+  { id: 'hero', label: 'Hero Slides', icon: <SlidersHorizontal size={20} /> },
   { id: 'registrations', label: 'Registrations', icon: <UserPlus size={20} /> },
   { id: 'users', label: 'Users', icon: <Users size={20} /> },
   { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
@@ -70,6 +74,12 @@ const initialGalleryAlbums = [
 ];
 const initialAnnouncements = [];
 
+const initialHeroSlides = [
+  { id: genId(), image: gr1, title: 'ELEVATE', highlight: 'SKILL', subtitle: 'Project-based learning platform designed for the modern engineer.', cta: 'GET STARTED', color: '#3C83F6', active: true },
+  { id: genId(), image: gr3, title: 'YOUR', highlight: 'JOURNEY', subtitle: 'From beginner to senior architect. Structured paths that adapt to your pace and goals.', cta: 'EXPLORE PATHS', color: '#f89f29', active: true },
+  { id: genId(), image: grad2, title: 'MASTER', highlight: 'CRAFT', subtitle: 'Industry-driven curriculum with real mentors. Code, design, deploy — master the full stack.', cta: 'WATCH NOW', color: '#17c966', active: true },
+];
+
 export default function AdminDashboard() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem('admin-theme') !== 'light');
   useEffect(() => {
@@ -97,6 +107,7 @@ export default function AdminDashboard() {
   const [photos, setPhotos] = useState(initialPhotos);
   const [galleryAlbums, setGalleryAlbums] = useState(initialGalleryAlbums);
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
+  const [heroSlides, setHeroSlides] = useState(initialHeroSlides);
 
   const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
   const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', price: '', status: 'Active' });
@@ -555,6 +566,54 @@ export default function AdminDashboard() {
           </div>
         );
 
+      case 'hero':
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-1">Hero Slides</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-medium">{heroSlides.length} slides · Manage your landing page hero slider</p>
+              </div>
+              <button onClick={() => { setEditItem({ image: '', title: '', highlight: '', subtitle: '', cta: 'GET STARTED', color: '#3C83F6', active: true }); setShowModal('hero'); }} className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#f89f29] to-[#3C83F6] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Slide</button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {heroSlides.map((slide, i) => (
+                <motion.div key={slide.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 overflow-hidden hover:border-[#15c8fb]/30 transition-all group">
+                  <div className="flex flex-col md:flex-row">
+                    <div className="md:w-72 h-48 md:h-auto relative shrink-0">
+                      <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+                      <div className="absolute top-3 left-3">
+                        <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${slide.active ? 'bg-green-500 text-white' : 'bg-gray-500 text-white'}`}>{slide.active ? 'Active' : 'Inactive'}</span>
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+                    </div>
+                    <div className="flex-1 p-5 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs text-gray-400 dark:text-white/30 font-bold">Slide {i + 1}</span>
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: slide.color }} />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{slide.title} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f89f29] to-[#3C83F6]">{slide.highlight}</span></h3>
+                        <p className="text-sm text-gray-500 dark:text-white/40 mb-3">{slide.subtitle}</p>
+                        <div className="flex items-center gap-4 text-xs">
+                          <span className="px-3 py-1 rounded-lg bg-gray-200 dark:bg-white/10 text-gray-600 dark:text-white/60 font-bold">{slide.cta}</span>
+                          <span className="flex items-center gap-1 text-gray-400 dark:text-white/30"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: slide.color }} /> Color: {slide.color}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-white/5">
+                        <button onClick={() => { setEditItem(slide); setShowModal('hero'); }} className="p-2 rounded-lg bg-blue-100 dark:bg-[#15c8fb]/10 text-[#15c8fb] hover:bg-blue-200 dark:hover:bg-[#15c8fb]/20 transition-all"><Edit3 size={14} /></button>
+                        <button onClick={() => { setHeroSlides(prev => prev.map(s => s.id === slide.id ? { ...s, active: !s.active } : s)); showToast(`Slide ${slide.active ? 'deactivated' : 'activated'}`); }} className="p-2 rounded-lg bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-500/20 transition-all">{slide.active ? <EyeOff size={14} /> : <Eye size={14} />}</button>
+                        <button onClick={() => { setSelectedItem({ type: 'hero', id: slide.id }); setShowModal('delete'); }} className="p-2 rounded-lg bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 transition-all"><Trash2 size={14} /></button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        );
+
       default: return null;
     }
   };
@@ -570,6 +629,7 @@ export default function AdminDashboard() {
           if (type === 'post') setPosts(prev => prev.filter(p => p.id !== id));
           if (type === 'testimonial') setTestimonials(prev => prev.filter(t => t.id !== id));
           if (type === 'gallery') setGalleryAlbums(prev => prev.filter(a => a.id !== id));
+          if (type === 'hero') setHeroSlides(prev => prev.filter(s => s.id !== id));
           showToast('Item deleted');
           setShowModal(null); setSelectedItem(null);
         }} onCancel={() => { setShowModal(null); setSelectedItem(null); }} />
@@ -683,6 +743,31 @@ export default function AdminDashboard() {
                 else { setUsers(prev => [...prev, { id: genId(), ...editItem, joined: new Date().toISOString().split('T')[0], courses: 0 }]); showToast('User added'); }
                 setShowModal(null); setEditItem(null);
               }} className="px-6 py-3 bg-[#15c8fb] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {showModal === 'hero' && (
+        <Modal title={editItem?.id ? 'Edit Hero Slide' : 'New Hero Slide'} onClose={() => setShowModal(null)}>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Title" value={editItem?.title || ''} onChange={e => setEditItem(p => ({ ...p, title: e.target.value }))} placeholder="ELEVATE" />
+              <Input label="Highlight Word" value={editItem?.highlight || ''} onChange={e => setEditItem(p => ({ ...p, highlight: e.target.value }))} placeholder="SKILL" />
+            </div>
+            <Input label="Image URL" value={editItem?.image || ''} onChange={e => setEditItem(p => ({ ...p, image: e.target.value }))} placeholder="https://... or imported image" />
+            <TextArea label="Subtitle" rows={2} value={editItem?.subtitle || ''} onChange={e => setEditItem(p => ({ ...p, subtitle: e.target.value }))} placeholder="Subtitle text..." />
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="CTA Text" value={editItem?.cta || ''} onChange={e => setEditItem(p => ({ ...p, cta: e.target.value }))} placeholder="GET STARTED" />
+              <Input label="Accent Color" value={editItem?.color || '#3C83F6'} onChange={e => setEditItem(p => ({ ...p, color: e.target.value }))} placeholder="#3C83F6" />
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-500 dark:text-white/60 font-bold text-xs hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
+              <button onClick={() => {
+                if (editItem?.id) { setHeroSlides(prev => prev.map(s => s.id === editItem.id ? { ...s, ...editItem } : s)); showToast('Hero slide updated'); }
+                else { setHeroSlides(prev => [...prev, { id: genId(), ...editItem, active: true }]); showToast('Hero slide added'); }
+                setShowModal(null); setEditItem(null);
+              }} className="px-6 py-3 bg-gradient-to-r from-[#f89f29] to-[#3C83F6] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
             </div>
           </div>
         </Modal>

@@ -2,10 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, PlayCircle, ChevronLeft, ChevronRight, Mouse } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import slide1 from '../assets/gr1.jpg';
+import slide2 from '../assets/gr3.jpg';
+import slide3 from '../assets/grad2.jpg';
 
 const slides = [
   {
-    url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070",
+    url: slide1,
     title: "ELEVATE",
     highlight: "SKILL",
     amharicTitle: "የወደፊት ትምህርት",
@@ -16,7 +19,7 @@ const slides = [
     gradient: "from-blue-600/30 via-transparent to-purple-600/30"
   },
   {
-    url: "https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070",
+    url: slide2,
     title: "YOUR",
     highlight: "JOURNEY",
     amharicTitle: "የወደፊት ጉዞ",
@@ -27,7 +30,7 @@ const slides = [
     gradient: "from-amber-600/30 via-transparent to-red-600/30"
   },
   {
-    url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2071",
+    url: slide3,
     title: "MASTER",
     highlight: "CRAFT",
     amharicTitle: "ጥበቡን ይለማመዱ",
