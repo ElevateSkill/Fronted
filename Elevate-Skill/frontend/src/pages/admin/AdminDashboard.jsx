@@ -88,14 +88,6 @@ export default function AdminDashboard() {
     localStorage.setItem('admin-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  useEffect(() => {
-    saveData('heroSlides', heroSlides);
-    saveData('courses', courses);
-    saveData('testimonials', testimonials);
-    saveData('posts', posts);
-    saveData('announcements', announcements);
-  }, [heroSlides, courses, testimonials, posts, announcements]);
-
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mediaOpen, setMediaOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -117,6 +109,14 @@ export default function AdminDashboard() {
   const [galleryAlbums, setGalleryAlbums] = useState(initialGalleryAlbums);
   const [announcements, setAnnouncements] = useState(() => loadData('announcements'));
   const [heroSlides, setHeroSlides] = useState(() => loadData('heroSlides').length ? loadData('heroSlides') : initialHeroSlides);
+
+  useEffect(() => {
+    saveData('heroSlides', heroSlides);
+    saveData('courses', courses);
+    saveData('testimonials', testimonials);
+    saveData('posts', posts);
+    saveData('announcements', announcements);
+  }, [heroSlides, courses, testimonials, posts, announcements]);
 
   const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
   const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', price: '', status: 'Active' });
