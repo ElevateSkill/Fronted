@@ -24,8 +24,13 @@ class UserService:
         """
         Business logic for updating user profile.
         """
+        password = kwargs.pop("password", None)
+        if password is not None:
+            user.set_password(password)
+            
         for field, value in kwargs.items():
             if hasattr(user, field) and value is not None:
                 setattr(user, field, value)
         user.save()
         return user
+

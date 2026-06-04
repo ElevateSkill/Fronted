@@ -64,9 +64,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=6, required=False)
+
     class Meta:
         model = User
-        fields = ("full_name", "email", "phone_number")
+        fields = ("full_name", "email", "phone_number", "password")
         extra_kwargs = {
             "email": {"required": False},
             "full_name": {"required": False},
@@ -81,6 +83,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         return UserService.update_profile(instance, **validated_data)
+
 
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField(help_text="The refresh token to be blacklisted.")

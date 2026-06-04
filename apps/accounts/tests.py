@@ -154,6 +154,23 @@ class AccountsTests(APITestCase):
         self.assertEqual(user.full_name, "Updated Name")
         self.assertEqual(user.phone_number, "0987654321")
 
+    def test_profile_update_password(self):
+        """Test updating user password through profile update endpoint."""
+        user = User.objects.create_user(**self.user_data)
+        refresh = RefreshToken.for_user(user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+        
+        update_payload = {
+            "password": "newpassword123"
+        }
+        response = self.client.put(self.profile_url, update_payload)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        # Verify db changes (password should be hashed and updated)
+        user.refresh_from_db()
+        self.assertTrue(user.check_password("newpassword123"))
+
+
     def test_unauthenticated_profile_access(self):
         """Test unauthenticated requests are blocked from profile."""
         response = self.client.get(self.profile_url)
