@@ -2,24 +2,25 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, PlayCircle, ChevronLeft, ChevronRight, Mouse } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import heroMain from '../assets/elevat.jpg';
 import slide1 from '../assets/gr1.jpg';
 import slide2 from '../assets/gr3.jpg';
 import slide3 from '../assets/grad2.jpg';
 
 const slides = [
   {
-    url: slide1,
+    url: heroMain,
     title: "ELEVATE",
-    highlight: "SKILL",
-    amharicTitle: "የወደፊት ትምህርት",
+    highlight: "YOUR SKILL",
+    amharicTitle: "ክህሎትህን ከፍ አድርግ",
     subtitle: "Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.",
     cta: "GET STARTED",
     ctaIcon: <Sparkles size={20} />,
-    color: "#3C83F6",
-    gradient: "from-blue-600/30 via-transparent to-purple-600/30"
+    color: "#15c8fb",
+    gradient: "from-cyan-600/30 via-transparent to-orange-600/30"
   },
   {
-    url: slide2,
+    url: slide1,
     title: "YOUR",
     highlight: "JOURNEY",
     amharicTitle: "የወደፊት ጉዞ",
@@ -30,7 +31,7 @@ const slides = [
     gradient: "from-amber-600/30 via-transparent to-red-600/30"
   },
   {
-    url: slide3,
+    url: slide2,
     title: "MASTER",
     highlight: "CRAFT",
     amharicTitle: "ጥበቡን ይለማመዱ",
@@ -39,6 +40,17 @@ const slides = [
     ctaIcon: <PlayCircle size={20} />,
     color: "#17c966",
     gradient: "from-green-600/30 via-transparent to-teal-600/30"
+  },
+  {
+    url: slide3,
+    title: "BUILD",
+    highlight: "FUTURE",
+    amharicTitle: "የወደፊቱን ይገንቡ",
+    subtitle: "Real-world projects, expert mentorship, and a community that pushes you forward.",
+    cta: "JOIN NOW",
+    ctaIcon: <ArrowRight size={20} />,
+    color: "#8b5cf6",
+    gradient: "from-violet-600/30 via-transparent to-pink-600/30"
   }
 ];
 

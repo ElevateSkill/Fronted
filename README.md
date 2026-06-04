@@ -1,11 +1,6 @@
 <div align="center">
   <img src="./Elevate-Skill/frontend/src/assets/logo.jpg" alt="Elevate Skill Logo" style="max-width: 100%; height: auto; width: 280px;" />
   <br/><br/>
-  <picture>
-    <source media="(min-width: 768px)" srcset="./Elevate-Skill/frontend/src/assets/elevat.jpg">
-    <img src="./Elevate-Skill/frontend/src/assets/elevat.jpg" alt="Elevate Skill Platform" style="width: 100%; max-width: 900px; height: auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);" />
-  </picture>
-  <br/><br/>
   <p>
     <strong>Project-based learning platform for the modern engineer.</strong><br/>
     Build real systems, not just tutorials.
