@@ -24,6 +24,10 @@ Summary of available endpoints (by area):
     - `GET|POST /api/v1/admin/categories/` — list/create categories
     - `GET|PUT|PATCH|DELETE /api/v1/admin/categories/{id}/` — category detail
 
+- Enrollments (requires JWT)
+  - `POST /api/v1/enrollments/` — enroll student in a course (default: pending status)
+  - `GET /api/v1/my-enrollments/` — list student's own enrollments
+
 - API Schema & Docs (project-level)
   - `GET /api/v1/schema/` — OpenAPI schema (JSON)
   - `GET /api/v1/schema/swagger-ui/` — Swagger UI
@@ -159,6 +163,74 @@ Detailed endpoint descriptions, request/response examples and behaviour
 - Admin: `GET|POST /api/v1/admin/categories/`, `GET|PUT|PATCH|DELETE /api/v1/admin/categories/{id}/`
 - Category object: `{ id, name, slug, created_at }`
 - Behaviour: deleting a category sets `course.category` to NULL (DB `SET NULL`).
+
+---
+
+## Enrollments
+
+### Enroll in Course
+
+- Method: POST
+- URL: `/api/v1/enrollments/`
+- Auth: Bearer access token (IsAuthenticated)
+- Body (example):
+
+```json
+{
+  "course": 1
+}
+```
+
+- Response 201 Created (example):
+
+```json
+{
+  "id": 1,
+  "student": {
+    "id": 2,
+    "username": "student1",
+    "email": "student1@test.com",
+    "role": "student",
+    "full_name": "Student One"
+  },
+  "course": {
+    "id": 1,
+    "title": "Published Python",
+    "slug": "published-python",
+    "short_description": "Short desc",
+    "thumbnail": null,
+    "category": {
+      "id": 1,
+      "name": "Programming",
+      "slug": "programming",
+      "created_at": "2026-06-05T08:44:44Z"
+    },
+    "price": "49.99",
+    "instructor": "",
+    "lessons": null,
+    "duration": "",
+    "is_active": true,
+    "is_published": true
+  },
+  "status": "pending",
+  "created_at": "2026-06-05T08:44:44Z",
+  "updated_at": "2026-06-05T08:44:44Z"
+}
+```
+
+- Notes:
+  - Default status is `pending`.
+  - Duplicate enrollment (same student + course) is blocked and returns 400 Bad Request.
+  - Cannot enroll in inactive or unpublished courses (returns 400 Bad Request).
+  - Attempting to enroll in a non-existent course returns 404 Not Found.
+
+### List My Enrollments
+
+- Method: GET
+- URL: `/api/v1/my-enrollments/`
+- Auth: Bearer access token (IsAuthenticated)
+- Response 200 OK: array of enrollment objects (EnrollmentSerializer)
+- Behaviour: returns only the authenticated student's own records.
 
 ---
 
