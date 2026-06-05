@@ -98,13 +98,9 @@ export default function Navbar() {
             <img 
               src={logoJpg} 
               className="h-10 sm:h-12 w-auto rounded-xl shadow-lg shadow-black/10 dark:shadow-white/5 object-cover" 
-              alt='ELEVATE' 
+              alt='ELEVATE'
             />
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#f89f29] rounded-full border-2 border-white dark:border-black" />
           </div>
-          <span className="hidden sm:block text-sm font-black tracking-tight text-gray-900 dark:text-white">
-            Elevate<span className="text-[#15c8fb]">Skill</span>
-          </span>
         </Link>
 
         {/* DESKTOP NAV */}
@@ -125,14 +121,14 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-4 border-l dark:border-white/10 border-slate-200 pl-6">
-            <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-[#15c8fb] hover:scale-110 transition-transform">
+            {/* <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-[#15c8fb] hover:scale-110 transition-transform">
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+            </button> */}
             {user ? (
               <div className="flex items-center gap-3">
                 <Link 
                   to={user.role === 'admin' ? '/admin' : '/dashboard'}
-                  className="flex items-center gap-2 px-4 py-2 bg-[#15c8fb]/10 text-[#15c8fb] font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase"
+                  className="flex items-center gap-2 px-4 py-2 bg-cyan/10 text-cyan font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase"
                 >
                   {user.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
                   {user.full_name || user.username}
@@ -146,9 +142,9 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                <Link to="/login" className="px-5 py-2 border border-[#15c8fb]/30 text-[#15c8fb] font-black text-[10px] tracking-widest rounded-md hover:bg-[#15c8fb]/10 transition-all uppercase">
+                {/* <Link to="/login" className="px-5 py-2 border border-[#15c8fb]/30 text-[#15c8fb] font-black text-[10px] tracking-widest rounded-md hover:bg-[#15c8fb]/10 transition-all uppercase">
                   Login
-                </Link>
+                </Link> */}
                 <Link to="/register" className="px-5 py-2 bg-[#f89f29] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase">
                   Portal
                 </Link>
@@ -159,9 +155,9 @@ export default function Navbar() {
 
         {/* MOBILE CONTROLS */}
         <div className="lg:hidden flex items-center gap-3">
-          <button onClick={toggleTheme} className="p-2 rounded-lg dark:text-[#15c8fb] text-slate-600 bg-slate-100 dark:bg-white/5">
+          {/* <button onClick={toggleTheme} className="p-2 rounded-lg dark:text-[#15c8fb] text-slate-600 bg-slate-100 dark:bg-white/5">
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
+          </button> */}
           <button onClick={() => setMobileMenu(!mobileMenu)} className="p-2 rounded-lg dark:text-white text-slate-900 bg-slate-100 dark:bg-white/5 relative z-[71]">
             {mobileMenu ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -225,19 +221,19 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link 
+                  {/* <Link 
                     to="/login" 
                     onClick={() => setMobileMenu(false)}
                     className="mt-4 w-full py-4 border border-[#15c8fb]/30 text-[#15c8fb] text-center font-black rounded-lg uppercase tracking-widest"
                   >
                     Login
-                  </Link>
+                  </Link> */}
                   <Link 
                     to="/register" 
                     onClick={() => setMobileMenu(false)}
                     className="w-full py-4 bg-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
                   >
-                    Access Portal
+                    Portal
                   </Link>
                 </>
               )}
