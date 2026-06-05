@@ -28,6 +28,15 @@ Summary of available endpoints (by area):
   - `POST /api/v1/enrollments/` — enroll student in a course (default: pending status)
   - `GET /api/v1/my-enrollments/` — list student's own enrollments
 
+- Payments (requires JWT)
+  - Student
+    - `POST /api/v1/payments/` — submit payment proof for a pending enrollment
+    - `GET /api/v1/payments/` — list authenticated student's payments
+  - Admin (requires JWT + user.role == 'admin')
+    - `GET /api/v1/admin/payments/` — list all payments
+    - `PUT /api/v1/admin/payments/{id}/approve/` — approve a pending payment and activate its enrollment
+    - `PUT /api/v1/admin/payments/{id}/reject/` — reject a pending payment and cancel its enrollment
+
 - API Schema & Docs (project-level)
   - `GET /api/v1/schema/` — OpenAPI schema (JSON)
   - `GET /api/v1/schema/swagger-ui/` — Swagger UI
@@ -234,6 +243,69 @@ Detailed endpoint descriptions, request/response examples and behaviour
 
 ---
 
+## Payments
+
+### Submit Payment Proof
+
+- Method: POST
+- URL: `/api/v1/payments/`
+- Auth: Bearer access token (student role required)
+- Content type: `multipart/form-data`
+- Body fields:
+
+```text
+enrollment_id: 1
+full_name: Student One
+email: student1@example.com
+phone: 1234567890
+proof_file: <file>
+```
+
+- Accepted proof file types: PDF, JPG, PNG
+- Maximum proof file size: 5MB
+- Response 201 Created: payment object with `status=pending`
+- Notes:
+  - The enrollment must exist, belong to the authenticated student, and still be `pending`.
+  - Payments are always created with `status=pending`.
+
+### List My Payments
+
+- Method: GET
+- URL: `/api/v1/payments/`
+- Auth: Bearer access token (student role required)
+- Response 200 OK: array of payment objects for the authenticated student only
+
+### Admin List Payments
+
+- Method: GET
+- URL: `/api/v1/admin/payments/`
+- Auth: Bearer access token (admin role required)
+- Response 200 OK: array of all payment objects
+
+### Approve Payment
+
+- Method: PUT
+- URL: `/api/v1/admin/payments/{id}/approve/`
+- Auth: Bearer access token (admin role required)
+- Behaviour:
+  - Only `pending` payments can be approved.
+  - Payment becomes `approved`.
+  - Linked enrollment becomes `active` through `EnrollmentService.update_enrollment_status(...)`.
+- Response 200 OK: updated payment object
+
+### Reject Payment
+
+- Method: PUT
+- URL: `/api/v1/admin/payments/{id}/reject/`
+- Auth: Bearer access token (admin role required)
+- Behaviour:
+  - Only `pending` payments can be rejected.
+  - Payment becomes `rejected`.
+  - Linked enrollment becomes `cancelled` through `EnrollmentService.update_enrollment_status(...)`.
+- Response 200 OK: updated payment object
+
+---
+
 ## Errors and Status Codes
 
 - 200 OK — successful GET/PUT/PATCH
@@ -243,6 +315,7 @@ Detailed endpoint descriptions, request/response examples and behaviour
 - 401 Unauthorized — missing/invalid token for protected endpoints
 - 403 Forbidden — authenticated but lacking admin role
 - 404 Not Found — missing resource or course not public
+- 413 Payload Too Large — may occur at the server/proxy layer for oversized uploads
 
 ---
 
@@ -251,3 +324,4 @@ Detailed endpoint descriptions, request/response examples and behaviour
 - All admin endpoints require the user model's `role` to equal the string `admin`.
 - Slugs are auto-generated; clients must not provide `slug` fields when creating/updating.
 - Use `category__slug` filter to provide human-readable category filtering.
+- Payment proof uploads are handled with multipart form requests and stored under `media/payments/proofs/` in development.
