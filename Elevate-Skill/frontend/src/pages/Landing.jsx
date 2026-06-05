@@ -152,14 +152,14 @@ export default function Landing() {
               </span>
             </h1>
 
-            <motion.p
+            {/* <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
               className="max-w-2xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-5 text-white/90 drop-shadow-lg [text-shadow:0_2px_20px_rgba(0,0,0,0.5)]"
             >
               {slide.subtitle}
-            </motion.p>
+            </motion.p> */}
 
             <motion.p
               initial={{ opacity: 0 }}
@@ -192,7 +192,7 @@ export default function Landing() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
+      {/* <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -220,11 +220,11 @@ export default function Landing() {
         >
           <ChevronRight size={20} />
         </motion.button>
-      </div>
+      </div> */}
 
-      <div className="absolute bottom-8 right-8 z-20 text-xs font-bold text-white/60 tracking-widest drop-shadow-lg">
+      {/* <div className="absolute bottom-8 right-8 z-20 text-xs font-bold text-white/60 tracking-widest drop-shadow-lg">
         {String(current + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
-      </div>
+      </div> */}
 
       <motion.div
         initial={{ opacity: 0 }}
@@ -233,13 +233,13 @@ export default function Landing() {
         className="absolute left-1/2 -translate-x-1/2 z-20"
         style={{ bottom: 'calc(12rem)' }}
       >
-        <motion.div
+        {/* <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
           className="text-white/60 drop-shadow-lg"
         >
           <Mouse size={20} />
-        </motion.div>
+        </motion.div> */}
       </motion.div>
     </div>
   );
