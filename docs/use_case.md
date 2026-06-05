@@ -40,8 +40,8 @@ Auth rules:
 
 3) Public Consumption (discover & enroll flow)
 
-- Actors: Public users
-- Purpose: discover courses, view details, and begin enrollment (enrollment endpoints are not yet in this MVP — placeholder).
+- Actors: Public users / Students
+- Purpose: discover courses, view details, and enroll.
 
 Discovery Flow:
 1. List: `GET /api/v1/courses/` to browse published & active courses
@@ -49,9 +49,12 @@ Discovery Flow:
    - Search: `?search=django`
 2. Detail: `GET /api/v1/courses/{id}/` — shows full course content
 
-Enrollment (future)
-- Expected flow: POST to `/api/v1/courses/{id}/enroll/` or `/api/v1/enrollments/` with JWT for authenticated students.
-- Auth rules: Enrollment requires authenticated student role; admin should not be the primary enrolling actor.
+Enrollment Flow:
+1. Authenticate: Student obtains JWT via `POST /api/v1/auth/login/` or registration.
+2. Enroll: Student calls `POST /api/v1/enrollments/` with `{ "course": <course_id> }` to create an enrollment.
+   - Outcome: 201 Created with initial `pending` status.
+   - Guards: Checks for course active/published status and prevents duplicate enrollments.
+3. List: Student views all their current enrollments via `GET /api/v1/my-enrollments/`.
 
 Notes & Requirements
 - Media uploads (thumbnails): use `multipart/form-data` and include `thumbnail` file in the POST/PATCH request body when creating/updating a course.
