@@ -44,7 +44,7 @@ export default function UserDashboard() {
     localStorage.setItem('user-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  const { user, logout } = useAuth();
+  const { user, logout, setUser } = useAuth();
   const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -298,9 +298,9 @@ export default function UserDashboard() {
                   </div>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: 'Enrolled Courses', value: allEnrollments.length || enrolledCourses.length, icon: <BookOpen size={16} />, color: 'text-[#15c8fb]' },
-                    { label: 'Lessons Completed', value: enrolledCourses.reduce((a, c) => a + c.completed, 0), icon: <CheckCircle size={16} />, color: 'text-green-500' },
-                    { label: 'Overall Progress', value: `${Math.round(enrolledCourses.reduce((a, c) => a + c.progress, 0) / Math.max(enrolledCourses.length, 1))}%`, icon: <TrendingUp size={16} />, color: 'text-[#f89f29]' }
+                    { label: 'Enrolled Courses', value: allEnrollments.length, icon: <BookOpen size={16} />, color: 'text-[#15c8fb]' },
+                    { label: 'Active Courses', value: allEnrollments.filter(e => e.status === 'active').length, icon: <Play size={16} />, color: 'text-green-500' },
+                    { label: 'Pending Approval', value: allEnrollments.filter(e => e.status === 'pending').length, icon: <Clock size={16} />, color: 'text-[#f89f29]' }
                   ].map((stat, i) => (
                     <div key={i} className="p-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 shadow-sm">
                       <div className={`${stat.color} mb-1`}>{stat.icon}</div>
@@ -317,8 +317,8 @@ export default function UserDashboard() {
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { label: 'My Courses', icon: <BookOpen size={16} />, desc: `${enrolledCourses.length} enrolled`, tab: 'courses', color: 'from-[#15c8fb]/20 to-blue-500/20 text-[#15c8fb]' },
-                    { label: 'Payment', icon: <Upload size={16} />, desc: paymentSubmitted ? 'Approved' : 'Pending', tab: 'payment', color: 'from-[#f89f29]/20 to-amber-500/20 text-[#f89f29]' },
+                    { label: 'My Courses', icon: <BookOpen size={16} />, desc: `${allEnrollments.length} enrolled`, tab: 'courses', color: 'from-[#15c8fb]/20 to-blue-500/20 text-[#15c8fb]' },
+                    { label: 'Payment', icon: <Upload size={16} />, desc: apiPayments.some(p => p.status === 'approved') ? 'Approved' : apiPayments.some(p => p.status === 'pending') ? 'Pending' : 'No payments', tab: 'payment', color: 'from-[#f89f29]/20 to-amber-500/20 text-[#f89f29]' },
                     { label: 'Support', icon: <MessageCircle size={16} />, desc: 'Get help', tab: 'support', color: 'from-green-500/20 to-emerald-500/20 text-green-600 dark:text-green-400' },
                     { label: 'Settings', icon: <Settings size={16} />, desc: 'Manage account', tab: 'settings', color: 'from-purple-500/20 to-pink-500/20 text-purple-600 dark:text-purple-400' },
                   ].map((item, i) => (
@@ -336,18 +336,18 @@ export default function UserDashboard() {
                   <Clock size={14} className="text-[#f89f29]" /> Recent Activity
                 </h3>
                 <div className="space-y-2">
-                  {[
-                    { action: 'Started lesson "API Integration"', course: 'Full-Stack Web Development', time: '2 hours ago' },
-                    { action: 'Completed 3 lessons', course: 'UI/UX Design Mastery', time: 'Yesterday' },
-                    { action: 'Submitted payment proof', course: '', time: '2 days ago' },
-                  ].map((act, i) => (
-                    <div key={i} className="flex items-start gap-3 p-2.5 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                  {allEnrollments.length === 0 ? (
+                    <p className="text-xs text-gray-500 dark:text-white/40 text-center py-4">No activity yet. Enroll in a course to get started!</p>
+                  ) : allEnrollments.slice(0, 5).map((e, i) => (
+                    <div key={e.id || i} className="flex items-start gap-3 p-2.5 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f89f29]/20 to-[#15c8fb]/20 flex items-center justify-center shrink-0">
-                        <Clock size={12} className="text-[#15c8fb]" />
+                        {e.status === 'active' ? <Play size={12} className="text-green-500" /> : e.status === 'pending' ? <Clock size={12} className="text-amber-500" /> : <CheckCircle size={12} className="text-[#15c8fb]" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{act.action}</p>
-                        <p className="text-[10px] text-gray-500 dark:text-white/40">{act.course && `${act.course} · `}{act.time}</p>
+                        <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
+                          {e.status === 'active' ? 'Started' : e.status === 'completed' ? 'Completed' : 'Enrolled in'} <span className="text-[#15c8fb]">{e.course?.title || 'a course'}</span>
+                        </p>
+                        <p className="text-[10px] text-gray-500 dark:text-white/40 capitalize">{e.status} · {new Date(e.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>
                   ))}
@@ -358,41 +358,50 @@ export default function UserDashboard() {
 
           {activeTab === 'courses' && (
             <div className="space-y-5">
-              <div>
-                <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">My Courses</h2>
-                <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">Continue learning where you left off</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">My Courses</h2>
+                  <p className="text-xs text-gray-500 dark:text-white/40 mt-0.5">Continue learning where you left off</p>
+                </div>
+                {allEnrollments.length > 0 && (
+                  <span className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-wider px-3 py-1.5 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-200 dark:border-white/10">{allEnrollments.length} enrolled</span>
+                )}
               </div>
               {allEnrollments.length === 0 ? (
                 <div className="rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-white/5 p-10 text-center shadow-sm">
                   <BookOpen size={36} className="mx-auto text-gray-300 dark:text-white/10 mb-2" />
                   <h3 className="text-base font-bold text-gray-500 dark:text-white/60 mb-1">No courses yet</h3>
-                  <p className="text-xs text-gray-400 dark:text-white/30">Enrolled courses will appear here after registration.</p>
+                  <p className="text-xs text-gray-400 dark:text-white/30 mb-4">Enrolled courses will appear here after registration.</p>
+                  <a href="/courses" className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#15c8fb] text-white font-bold text-[10px] rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><BookOpen size={14} /> Browse Courses</a>
                 </div>
               ) : allEnrollments.map((enrollment, i) => {
                 const course = enrollment.course;
+                const statusColor = enrollment.status === 'active' ? 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400' : enrollment.status === 'completed' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400' : enrollment.status === 'cancelled' ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400' : 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400';
                 return (
                 <motion.div key={enrollment.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className="rounded-2xl border border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-white/5 overflow-hidden hover:border-gray-300 dark:hover:border-white/20 transition-all shadow-sm group">
                   <div className="flex flex-col md:flex-row">
-                    <div className="md:w-44 h-28 md:h-auto overflow-hidden shrink-0">
+                    <div className="md:w-44 h-28 md:h-auto overflow-hidden shrink-0 relative">
                       <img src={course.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400'} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider bg-black/60 backdrop-blur-sm text-white">{course.category || 'Course'}</div>
                     </div>
                     <div className="flex-1 p-4 flex flex-col justify-between">
                       <div>
-                        <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">{course.title}</h3>
-                        <p className="text-xs text-gray-500 dark:text-white/40 mb-2">by {course.instructor}</p>
-                        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-white/40 mb-2">
-                          <span>{course.lessons || '—'} lessons</span>
-                          <span className="text-[#15c8fb] font-bold">{enrollment.status}</span>
+                        <div className="flex items-start justify-between gap-2">
+                          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-0.5">{course.title}</h3>
+                          <span className={`shrink-0 text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${statusColor}`}>{enrollment.status}</span>
                         </div>
-                        {course.duration && (
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-white/40 mb-2">
-                            <Clock size={11} className="text-[#f89f29]" /> Duration: {course.duration}
-                          </div>
-                        )}
+                        <p className="text-xs text-gray-500 dark:text-white/40 mb-2">by {course.instructor || 'Instructor'}</p>
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-gray-500 dark:text-white/40 mb-2">
+                          <span>{course.lessons || '—'} lessons</span>
+                          {course.duration && <span className="flex items-center gap-1"><Clock size={10} className="text-[#f89f29]" /> {course.duration}</span>}
+                          {course.price && <span className="font-bold text-[#15c8fb]">{course.price} ETB</span>}
+                        </div>
                       </div>
-                      <button onClick={() => setSelectedCourse(course)} className="flex items-center gap-1.5 px-4 py-2 bg-[#15c8fb] text-white font-bold text-[10px] rounded-lg hover:brightness-110 transition-all w-fit shadow-sm">
-                        <Play size={12} /> Continue
-                      </button>
+                      <div className="flex items-center gap-2 mt-2">
+                        <button onClick={() => setSelectedCourse(course)} className="flex items-center gap-1.5 px-4 py-2 bg-[#15c8fb] text-white font-bold text-[10px] rounded-lg hover:brightness-110 transition-all w-fit shadow-sm">
+                          <Play size={12} /> Continue
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.div>
@@ -787,28 +796,37 @@ export default function UserDashboard() {
                     <img src={selectedCourse.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400'} alt={selectedCourse.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs text-gray-500 dark:text-white/40 mb-1">by {selectedCourse.instructor}</p>
-                    <p className="text-xs text-gray-500 dark:text-white/40 mb-2 line-clamp-2">{selectedCourse.short_description || selectedCourse.description || ''}</p>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-white/40">
-                      <span>{selectedCourse.lessons || '—'} lessons</span>
-                      {selectedCourse.duration && <span>{selectedCourse.duration}</span>}
-                      <span className="font-bold text-[#15c8fb]">{selectedCourse.price} ETB</span>
+                    <p className="text-xs text-gray-500 dark:text-white/40 mb-1">by <span className="font-semibold text-gray-900 dark:text-white">{selectedCourse.instructor || 'Instructor'}</span></p>
+                    <p className="text-xs text-gray-500 dark:text-white/40 mb-3 line-clamp-3 leading-relaxed">{selectedCourse.short_description || selectedCourse.description || 'No description available.'}</p>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                        <p className="text-sm font-black text-gray-900 dark:text-white">{selectedCourse.lessons || '—'}</p>
+                        <p className="text-[9px] text-gray-500 dark:text-white/40 font-medium">Lessons</p>
+                      </div>
+                      <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                        <p className="text-sm font-black text-gray-900 dark:text-white">{selectedCourse.duration || '—'}</p>
+                        <p className="text-[9px] text-gray-500 dark:text-white/40 font-medium">Duration</p>
+                      </div>
+                      <div className="p-2 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                        <p className="text-sm font-black text-[#15c8fb]">{selectedCourse.price || '—'}</p>
+                        <p className="text-[9px] text-gray-500 dark:text-white/40 font-medium">Price</p>
+                      </div>
                     </div>
                   </div>
                 </div>
                 {selectedCourse.learning_outcomes && (
                   <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <p className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-wider mb-2">What You'll Learn</p>
-                    <p className="text-xs text-gray-600 dark:text-white/70">{selectedCourse.learning_outcomes}</p>
+                    <p className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-wider mb-2 flex items-center gap-1"><Sparkles size={12} /> What You'll Learn</p>
+                    <p className="text-xs text-gray-600 dark:text-white/70 leading-relaxed">{selectedCourse.learning_outcomes}</p>
                   </div>
                 )}
                 {selectedCourse.requirements && (
                   <div className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <p className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-wider mb-2">Requirements</p>
-                    <p className="text-xs text-gray-600 dark:text-white/70">{selectedCourse.requirements}</p>
+                    <p className="text-[10px] font-bold text-gray-400 dark:text-white/30 uppercase tracking-wider mb-2 flex items-center gap-1"><AlertTriangle size={12} /> Requirements</p>
+                    <p className="text-xs text-gray-600 dark:text-white/70 leading-relaxed">{selectedCourse.requirements}</p>
                   </div>
                 )}
-                <button onClick={() => setSelectedCourse(null)} className="w-full py-3 bg-[#15c8fb] text-white font-bold text-xs rounded-xl hover:brightness-110 transition-all">Close</button>
+                <button onClick={() => setSelectedCourse(null)} className="w-full py-3 bg-gradient-to-r from-[#f89f29] to-[#15c8fb] text-white font-bold text-xs rounded-xl hover:brightness-110 transition-all">Got it</button>
               </div>
             </motion.div>
           </motion.div>
