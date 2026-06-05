@@ -12,8 +12,8 @@ const levelMap = ['Beginner to Advanced', 'All Levels', 'Intermediate', 'Interme
 
 const defaultCourses = [
   {
-    title: 'Full-Stack Web Development', category: 'Development',
-    desc: 'Master React, Node.js, and scalable architectures. Build production-ready applications from scratch.',
+    title: 'Modern Front-End Development with React & TypeScript', category: 'Development',
+    desc: 'Master React, TypeScript, and modern front-end architectures. Build production-ready applications from scratch.',
     icon: iconMap[0], image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
     students: 1245, duration: '16 weeks', lessons: 48, level: 'Beginner to Advanced', color: '#15c8fb', price: '500 ETB'
   },

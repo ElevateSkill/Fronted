@@ -27,7 +27,7 @@ function buildSlides() {
   }
   return [
     {
-      url: heroMain, title: "ELEVATE", highlight: "YOUR SKILL",
+      url: heroMain, title: "Modern Front-End", highlight: "Development with React & TypeScript",
       amharicTitle: "ክህሎትህን ከፍ አድርግ",
       subtitle: "Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.",
       cta: "GET STARTED", ctaIcon: <Sparkles size={20} />, color: "#15c8fb",
