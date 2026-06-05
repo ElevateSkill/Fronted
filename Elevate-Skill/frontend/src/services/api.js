@@ -33,3 +33,4 @@ export function getMediaUrl(path) {
 }
 
 export default api;
+export { api };
