@@ -81,11 +81,11 @@ export default function Services() {
   ];
 
   return (
-    <div id="services" className="relative w-full bg-[#f8fafc] dark:bg-[#050505] py-16 md:py-24 sm:px-6 overflow-hidden transition-colors duration-500 font-sans">
+    <div id="services" className="relative w-full bg-[#f8fafc] dark:bg-black py-16 md:py-24 sm:px-6 overflow-hidden transition-colors duration-500 font-sans">
       
       {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#f89f29]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         
@@ -97,11 +97,11 @@ export default function Services() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-16 md:mb-24 text-center lg:text-left"
         >
-          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white dark:bg-white/[0.04] border border-slate-100 dark:border-white/5 backdrop-blur-3xl shadow-xl shadow-slate-500/5">
+          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white/95 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] backdrop-blur-3xl shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5 rounded-3xl">
             <div className="flex-none max-w-xs">
                 <div className="flex items-center gap-3 mb-2 justify-center lg:justify-start">
-                    <span className="w-8 h-[2px] bg-[#3C83F6]" />
-                    <span className="text-[#3C83F6] font-bold uppercase tracking-widest text-xs">Collaboration Network</span>
+                    <span className="w-8 h-[2px] bg-[#15c8fb]" />
+                    <span className="text-[#15c8fb] font-bold uppercase tracking-widest text-xs">Collaboration Network</span>
                 </div>
                 {/* <h3 className="text-3xl font-black text-slate-900 dark:text-white leading-tight mb-2">
                     Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-white">Industry</span> Partners.
@@ -121,7 +121,7 @@ export default function Services() {
                       <img 
                         src={partner.logo} 
                         alt={`${partner.name} logo`} 
-                        className="h-auto max-h-full max-w-full object-contain filter dark:brightness-75 transition-all group-hover:brightness-100 opacity-40 dark:opacity-30 group-hover:opacity-100 drop-shadow-lg" 
+                        className="h-auto max-h-full max-w-full object-contain filter dark:brightness-75 transition-all group-hover:brightness-100 opacity-80 dark:opacity-70 group-hover:opacity-100 drop-shadow-lg" 
                       />
                     </motion.div>
                   ))}
@@ -146,21 +146,21 @@ export default function Services() {
               <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs md:text-sm">Our Expertise</span>
             </motion.div>
             
-            {/* <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl sm:text-5xl md:text-7xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight"
+              className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight"
             >
-              Solutions For Growth.
-            </motion.h2> */}
+              Solutions For <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#15c8fb] to-[#f89f29]">Growth</span>.
+            </motion.h2>
           </div>
 
           {/* Social Proof Join Button */}
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center lg:items-end gap-5 bg-white/50 dark:bg-white/5 p-6 rounded-3xl backdrop-blur-md border border-white/20 shadow-2xl shadow-black/5 dark:shadow-white/5"
+            className="flex flex-col items-center lg:items-end gap-5 bg-white/95 dark:bg-white/[0.06] p-6 rounded-3xl backdrop-blur-md border border-slate-200 dark:border-white/[0.08] shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5"
           >
             <div className="flex justify-between">
                 <div className="flex -space-x-3">
@@ -169,16 +169,16 @@ export default function Services() {
                         key={i} 
                         whileHover={{ y: -5, zIndex: 10 }}
                         src={url} 
-                        className="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white dark:border-[#0a0a0a] shadow-xl cursor-pointer" 
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white dark:border-black shadow-xl cursor-pointer" 
                         alt="user" 
                     />
                 ))}
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#3C83F6] to-blue-700 border-4 border-white dark:border-[#0a0a0a] flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] border-4 border-white dark:border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
                     24k+
                 </div>
                 </div>
             </div>
-            <button className="w-full sm:w-auto px-8 py-4 bg-[#3C83F6] hover:bg-[#2563eb] text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
+            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#15c8fb] to-[#0fa3d4] hover:brightness-110 text-white font-bold rounded-2xl shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
               <span className="relative z-10">JOIN PLATFORM</span>
               <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform relative z-10" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -197,10 +197,10 @@ export default function Services() {
               transition={{ delay: idx * 0.1 }}
               viewport={{ once: true, margin: "-100px" }}
               layout
-               className={`group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 border-2 ${
+               className={`group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 border ${
                 activeService === service.id 
-                ? 'bg-white dark:bg-[#111] border-[#3C83F6] shadow-2xl shadow-blue-500/10' 
-                : 'bg-white/70 dark:bg-white/[0.03] border-transparent hover:border-slate-200 dark:hover:border-white/10 shadow-xl shadow-black/5 dark:shadow-white/5'
+                ? 'bg-white dark:bg-black/60 border-[#15c8fb] shadow-2xl shadow-[#15c8fb]/10' 
+                : 'bg-white/95 dark:bg-white/[0.06] border-transparent hover:border-slate-200 dark:hover:border-white/[0.12] shadow-xl shadow-slate-900/5 dark:shadow-white/5'
               }`}
             >
               {/* Image Header */}
@@ -210,15 +210,15 @@ export default function Services() {
                     className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
                     alt={service.title} 
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
-                <div className={`absolute top-6 right-6 p-3 rounded-2xl backdrop-blur-md bg-white/10 border border-white/20 text-white`}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className={`absolute top-6 right-6 p-3 rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 text-white shadow-lg shadow-black/20`}>
                     {React.cloneElement(service.icon, { size: 24 })}
                 </div>
               </div>
 
               <div className="p-8">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-[#3C83F6] transition-colors tracking-tight">{service.title}</h3>
-                <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-[#15c8fb] transition-colors tracking-tight">{service.title}</h3>
+                <p className="text-slate-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
                   {service.short}
                 </p>
 
@@ -227,8 +227,8 @@ export default function Services() {
                   onClick={() => toggleService(service.id)}
                   className={`flex items-center justify-between w-full p-4 rounded-2xl transition-all duration-300 ${
                     activeService === service.id 
-                    ? 'bg-[#3C83F6] text-white' 
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
+                    ? 'bg-[#15c8fb] text-white' 
+                    : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/15'
                   }`}
                 >
                   <span className="font-bold text-xs uppercase tracking-[0.2em]">Explore Service</span>
@@ -250,18 +250,18 @@ export default function Services() {
                       className="overflow-hidden"
                     >
                       <div className="pt-8 space-y-6 relative z-10">
-                        <div className="relative p-4 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-100 dark:border-white/5">
+                        <div className="relative p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-white dark:from-white/5 dark:to-black/40 border border-slate-200 dark:border-white/[0.06]">
                             <Sparkles className="absolute -top-3 -left-3 text-[#f89f29]" size={20} />
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 italic">
+                            <p className="text-sm leading-relaxed text-slate-600 dark:text-gray-300 italic font-medium">
                             "{service.desc}"
                             </p>
                         </div>
                         
                         <div className="flex flex-wrap gap-4">
-                           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-500/10 text-[10px] font-black text-[#f89f29] border border-red-100 dark:border-red-500/20">
+                           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#f89f29]/10 to-[#f89f29]/5 dark:from-[#f89f29]/15 dark:to-transparent text-[10px] font-black text-[#f89f29] border border-[#f89f29]/20">
                               24/7 PRIORITY
                            </div>
-                           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-[10px] font-black text-[#3C83F6] border border-blue-100 dark:border-blue-500/20">
+                           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#15c8fb]/10 to-[#15c8fb]/5 dark:from-[#15c8fb]/15 dark:to-transparent text-[10px] font-black text-[#15c8fb] border border-[#15c8fb]/20">
                               ELITE RATING
                            </div>
                         </div>
@@ -279,16 +279,16 @@ export default function Services() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#3C83F6] to-transparent rounded-[3rem]"
+          className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#15c8fb] to-transparent rounded-[3rem]"
         >
-          <div className="bg-white dark:bg-[#0a0a0a] p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20">
+          <div className="bg-white dark:bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20 rounded-[2.9rem]">
             <div className="text-center lg:text-left">
               {/* <h4 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Ready to elevate?</h4> */}
-              <p className="text-slate-500 dark:text-slate-400 text-lg max-w-md">Join 24,000+ visionaries scaling their digital presence today.</p>
+              <p className="text-slate-600 dark:text-gray-300 text-lg max-w-md">Join 24,000+ visionaries scaling their digital presence today.</p>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">              
-              <button className="group w-full sm:w-auto px-10 py-6 bg-[#0a0a0a] dark:bg-white text-white dark:text-[#0a0a0a] rounded-2xl font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
+              <button className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white rounded-2xl font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
                 GET STARTED NOW
                 <ArrowRight className="group-hover:rotate-[-45deg] transition-transform" />
               </button>

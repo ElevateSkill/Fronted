@@ -29,8 +29,8 @@ export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
-    <div id="faq" className="relative w-full bg-gray-50 dark:bg-[#050505] py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
-      <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#17c966]/10 rounded-full blur-[120px] pointer-events-none" />
+    <div id="faq" className="relative w-full bg-gray-50 dark:bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
+      <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/3 right-0 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto relative z-10">
@@ -48,7 +48,7 @@ export default function FAQ() {
           <h2 className="text-4xl sm:text-5xl font-black tracking-tighter dark:text-white text-gray-900 mb-2">
             Got <span className="text-[#f89f29]">Questions?</span>
           </h2>
-          <p className="text-gray-500 dark:text-white/40 text-sm">Find answers to common questions about our platform.</p>
+          <p className="text-gray-500 dark:text-white/60 text-sm">Find answers to common questions about our platform.</p>
         </div>
 
         {/* --- ACCORDION SECTION --- */}
@@ -61,7 +61,7 @@ export default function FAQ() {
               transition={{ delay: index * 0.1 }}
               className={`group overflow-hidden rounded-2xl border transition-all duration-300 ${
                 activeIndex === index 
-                ? 'bg-gray-100 dark:bg-white/5 border-[#3C83F6] shadow-xl shadow-[#3C83F6]/10' 
+                ? 'bg-gray-100 dark:bg-white/5 border-[#15c8fb] shadow-xl shadow-[#15c8fb]/10' 
                 : 'bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
               }`}
             >
@@ -71,7 +71,7 @@ export default function FAQ() {
               >
                 <div className="flex items-center gap-4">
                   <span className={`text-xs font-black px-3 py-1 rounded-lg transition-colors ${
-                    activeIndex === index ? 'bg-[#3C83F6] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/40'
+                    activeIndex === index ? 'bg-[#15c8fb] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/70'
                   }`}>
                     0{index + 1}
                   </span>
@@ -80,7 +80,7 @@ export default function FAQ() {
                   </span>
                 </div>
                 <div className={`p-1.5 rounded-lg transition-all duration-300 ${
-                  activeIndex === index ? 'rotate-180 bg-[#3C83F6] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/40'
+                  activeIndex === index ? 'rotate-180 bg-[#15c8fb] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/70'
                 }`}>
                   {activeIndex === index ? <Minus size={18} /> : <Plus size={18} />}
                 </div>
@@ -95,7 +95,7 @@ export default function FAQ() {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                   >
                     <div className="px-6 pb-6 ml-16">
-                      <p className="text-gray-500 dark:text-white/40 leading-relaxed text-sm">
+                      <p className="text-gray-500 dark:text-white/80 leading-relaxed text-sm">
                         {item.answer}
                       </p>
                     </div>
@@ -112,13 +112,13 @@ export default function FAQ() {
           whileInView={{ opacity: 1, y: 0 }}
           className="mt-16 p-8 md:p-12 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-3xl text-center relative overflow-hidden group shadow-2xl shadow-black/5 dark:shadow-white/5"
         >
-          <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#3C83F6]/10 blur-[80px] group-hover:bg-[#f89f29]/10 transition-colors duration-700" />
+          <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#15c8fb]/10 blur-[80px] group-hover:bg-[#f89f29]/10 transition-colors duration-700" />
           
           <div className="relative z-10">
             <h4 className="text-2xl md:text-3xl font-black dark:text-white text-gray-900 mb-2">
               Still have a question?
             </h4>
-            <p className="text-gray-500 dark:text-white/40 text-sm mb-8 max-w-md mx-auto">
+            <p className="text-gray-500 dark:text-white/80 text-sm mb-8 max-w-md mx-auto">
               Our support team is available 24/7 to help you.
             </p>
             

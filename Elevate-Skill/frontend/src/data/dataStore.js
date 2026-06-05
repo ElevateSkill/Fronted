@@ -1,5 +1,7 @@
 const STORE_KEY = 'elevate_data';
 
+const genId = () => Date.now() + Math.random();
+
 const defaults = {
   heroSlides: [],
   courses: [
@@ -37,7 +39,24 @@ const defaults = {
     { id: 'p1', title: 'Why Full-Stack Development is the Future', author: 'Admin', date: '2026-05-20', status: 'Published', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', excerpt: 'The tech industry is evolving rapidly. Full-stack developers who can handle both frontend and backend are becoming invaluable assets to modern teams.' },
     { id: 'p2', title: 'UI/UX Trends for 2026', author: 'Admin', date: '2026-05-18', status: 'Published', image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600', excerpt: 'Stay ahead of the curve with these emerging design trends that are shaping how users interact with digital products.' }
   ],
-  announcements: []
+  announcements: [],
+  payments: [
+    {
+      id: genId(), full_name: 'Dawit Mekonnen', email: 'dawit@example.com',
+      phone: '+251 911 234 567', amount: '500', course: 'Full-Stack Web Development',
+      comment: 'Payment for Full-Stack course',
+      proof_url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400',
+      status: 'Pending', submitted_at: '2026-06-01'
+    },
+    {
+      id: genId(), full_name: 'Selamawit Bekele', email: 'selam@example.com',
+      phone: '+251 922 345 678', amount: '450', course: 'UI/UX Design Mastery',
+      comment: 'Course fee payment',
+      proof_url: 'https://images.unsplash.com/photo-1560472354-b33dd0b9985c?w=400',
+      status: 'Approved', submitted_at: '2026-05-28'
+    }
+  ],
+  registrations: []
 };
 
 export function loadData(key) {

@@ -46,7 +46,7 @@ export default function Footer() {
                 <span className="text-xl font-black tracking-tight text-[#15c8fb]">Skill</span>
               </div>
             </div>
-            <p className="text-sm leading-relaxed max-w-xs text-white/50">
+            <p className="text-sm leading-relaxed max-w-xs text-white/70">
               Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.
             </p>
             <div className="flex gap-3">
@@ -54,7 +54,7 @@ export default function Footer() {
                 <a
                   key={i}
                   href="#"
-                  className="w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-white/40 hover:border-[#15c8fb]/50 hover:text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all duration-300"
+                  className="w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-white/70 hover:border-[#15c8fb]/50 hover:text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all duration-300"
                 >
                   <Icon size={16} />
                 </a>
@@ -71,7 +71,7 @@ export default function Footer() {
               <ul className="space-y-3">
                 {section.links.map((link) => (
                   <li key={link}>
-                    <a href="#" className="text-sm text-white/40 hover:text-[#15c8fb] transition-colors duration-200">
+                    <a href="#" className="text-sm text-white/70 hover:text-[#15c8fb] transition-colors duration-200">
                       {link}
                     </a>
                   </li>
@@ -89,7 +89,7 @@ export default function Footer() {
               <div className="group cursor-pointer">
                 <div className="flex items-center gap-2 mb-1">
                   <Phone size={13} className="text-[#15c8fb]" />
-                  <span className="text-[10px] uppercase font-bold text-white/30 tracking-wider">Call us</span>
+                  <span className="text-[10px] uppercase font-bold text-white/60 tracking-wider">Call us</span>
                 </div>
                 <p className="text-sm font-bold text-white/80 group-hover:text-[#15c8fb] transition-colors">
                   (+02) 0100-556-345
@@ -98,7 +98,7 @@ export default function Footer() {
               <div className="group cursor-pointer">
                 <div className="flex items-center gap-2 mb-1">
                   <Mail size={13} className="text-[#f89f29]" />
-                  <span className="text-[10px] uppercase font-bold text-white/30 tracking-wider">Email</span>
+                  <span className="text-[10px] uppercase font-bold text-white/60 tracking-wider">Email</span>
                 </div>
                 <p className="text-sm font-semibold text-white/80 group-hover:text-[#f89f29] transition-colors">
                   help@elevate-skill.com
@@ -112,14 +112,14 @@ export default function Footer() {
             <h5 className="text-white font-bold uppercase tracking-widest text-[10px]">
               Newsletter
             </h5>
-            <p className="text-xs text-white/40 leading-relaxed">
+            <p className="text-xs text-white/70 leading-relaxed">
               Follow the latest news and updates from us.
             </p>
             <div className="relative">
               <input 
                 type="email" 
                 placeholder="your@email.com"
-                className="w-full bg-white/5 border border-white/10 py-3 pl-4 pr-28 rounded-xl text-sm text-white focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20"
+                className="w-full bg-white/5 border border-white/10 py-3 pl-4 pr-28 rounded-xl text-sm text-white focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/40"
               />
               <button className="absolute right-1 top-1 bottom-1 px-4 bg-gradient-to-r from-[#15c8fb] to-[#f89f29] hover:brightness-110 text-white text-[10px] font-black rounded-lg transition-all uppercase tracking-wider">
                 Subscribe
@@ -130,13 +130,13 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[12px] text-white/30">
+          <p className="text-[12px] text-white/60">
             Copyright © {currentYear} <span className="text-white font-medium">Elevate Skill</span>. 
             Designed & Developed by <span className="text-white/60">Lide-X</span>
           </p>
           <div className="flex gap-6 text-[12px]">
-            <a href="#" className="text-white/30 hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="text-white/30 hover:text-white transition-colors">Terms of Use</a>
+            <a href="#" className="text-white/60 hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#" className="text-white/60 hover:text-white transition-colors">Terms of Use</a>
           </div>
         </div>
       </div>

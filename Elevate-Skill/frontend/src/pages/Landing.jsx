@@ -44,15 +44,15 @@ function buildSlides() {
       url: slide2, title: "MASTER", highlight: "CRAFT",
       amharicTitle: "ጥበቡን ይለማመዱ",
       subtitle: "Industry-driven curriculum with real mentors. Code, design, deploy — master the full stack.",
-      cta: "WATCH NOW", ctaIcon: <PlayCircle size={20} />, color: "#17c966",
-      gradient: "from-green-600/30 via-transparent to-teal-600/30"
+      cta: "WATCH NOW", ctaIcon: <PlayCircle size={20} />, color: "#15c8fb",
+      gradient: "from-cyan-600/30 via-transparent to-orange-600/30"
     },
     {
       url: slide3, title: "BUILD", highlight: "FUTURE",
       amharicTitle: "የወደፊቱን ይገንቡ",
       subtitle: "Real-world projects, expert mentorship, and a community that pushes you forward.",
-      cta: "JOIN NOW", ctaIcon: <ArrowRight size={20} />, color: "#8b5cf6",
-      gradient: "from-violet-600/30 via-transparent to-pink-600/30"
+      cta: "JOIN NOW", ctaIcon: <ArrowRight size={20} />, color: "#f89f29",
+      gradient: "from-amber-600/30 via-transparent to-orange-600/30"
     }
   ];
 }
@@ -91,7 +91,7 @@ export default function Landing() {
   };
 
   return (
-    <div id="home" className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-700">
+    <div id="home" className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] dark:bg-black transition-colors duration-700">
       <div className="absolute inset-0 z-0">
         <AnimatePresence custom={direction} mode="popLayout">
           <motion.img

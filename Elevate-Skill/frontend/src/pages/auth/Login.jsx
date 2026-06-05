@@ -1,57 +1,86 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  KeyRound, Mail, ArrowRight, 
-  Github, Chrome, ShieldCheck, 
-  Terminal, Lock, Fingerprint,
-  RefreshCcw, AlertCircle
+import {
+  Mail, ArrowRight, Lock, ShieldCheck, Terminal,
+  Fingerprint, AlertCircle, TriangleAlert, Eye, EyeOff
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import logoJpg from '../../assets/logo.jpg';
 
 const slides = [
   {
     url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2070",
     title: "Airspace",
     subtitle: "Autonomous systems & drone engineering",
-    gradient: "from-blue-600/30 via-transparent to-cyan-600/30",
     color: "#15c8fb"
   },
   {
     url: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2070",
     title: "Graphics",
     subtitle: "Visual computing & real-time rendering",
-    gradient: "from-purple-600/30 via-transparent to-pink-600/30",
     color: "#f89f29"
   },
   {
     url: "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=2070",
     title: "Web Dev",
     subtitle: "Full-stack systems & modern architectures",
-    gradient: "from-green-600/30 via-transparent to-teal-600/30",
-    color: "#17c966"
+    color: "#15c8fb"
   },
   {
     url: "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?q=80&w=2070",
     title: "IoT",
     subtitle: "Connected devices & embedded intelligence",
-    gradient: "from-amber-600/30 via-transparent to-red-600/30",
     color: "#f89f29"
   }
 ];
 
 export default function Login() {
   const [current, setCurrent] = useState(0);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => setCurrent(prev => (prev + 1) % slides.length), 5000);
     return () => clearInterval(timer);
   }, []);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    try {
+      const user = await login({ username, password });
+      if (user?.role?.toLowerCase() === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      const data = err?.response?.data;
+      if (data?.detail) {
+        setError(data.detail);
+      } else if (typeof data === 'object') {
+        const key = Object.keys(data)[0];
+        const val = data[key];
+        setError(Array.isArray(val) ? val[0] : val);
+      } else {
+        setError('Invalid username or password.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex transition-colors duration-500 dark:bg-[#050505] bg-[#f8fafc] text-slate-900 dark:text-zinc-100 overflow-hidden font-sans">
-      
-      {/* --- LEFT PANEL: IMAGE SLIDER --- */}
-      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden border-r border-slate-200 dark:border-white/5">
+    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#020202] text-slate-900 dark:text-white overflow-hidden font-sans">
+      {/* LEFT PANEL */}
+      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-black">
         <AnimatePresence mode="popLayout">
           <motion.img
             key={current}
@@ -64,45 +93,44 @@ export default function Login() {
             className="absolute inset-0 w-full h-full object-cover"
           />
         </AnimatePresence>
-        <div className={`absolute inset-0 bg-gradient-to-br ${slides[current].gradient} z-[1]`} />
-        <div className="absolute inset-0 bg-black/50 z-[2]" />
-        
-        <div className="relative z-10 p-16 flex flex-col justify-between w-full">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-3"
-          >
-            <div className="w-10 h-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center shadow-2xl">
-              <Terminal size={20} className="text-[#15c8fb]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent z-[1]" />
+
+        <div className="relative z-10 p-12 xl:p-16 flex flex-col justify-between w-full">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg">
+              <img src={logoJpg} alt="Elevate Skill" className="w-7 h-7 rounded-lg object-cover" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/60">Auth_Protocol_v4.2</span>
+            <span className="text-xs font-black tracking-wide text-white/80">
+              Elevate<span className="text-[#15c8fb]">Skill</span>
+            </span>
           </motion.div>
 
-          <div className="space-y-8">
-            <motion.div 
+          <div className="space-y-6">
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
               className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur border border-white/20 rounded-full"
             >
-              <ShieldCheck size={12} className="text-[#17c966]" />
-              <span className="text-[9px] font-black uppercase tracking-widest text-white/90">Secured Session</span>
+              <ShieldCheck size={12} className="text-[#15c8fb]" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Secured Session</span>
             </motion.div>
 
             <AnimatePresence mode="wait">
-              <motion.h2
-                key={current + "title"}
+              <motion.div
+                key={current}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.4 }}
-                className="text-6xl font-black uppercase tracking-tighter leading-none"
               >
-                <span className="text-white">{slides[current].title}</span>
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/70">Terminal.</span>
-              </motion.h2>
+                <h2 className="text-5xl xl:text-6xl font-black uppercase tracking-tighter leading-none">
+                  <span className="text-white">{slides[current].title}</span>
+                  <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#15c8fb] via-white to-[#f89f29]">Terminal.</span>
+                </h2>
+              </motion.div>
             </AnimatePresence>
 
             <AnimatePresence mode="wait">
@@ -112,117 +140,165 @@ export default function Login() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-base text-white/70 font-medium max-w-sm"
+                className="text-base text-white/60 font-medium max-w-md leading-relaxed"
               >
-                {slides[current].subtitle}. Please provide your credentials to resume your engineering progression. All sessions are encrypted via SHA-256.
+                {slides[current].subtitle}. Sign in to continue your engineering journey.
               </motion.p>
             </AnimatePresence>
 
-            {/* Slide Dots */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {slides.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrent(i)}
-                  className={`h-1.5 rounded-full transition-all duration-500 ${i === current ? 'w-8 bg-white' : 'w-1.5 bg-white/30 hover:bg-white/50'}`}
+                  className={`h-1.5 rounded-full transition-all duration-500 ${i === current ? 'w-10 bg-gradient-to-r from-[#15c8fb] to-[#f89f29]' : 'w-1.5 bg-white/30 hover:bg-white/50'}`}
                 />
               ))}
+              <span className="text-[10px] font-mono text-white/30 ml-2">
+                0{current + 1}/0{slides.length}
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl">
-              <Fingerprint size={32} className="text-white opacity-40 animate-pulse" />
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl">
+              <Fingerprint size={24} className="text-[#15c8fb]/60" />
             </div>
-            <div className="space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/40">Identity Node</p>
-              <p className="text-sm font-mono text-[#15c8fb]">0x82...BF92</p>
+            <div className="text-[10px] text-white/40 font-mono">
+              <p className="font-bold uppercase tracking-widest text-white/50">Encrypted Link</p>
+              <p className="text-[#f89f29] text-xs">TLS 1.3 · AES-256</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* --- RIGHT PANEL: THE LOGIN INTERFACE --- */}
-      <div className="w-full lg:w-7/12 flex flex-col items-center justify-center p-8 lg:p-24 relative">
-        <div className="w-full max-w-sm">
-          
-          <header className="mb-10">
-            <h1 className="text-4xl font-black uppercase tracking-tighter mb-2">Resume Session</h1>
-            <p className="text-slate-500 dark:text-zinc-500 font-medium">
-              Enter your credentials to enter the lab.
-            </p>
-          </header>
+      {/* RIGHT PANEL */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative">
+        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-[#15c8fb]/10 rounded-full blur-[150px] pointer-events-none" />
+        <div className="absolute bottom-1/3 -right-32 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[150px] pointer-events-none" />
 
-          {/* OAUTH INTEGRATION */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <button className="flex items-center justify-center gap-3 py-4 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#15c8fb]/50 transition-all shadow-sm">
-              <Chrome size={18} className="text-[#15c8fb]" />
-              <span className="text-xs font-black uppercase tracking-widest">Google</span>
-            </button>
-            <button className="flex items-center justify-center gap-3 py-4 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#17c966]/50 transition-all shadow-sm">
-              <Github size={18} className="dark:text-white" />
-              <span className="text-xs font-black uppercase tracking-widest">GitHub</span>
-            </button>
-          </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:p-10 shadow-2xl shadow-black/5 dark:shadow-black/40 relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#15c8fb] via-[#f89f29] to-[#15c8fb]" />
 
-          <div className="relative mb-8 text-center">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200 dark:border-white/5"></div></div>
-            <span className="relative px-4 bg-[#f8fafc] dark:bg-[#050505] text-[10px] font-black uppercase tracking-widest text-slate-400">Manual Entry</span>
-          </div>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f89f29]/20 to-[#15c8fb]/20 border border-[#15c8fb]/20 flex items-center justify-center">
+                <img src={logoJpg} alt="Elevate Skill" className="w-7 h-7 rounded-lg object-cover" />
+              </div>
+              <div>
+                <h1 className="text-lg font-black tracking-tight text-gray-900 dark:text-white">
+                  Welcome Back
+                </h1>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">
+                  Sign in to your account
+                </p>
+              </div>
+            </div>
 
-          {/* LOGIN FORM */}
-          <form className="space-y-6" onSubmit={e => e.preventDefault()}>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest opacity-50 ml-1">Email Protocol</label>
-              <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#15c8fb]" size={16} />
-                <input 
-                  type="email" 
-                  placeholder="name@astu.edu" 
-                  className="w-full pl-12 pr-4 py-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#15c8fb]/20 transition-all" 
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="mb-5 p-3.5 rounded-xl text-sm font-semibold flex items-start gap-3 border bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400"
+                >
+                  <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1">Username</label>
+                <div className="relative group">
+                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-colors" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
+                    required
+                    autoComplete="username"
+                    placeholder="Enter your username"
+                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.10] rounded-xl focus:outline-none focus:border-[#15c8fb]/60 focus:ring-2 focus:ring-[#15c8fb]/15 transition-all dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-white/30"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center px-1">
+                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Password</label>
+                  <Link to="/forgot-password" className="text-[10px] font-bold text-[#15c8fb] hover:text-[#f89f29] transition-colors tracking-wide">
+                    Forgot?
+                  </Link>
+                </div>
+                <div className="relative group">
+                  <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-colors" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    className="w-full pl-11 pr-11 py-3.5 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.10] rounded-xl focus:outline-none focus:border-[#15c8fb]/60 focus:ring-2 focus:ring-[#15c8fb]/15 transition-all dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-white/30"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="remember"
+                  className="w-4 h-4 rounded border-gray-300 dark:border-white/20 bg-transparent text-[#15c8fb] focus:ring-[#15c8fb]/30 focus:ring-2 accent-[#15c8fb]"
                 />
+                <label htmlFor="remember" className="text-[11px] font-bold text-gray-600 dark:text-gray-400 cursor-pointer select-none">
+                  Remember me
+                </label>
               </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-3.5 bg-gradient-to-r from-[#15c8fb] to-[#0fa3d4] text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-[#15c8fb]/25 hover:shadow-[#15c8fb]/40 hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2.5"
+              >
+                {submitting ? (
+                  <span className="flex items-center gap-2.5">
+                    <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/[0.06] text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Don't have an account?{' '}
+                <Link to="/register" className="font-bold text-[#f89f29] hover:text-[#e08e1f] transition-colors">
+                  Create one
+                </Link>
+              </p>
             </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-black uppercase tracking-widest opacity-50">Access Key</label>
-                <Link to="/forgot-password" size={10} className="text-[9px] font-black uppercase tracking-widest text-[#15c8fb] hover:text-[#17c966]">Recover Key?</Link>
-              </div>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#17c966]" size={16} />
-                <input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  className="w-full pl-12 pr-4 py-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#17c966]/20 transition-all" 
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 px-1">
-              <input type="checkbox" className="w-4 h-4 rounded border-slate-200 dark:border-white/10 bg-transparent text-[#15c8fb] focus:ring-[#15c8fb]" />
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Remember Node</span>
-            </div>
-
-            <button className="w-full py-5 bg-slate-900 dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.3em] text-[10px] rounded-2xl transition-all shadow-xl hover:bg-[#15c8fb] hover:text-white dark:hover:bg-[#17c966] dark:hover:text-white transform hover:scale-[1.01] active:scale-[0.98] flex items-center justify-center gap-3">
-              Enter Terminal <ArrowRight size={16} />
-            </button>
-          </form>
-
-          {/* ALERTS & REDIRECTS */}
-          <div className="mt-10 p-4 bg-amber-500/5 border border-amber-500/10 rounded-xl flex gap-3">
-             <AlertCircle size={14} className="text-amber-500 shrink-0" />
-             <p className="text-[9px] text-amber-500/80 leading-relaxed font-bold uppercase tracking-tight">
-               System Notice: Ensure you are on the official elevate-skill.edu domain before entering keys.
-             </p>
           </div>
-
-          <footer className="mt-10 text-center">
-            <p className="text-xs font-medium text-slate-500 dark:text-zinc-500">
-              New to the system? <Link to="/register" className="text-[#15c8fb] font-black uppercase tracking-widest ml-1 hover:underline">Initialize Profile</Link>
-            </p>
-          </footer>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

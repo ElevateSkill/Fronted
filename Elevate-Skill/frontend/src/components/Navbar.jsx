@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sun, Moon, ChevronDown, Code2, Palette, BrainCircuit, Rocket } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import logoSvg from '../assets/logo-elevate.svg';
+import { Menu, X, Sun, Moon, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import logoJpg from '../assets/logo.jpg';
 
 export default function Navbar() {
@@ -11,6 +11,8 @@ export default function Navbar() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [activeMega, setActiveMega] = useState(null);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   
   // Initialize theme: Default to DARK
   const [isDark, setIsDark] = useState(() => {
@@ -52,6 +54,11 @@ export default function Navbar() {
     const newMode = !isDark;
     setIsDark(newMode);
     localStorage.setItem('hachalu-theme', newMode ? 'dark' : 'light');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const navLinks = [
@@ -121,9 +128,32 @@ export default function Navbar() {
             <button onClick={toggleTheme} className="p-2 rounded-lg bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-[#15c8fb] hover:scale-110 transition-transform">
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-            <Link to="/register" className="px-5 py-2 bg-[#f89f29] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase">
-              Portal
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <Link 
+                  to={user.role === 'admin' ? '/admin' : '/dashboard'}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#15c8fb]/10 text-[#15c8fb] font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase"
+                >
+                  {user.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
+                  {user.full_name || user.username}
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-all"
+                >
+                  <LogOut size={16} />
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link to="/login" className="px-5 py-2 border border-[#15c8fb]/30 text-[#15c8fb] font-black text-[10px] tracking-widest rounded-md hover:bg-[#15c8fb]/10 transition-all uppercase">
+                  Login
+                </Link>
+                <Link to="/register" className="px-5 py-2 bg-[#f89f29] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase">
+                  Portal
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -149,7 +179,7 @@ export default function Navbar() {
               {navLinks.find(l => l.name === activeMega)?.subItems?.map((sub, i) => (
                 <div key={i} className="group cursor-pointer p-4 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
                   <h4 className="text-xs font-black dark:text-white text-slate-900 mb-2 uppercase tracking-widest group-hover:text-[#15c8fb]">{sub.title}</h4>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">{sub.desc}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-gray-300 leading-relaxed">{sub.desc}</p>
                 </div>
               ))}
             </div>
@@ -177,13 +207,40 @@ export default function Navbar() {
                   </a>
                 </div>
               ))}
-              <Link 
-                to="/register" 
-                onClick={() => setMobileMenu(false)}
-                className="mt-4 w-full py-4 bg-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
-              >
-                Access Portal
-              </Link>
+              {user ? (
+                <>
+                  <Link 
+                    to={user.role === 'admin' ? '/admin' : '/dashboard'}
+                    onClick={() => setMobileMenu(false)}
+                    className="mt-4 w-full py-4 bg-[#15c8fb] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
+                  >
+                    Dashboard
+                  </Link>
+                  <button 
+                    onClick={() => { handleLogout(); setMobileMenu(false); }}
+                    className="w-full py-4 bg-red-500/10 text-red-400 text-center font-black rounded-lg uppercase tracking-widest"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    onClick={() => setMobileMenu(false)}
+                    className="mt-4 w-full py-4 border border-[#15c8fb]/30 text-[#15c8fb] text-center font-black rounded-lg uppercase tracking-widest"
+                  >
+                    Login
+                  </Link>
+                  <Link 
+                    to="/register" 
+                    onClick={() => setMobileMenu(false)}
+                    className="w-full py-4 bg-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
+                  >
+                    Access Portal
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}

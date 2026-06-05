@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, Users, BookOpen, Megaphone, LogOut,
   CheckCircle, XCircle, Eye, ChevronDown, Search,
@@ -11,17 +13,20 @@ import {
   AlertTriangle, Info, RefreshCw, CheckCheck, Ban,
   Maximize2, Grid, List, Heart, Share2, Play,
   UserCheck, UserX, UserCog, Shield, Award,
-  ChevronLeft, ChevronRight as ChevronRightIcon, SlidersHorizontal, Zap, EyeOff
+  ChevronLeft, ChevronRight as ChevronRightIcon, SlidersHorizontal, Zap, EyeOff,
+  CreditCard
 } from 'lucide-react';
 import gr1 from '../../assets/gr1.jpg';
 import gr3 from '../../assets/gr3.jpg';
 import grad2 from '../../assets/grad2.jpg';
+import { api, getMediaUrl } from '../../services/api';
 import { loadData, saveData } from '../../data/dataStore';
 
 const sidebarItems = [
   { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
   { id: 'hero', label: 'Hero Slides', icon: <SlidersHorizontal size={20} /> },
   { id: 'registrations', label: 'Registrations', icon: <UserPlus size={20} /> },
+  { id: 'payments', label: 'Payments', icon: <CheckCircle size={20} /> },
   { id: 'users', label: 'Users', icon: <Users size={20} /> },
   { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
   {
@@ -49,9 +54,9 @@ const initialUsers = [
   { id: genId(), name: 'Admin User', email: 'admin@elevate.com', role: 'Admin', status: 'Active', joined: '2025-12-01', courses: 0 },
 ];
 const initialCourses = [
-  { id: genId(), title: 'Full-Stack Web Development', category: 'Development', students: 245, lessons: 48, status: 'Active', price: '500 ETB', desc: 'Master React, Node.js, and scalable architectures.' },
-  { id: genId(), title: 'UI/UX Design Mastery', category: 'Design', students: 189, lessons: 36, status: 'Active', price: '450 ETB', desc: 'Prototyping and user-centric systems.' },
-  { id: genId(), title: 'AI & Machine Learning', category: 'AI', students: 312, lessons: 52, status: 'Active', price: '600 ETB', desc: 'LLMs, Neural Networks, and practical AI.' },
+  { id: genId(), title: 'Full-Stack Web Development', category: 'Development', students: 245, lessons: 48, status: 'Active', price: '500', desc: 'Master React, Node.js, and scalable architectures.', instructor: 'Lidetu Tesfaye', duration: '12 weeks', thumbnail: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400' },
+  { id: genId(), title: 'UI/UX Design Mastery', category: 'Design', students: 189, lessons: 36, status: 'Active', price: '450', desc: 'Prototyping and user-centric systems.', instructor: 'Meron Tadesse', duration: '10 weeks', thumbnail: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=400' },
+  { id: genId(), title: 'AI & Machine Learning', category: 'AI', students: 312, lessons: 52, status: 'Active', price: '600', desc: 'LLMs, Neural Networks, and practical AI.', instructor: 'Abenezer Lemma', duration: '16 weeks', thumbnail: 'https://images.unsplash.com/photo-1523050854058-8df90110c7f1?w=400' },
 ];
 const initialPosts = [
   { id: genId(), title: 'Why Full-Stack Development is the Future', author: 'Admin', date: '2026-05-20', status: 'Published', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400', excerpt: 'The tech industry is evolving rapidly...' },
@@ -81,6 +86,76 @@ const initialHeroSlides = [
   { id: genId(), image: grad2, title: 'MASTER', highlight: 'CRAFT', subtitle: 'Industry-driven curriculum with real mentors. Code, design, deploy — master the full stack.', cta: 'WATCH NOW', color: '#17c966', active: true },
 ];
 
+const Modal = ({ title, children, onClose }) => (
+  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
+    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white dark:bg-[#0a0a0a] rounded-3xl border border-gray-200 dark:border-white/10 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+      <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-white/5">
+        <h3 className="text-lg font-black text-gray-900 dark:text-white">{title}</h3>
+        <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-white/40 transition-all"><X size={18} /></button>
+      </div>
+      <div className="p-5">{children}</div>
+    </motion.div>
+  </motion.div>
+);
+
+const Toast = ({ toast }) => toast && (
+  <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -50, opacity: 0 }} className={`fixed top-6 right-6 z-[60] px-6 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 text-sm font-bold ${toast.type === 'success' ? 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400'}`}>
+    {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
+    {toast.message}
+  </motion.div>
+);
+
+const DeleteConfirm = ({ onConfirm, onCancel }) => (
+  <Modal title="Confirm Delete" onClose={onCancel}>
+    <div className="text-center">
+      <Trash2 size={48} className="mx-auto text-red-500 mb-4" />
+      <p className="text-gray-600 dark:text-white/70 mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
+      <div className="flex gap-3 justify-center">
+        <button onClick={onCancel} className="px-6 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-500 dark:text-white/60 font-bold text-xs hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
+        <button onClick={onConfirm} className="px-6 py-3 bg-red-600 text-white font-black text-xs rounded-xl hover:bg-red-700 transition-all">Delete</button>
+      </div>
+    </div>
+  </Modal>
+);
+
+const Input = ({ label, ...props }) => (
+  <div className="space-y-1.5">
+    {label && <label className="text-xs font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">{label}</label>}
+    <input {...props} className={`w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20 ${props.className || ''}`} />
+  </div>
+);
+
+const TextArea = ({ label, ...props }) => (
+  <div className="space-y-1.5">
+    {label && <label className="text-xs font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">{label}</label>}
+    <textarea {...props} className={`w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20 resize-none ${props.className || ''}`} />
+  </div>
+);
+
+const Select = ({ label, options, ...props }) => (
+  <div className="space-y-1.5">
+    {label && <label className="text-xs font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">{label}</label>}
+    <select {...props} className="w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all">
+      {options.map(o => <option key={o} value={o}>{o}</option>)}
+    </select>
+  </div>
+);
+
+const StatusBadge = ({ status }) => {
+  const map = {
+    Approved: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
+    Rejected: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',
+    Pending: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400',
+    Active: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
+    Inactive: 'bg-gray-100 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400',
+    Published: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
+    Draft: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400',
+    Admin: 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-400',
+    Student: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400',
+  };
+  return <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider inline-block ${map[status] || 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-white/40'}`}>{status}</span>;
+};
+
 export default function AdminDashboard() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem('admin-theme') !== 'light');
   useEffect(() => {
@@ -88,19 +163,31 @@ export default function AdminDashboard() {
     localStorage.setItem('admin-theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   const [activeTab, setActiveTab] = useState('dashboard');
   const [mediaOpen, setMediaOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [toast, setToast] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [showModal, setShowModal] = useState(null);
   const [editItem, setEditItem] = useState(null);
+  const [paymentDetail, setPaymentDetail] = useState(null);
+  const [lightboxImg, setLightboxImg] = useState(null);
 
   const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
-  const [registrations, setRegistrations] = useState(initialRegistrations);
+  const [registrations, setRegistrations] = useState(() => loadData('registrations').length ? loadData('registrations') : initialRegistrations);
+  const [payments, setPayments] = useState(() => loadData('payments'));
   const [users, setUsers] = useState(initialUsers);
   const [courses, setCourses] = useState(() => loadData('courses'));
   const [posts, setPosts] = useState(() => loadData('posts'));
@@ -116,10 +203,65 @@ export default function AdminDashboard() {
     saveData('testimonials', testimonials);
     saveData('posts', posts);
     saveData('announcements', announcements);
-  }, [heroSlides, courses, testimonials, posts, announcements]);
+    saveData('payments', payments);
+    saveData('registrations', registrations);
+  }, [heroSlides, courses, testimonials, posts, announcements, payments, registrations]);
+
+  const [apiPayments, setApiPayments] = useState([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
+
+  const fetchApiPayments = async () => {
+    setPaymentsLoading(true);
+    try {
+      const res = await api.get('/admin/payments/');
+      setApiPayments(res.data);
+    } catch {
+      // fallback to local data
+    } finally {
+      setPaymentsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'payments') {
+      fetchApiPayments();
+    }
+  }, [activeTab]);
+
+  const [adminCourses, setAdminCourses] = useState([]);
+  const [adminCategories, setAdminCategories] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(false);
+
+  const fetchAdminCourses = async () => {
+    setCoursesLoading(true);
+    try {
+      const res = await api.get('/admin/courses/');
+      setAdminCourses(res.data);
+    } catch {
+      // fallback to local
+    } finally {
+      setCoursesLoading(false);
+    }
+  };
+
+  const fetchAdminCategories = async () => {
+    try {
+      const res = await api.get('/admin/categories/');
+      setAdminCategories(res.data);
+    } catch {
+      // fallback
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'courses') {
+      fetchAdminCourses();
+      fetchAdminCategories();
+    }
+  }, [activeTab]);
 
   const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
-  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', price: '', status: 'Active' });
+  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', price: '', status: 'Active', instructor: '', lessons: '', duration: '', thumbnail: '' });
 
   const stats = {
     total: registrations.length,
@@ -127,9 +269,12 @@ export default function AdminDashboard() {
     approved: registrations.filter(r => r.status === 'Approved').length,
     rejected: registrations.filter(r => r.status === 'Rejected').length,
     activeUsers: users.filter(u => u.status === 'Active').length,
-    totalCourses: courses.length,
+    totalCourses: adminCourses.length || courses.length,
     totalPosts: posts.length,
     totalPhotos: photos.length,
+    pendingPayments: (apiPayments.length ? apiPayments : payments).filter(p => p.status === 'Pending' || p.status === 'pending').length,
+    approvedPayments: (apiPayments.length ? apiPayments : payments).filter(p => p.status === 'Approved' || p.status === 'approved').length,
+    rejectedPayments: (apiPayments.length ? apiPayments : payments).filter(p => p.status === 'Rejected' || p.status === 'rejected').length,
   };
 
   const statCards = [
@@ -138,7 +283,7 @@ export default function AdminDashboard() {
     { label: 'Approved', value: stats.approved, icon: <CheckCircle size={24} />, color: 'from-green-500 to-green-600' },
     { label: 'Active Users', value: stats.activeUsers, icon: <Users size={24} />, color: 'from-violet-500 to-violet-600' },
     { label: 'Courses', value: stats.totalCourses, icon: <BookOpen size={24} />, color: 'from-cyan-500 to-cyan-600' },
-    { label: 'Published Posts', value: stats.totalPosts, icon: <Newspaper size={24} />, color: 'from-pink-500 to-pink-600' },
+    { label: 'Pending Payments', value: stats.pendingPayments, icon: <CreditCard size={24} />, color: 'from-amber-500 to-amber-600' },
   ];
 
   const handleSidebarClick = (id) => {
@@ -146,77 +291,8 @@ export default function AdminDashboard() {
     else { setActiveTab(id); setMediaOpen(false); }
   };
 
-  const Modal = ({ title, children, onClose }) => (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onClose}>
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white dark:bg-[#0a0a0a] rounded-3xl border border-gray-200 dark:border-white/10 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-white/5">
-          <h3 className="text-lg font-black text-gray-900 dark:text-white">{title}</h3>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-white/40 transition-all"><X size={18} /></button>
-        </div>
-        <div className="p-5">{children}</div>
-      </motion.div>
-    </motion.div>
-  );
-
-  const Toast = () => toast && (
-    <motion.div initial={{ y: -50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -50, opacity: 0 }} className={`fixed top-6 right-6 z-[60] px-6 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 text-sm font-bold ${toast.type === 'success' ? 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-400' : 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400'}`}>
-      {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
-      {toast.message}
-    </motion.div>
-  );
-
-  const DeleteConfirm = ({ onConfirm, onCancel }) => (
-    <Modal title="Confirm Delete" onClose={onCancel}>
-      <div className="text-center">
-        <Trash2 size={48} className="mx-auto text-red-500 mb-4" />
-        <p className="text-gray-600 dark:text-white/70 mb-6">Are you sure you want to delete this item? This action cannot be undone.</p>
-        <div className="flex gap-3 justify-center">
-          <button onClick={onCancel} className="px-6 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-500 dark:text-white/60 font-bold text-xs hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
-          <button onClick={onConfirm} className="px-6 py-3 bg-red-600 text-white font-black text-xs rounded-xl hover:bg-red-700 transition-all">Delete</button>
-        </div>
-      </div>
-    </Modal>
-  );
-
-  const Input = ({ label, ...props }) => (
-    <div className="space-y-1.5">
-      {label && <label className="text-xs font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">{label}</label>}
-      <input {...props} className={`w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20 ${props.className || ''}`} />
-    </div>
-  );
-
-  const TextArea = ({ label, ...props }) => (
-    <div className="space-y-1.5">
-      {label && <label className="text-xs font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">{label}</label>}
-      <textarea {...props} className={`w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20 resize-none ${props.className || ''}`} />
-    </div>
-  );
-
-  const Select = ({ label, options, ...props }) => (
-    <div className="space-y-1.5">
-      {label && <label className="text-xs font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">{label}</label>}
-      <select {...props} className="w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all">
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
-    </div>
-  );
-
-  const StatusBadge = ({ status }) => {
-    const map = {
-      Approved: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
-      Rejected: 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400',
-      Pending: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400',
-      Active: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
-      Inactive: 'bg-gray-100 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400',
-      Published: 'bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400',
-      Draft: 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400',
-      Admin: 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-400',
-      Student: 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400',
-    };
-    return <span className={`text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider inline-block ${map[status] || 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-white/40'}`}>{status}</span>;
-  };
-
   const renderContent = () => {
+    const displayCourses = adminCourses.length ? adminCourses : courses;
     switch (activeTab) {
       case 'dashboard':
         return (
@@ -227,7 +303,7 @@ export default function AdminDashboard() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
               {statCards.map((card, i) => (
-                <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 group hover:border-gray-300 dark:hover:border-white/20 transition-all cursor-pointer" onClick={() => { const map = { 'Total Registrations': 'registrations', 'Pending Review': 'registrations', 'Approved': 'registrations', 'Active Users': 'users', 'Courses': 'courses', 'Published Posts': 'posts' }; setActiveTab(map[card.label]); }}>
+                <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 group hover:border-gray-300 dark:hover:border-white/20 transition-all cursor-pointer" onClick={() => { const map = { 'Total Registrations': 'registrations', 'Pending Review': 'registrations', 'Approved': 'registrations', 'Active Users': 'users', 'Courses': 'courses', 'Pending Payments': 'payments' }; setActiveTab(map[card.label]); }}>
                   <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br ${card.color}`} />
                   <div className="flex items-center justify-between mb-3">
                     <div className="p-2.5 rounded-xl bg-gray-200 dark:bg-white/5 text-gray-600 dark:text-white/70">{card.icon}</div>
@@ -253,27 +329,27 @@ export default function AdminDashboard() {
                       </div>
                       <StatusBadge status={r.status} />
                     </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-6">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><Zap size={18} className="text-[#15c8fb]" /> Quick Actions</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    { label: 'New Course', icon: <BookOpen size={16} />, tab: 'courses', color: 'from-cyan-500/20 to-blue-500/20 text-[#15c8fb]' },
-                    { label: 'New Post', icon: <Newspaper size={16} />, tab: 'posts', color: 'from-pink-500/20 to-rose-500/20 text-pink-600 dark:text-pink-400' },
-                    { label: 'New User', icon: <UserPlus size={16} />, tab: 'users', color: 'from-violet-500/20 to-purple-500/20 text-violet-600 dark:text-violet-400' },
-                    { label: 'Announcement', icon: <Megaphone size={16} />, tab: 'announcements', color: 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400' },
-                  ].map(a => (
-                    <button key={a.label} onClick={() => { setActiveTab(a.tab); if (a.tab === 'posts' || a.tab === 'testimonials' || a.tab === 'photos' || a.tab === 'gallery') { setMediaOpen(true); } }} className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br ${a.color} border border-white/10 font-bold text-xs hover:scale-[1.02] transition-all`}>
-                      {a.icon} {a.label}
-                    </button>
-                  ))}
-                </div>
+              ))}
+            </div>
+            <div className="rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2"><Zap size={18} className="text-[#15c8fb]" /> Quick Actions</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'New Course', icon: <BookOpen size={16} />, tab: 'courses', color: 'from-cyan-500/20 to-blue-500/20 text-[#15c8fb]' },
+                  { label: 'New Post', icon: <Newspaper size={16} />, tab: 'posts', color: 'from-pink-500/20 to-rose-500/20 text-pink-600 dark:text-pink-400' },
+                  { label: 'New User', icon: <UserPlus size={16} />, tab: 'users', color: 'from-violet-500/20 to-purple-500/20 text-violet-600 dark:text-violet-400' },
+                  { label: 'Announcement', icon: <Megaphone size={16} />, tab: 'announcements', color: 'from-amber-500/20 to-orange-500/20 text-amber-600 dark:text-amber-400' },
+                ].map(a => (
+                  <button key={a.label} onClick={() => { setActiveTab(a.tab); if (a.tab === 'posts' || a.tab === 'testimonials' || a.tab === 'photos' || a.tab === 'gallery') { setMediaOpen(true); } }} className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br ${a.color} border border-white/10 font-bold text-xs hover:scale-[1.02] transition-all`}>
+                    {a.icon} {a.label}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
-        );
+        </div>
+      </div>
+      );
 
       case 'registrations':
         return (
@@ -376,33 +452,52 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-1">Courses</h2>
-                <p className="text-gray-500 dark:text-white/40 text-sm font-medium">{courses.length} courses available</p>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-medium">{displayCourses.length} courses available</p>
               </div>
-              <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', price: '', status: 'Active' }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#f89f29] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
+              <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', price: '', status: 'Active', instructor: '', lessons: '', duration: '', thumbnail: '' }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#f89f29] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
             </div>
+            {coursesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <RefreshCw size={24} className="animate-spin text-gray-400" />
+              </div>
+            ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {courses.map((course, i) => (
-                <motion.div key={course.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 p-5 hover:border-[#15c8fb]/30 transition-all group">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 rounded-xl bg-blue-100 dark:bg-[#15c8fb]/10 text-[#15c8fb]"><BookOpen size={24} /></div>
-                    <StatusBadge status={course.status} />
+              {displayCourses.map((course, i) => {
+                const courseStatus = course.is_active !== undefined ? (course.is_active ? 'Active' : 'Inactive') : course.status;
+                const courseCategory = course.category?.name || course.category || '';
+                const courseThumb = course.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400';
+                const coursePrice = course.price ? (course.price.toString().includes('ETB') ? course.price : `${course.price} ETB`) : '';
+                const courseDesc = course.short_description || course.desc || '';
+                const courseStudents = course.students || course.enrolled_count || 0;
+                const courseLessons = course.lessons || 0;
+                return (
+                <motion.div key={course.id || course.slug} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-100 dark:bg-white/5 overflow-hidden hover:border-[#15c8fb]/30 transition-all group">
+                  <div className="h-36 overflow-hidden relative">
+                    <img src={courseThumb} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute top-3 right-3"><StatusBadge status={courseStatus} /></div>
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-[#15c8fb] transition-colors">{course.title}</h3>
-                  <p className="text-xs text-gray-500 dark:text-white/40 mb-1">{course.category}</p>
-                  <p className="text-xs text-gray-400 dark:text-white/30 mb-4 line-clamp-2">{course.desc}</p>
-                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-white/40 mb-4">
-                    <span>{course.students} students</span>
-                    <span>{course.lessons} lessons</span>
-                    <span className="font-bold text-[#15c8fb]">{course.price}</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button className="flex-1 py-3 border border-[#15c8fb]/30 text-[#15c8fb] font-bold text-xs rounded-xl hover:bg-[#15c8fb] hover:text-white transition-all">Apply</button>
-                    <button onClick={() => { setEditItem(course); setShowModal('course'); }} className="p-3 rounded-xl border border-gray-200 dark:border-white/10 text-gray-500 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/5 transition-all"><Edit3 size={14} /></button>
-                    <button onClick={() => { setSelectedItem({ type: 'course', id: course.id }); setShowModal('delete'); }} className="p-3 rounded-xl border border-gray-200 dark:border-white/10 text-red-500/60 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all"><Trash2 size={14} /></button>
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-[#15c8fb] transition-colors">{course.title}</h3>
+                    <p className="text-xs text-gray-500 dark:text-white/40 mb-1">{courseCategory}</p>
+                    {course.instructor && <p className="text-[10px] text-gray-400 dark:text-white/30 mb-1">by {course.instructor}</p>}
+                    <p className="text-xs text-gray-400 dark:text-white/30 mb-4 line-clamp-2">{courseDesc}</p>
+                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-white/40 mb-4">
+                      <span>{courseStudents} students</span>
+                      <span>{courseLessons} lessons</span>
+                      {coursePrice && <span className="font-bold text-[#15c8fb]">{coursePrice}</span>}
+                      {course.duration && <span>{course.duration}</span>}
+                    </div>
+                    <div className="flex gap-2">
+                      <button className="flex-1 py-3 border border-[#15c8fb]/30 text-[#15c8fb] font-bold text-xs rounded-xl hover:bg-[#15c8fb] hover:text-white transition-all">Apply</button>
+                      <button onClick={() => { setEditItem(course); setShowModal('course'); }} className="p-3 rounded-xl border border-gray-200 dark:border-white/10 text-gray-500 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/5 transition-all"><Edit3 size={14} /></button>
+                      <button onClick={() => { setSelectedItem({ type: 'course', id: course.id }); setShowModal('delete'); }} className="p-3 rounded-xl border border-gray-200 dark:border-white/10 text-red-500/60 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all"><Trash2 size={14} /></button>
+                    </div>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
+            )}
           </div>
         );
 
@@ -623,18 +718,122 @@ export default function AdminDashboard() {
           </div>
         );
 
+      case 'payments':
+        const displayPayments = apiPayments.length ? apiPayments : payments;
+        return (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight mb-2">Payment Proofs</h2>
+                <p className="text-gray-500 dark:text-white/40 text-sm font-medium">{displayPayments.length} total · {stats.pendingPayments} pending approval</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button onClick={fetchApiPayments} disabled={paymentsLoading} className="p-2 rounded-lg bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/10 transition-all" title="Refresh">
+                  <RefreshCw size={16} className={paymentsLoading ? 'animate-spin' : ''} />
+                </button>
+                <div className="relative">
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30" />
+                  <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-48 pl-10 pr-4 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 placeholder:text-gray-400 dark:placeholder:text-white/20" />
+                </div>
+                <div className="flex gap-1 p-1 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+                  {['All', 'Pending', 'Approved', 'Rejected'].map(s => (
+                    <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all uppercase tracking-wider ${statusFilter === s ? 'bg-white dark:bg-white/10 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-white/40 hover:text-gray-700 dark:hover:text-white/60'}`}>{s}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="overflow-x-auto rounded-2xl border border-gray-200 dark:border-white/10">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5">
+                    {['Full Name', 'Email', 'Phone', 'Course', 'Status', 'Date', 'Actions'].map(h => <th key={h} className={`text-left p-3 text-[10px] font-black text-gray-500 dark:text-white/50 uppercase tracking-wider ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(searchQuery || statusFilter !== 'All' ? displayPayments.filter(p => {
+                    const matchesSearch = !searchQuery || (p.full_name || '').toLowerCase().includes(searchQuery.toLowerCase()) || (p.email || '').toLowerCase().includes(searchQuery.toLowerCase());
+                    const s = (p.status || '').toLowerCase();
+                    const matchesStatus = statusFilter === 'All' || s === statusFilter.toLowerCase();
+                    return matchesSearch && matchesStatus;
+                  }) : displayPayments).map((p, i) => {
+                    const isPending = (p.status || '').toLowerCase() === 'pending';
+                    const isApproved = (p.status || '').toLowerCase() === 'approved';
+                    const isRejected = (p.status || '').toLowerCase() === 'rejected';
+                    return (
+                    <motion.tr key={p.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }} className="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/[0.02] transition-colors">
+                      <td className="p-3"><span className="font-semibold text-gray-900 dark:text-white text-sm">{p.full_name}</span></td>
+                      <td className="p-3 text-gray-500 dark:text-white/60 text-xs">{p.email}</td>
+                      <td className="p-3 text-gray-500 dark:text-white/60 text-xs">{p.phone}</td>
+                      <td className="p-3 text-gray-500 dark:text-white/60 text-xs">{p.course_title}</td>
+                      <td className="p-3"><StatusBadge status={p.status} /></td>
+                      <td className="p-3 text-gray-500 dark:text-white/60 text-xs">{p.submitted_at ? new Date(p.submitted_at).toLocaleDateString() : '-'}</td>
+                      <td className="p-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <button onClick={() => setPaymentDetail(p)} className="p-2 rounded-lg bg-blue-100 dark:bg-[#15c8fb]/10 text-[#15c8fb] hover:bg-blue-200 dark:hover:bg-[#15c8fb]/20 transition-all" title="View Details">
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await api.put(`/admin/payments/${p.id}/approve/`);
+                                showToast(`${p.full_name}'s payment approved`);
+                                fetchApiPayments();
+                              } catch (err) {
+                                showToast(err?.response?.data?.detail || 'Failed to approve', 'error');
+                              }
+                            }}
+                            disabled={!isPending}
+                            className="p-2 rounded-lg bg-green-100 dark:bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-500/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            title="Approve"
+                          >
+                            <CheckCircle size={16} />
+                          </button>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await api.put(`/admin/payments/${p.id}/reject/`);
+                                showToast(`${p.full_name}'s payment rejected`);
+                                fetchApiPayments();
+                              } catch (err) {
+                                showToast(err?.response?.data?.detail || 'Failed to reject', 'error');
+                              }
+                            }}
+                            disabled={!isPending}
+                            className="p-2 rounded-lg bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            title="Reject"
+                          >
+                            <XCircle size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </motion.tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              {displayPayments.length === 0 && <div className="p-12 text-center"><CreditCard size={40} className="mx-auto text-gray-300 dark:text-white/10 mb-4" /><p className="text-gray-400 dark:text-white/30 text-sm">No payment submissions yet</p></div>}
+            </div>
+          </div>
+        );
+
       default: return null;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#050505] flex transition-colors duration-300">
-      <Toast />
+      <Toast toast={toast} />
       {showModal === 'delete' && selectedItem?.type && (
         <DeleteConfirm onConfirm={() => {
           const { type, id } = selectedItem;
           if (type === 'user') setUsers(prev => prev.filter(u => u.id !== id));
-          if (type === 'course') setCourses(prev => prev.filter(c => c.id !== id));
+          if (type === 'course') {
+            if (adminCourses.length) {
+              api.delete(`/admin/courses/${id}/`).then(fetchAdminCourses).catch(() => {});
+            } else {
+              setCourses(prev => prev.filter(c => c.id !== id));
+            }
+          }
           if (type === 'post') setPosts(prev => prev.filter(p => p.id !== id));
           if (type === 'testimonial') setTestimonials(prev => prev.filter(t => t.id !== id));
           if (type === 'gallery') setGalleryAlbums(prev => prev.filter(a => a.id !== id));
@@ -649,16 +848,66 @@ export default function AdminDashboard() {
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <Input label="Title" value={editItem?.title || newCourse.title} onChange={e => editItem ? setEditItem(p => ({ ...p, title: e.target.value })) : setNewCourse(p => ({ ...p, title: e.target.value }))} placeholder="Course title" />
-              <Input label="Category" value={editItem?.category || newCourse.category} onChange={e => editItem ? setEditItem(p => ({ ...p, category: e.target.value })) : setNewCourse(p => ({ ...p, category: e.target.value }))} placeholder="Development" />
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-gray-500 dark:text-white/40 uppercase tracking-wider">Category</label>
+                <select
+                  value={editItem?.category?.id || editItem?.category_id || newCourse.category || ''}
+                  onChange={e => editItem ? setEditItem(p => ({ ...p, category_id: Number(e.target.value), category: adminCategories.find(c => c.id === Number(e.target.value)) })) : setNewCourse(p => ({ ...p, category: e.target.value }))}
+                  className="w-full px-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all"
+                >
+                  <option value="">-- Select category --</option>
+                  {adminCategories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-            <Input label="Price" value={editItem?.price || newCourse.price} onChange={e => editItem ? setEditItem(p => ({ ...p, price: e.target.value })) : setNewCourse(p => ({ ...p, price: e.target.value }))} placeholder="500 ETB" />
-            <Select label="Status" value={editItem?.status || newCourse.status} onChange={e => editItem ? setEditItem(p => ({ ...p, status: e.target.value })) : setNewCourse(p => ({ ...p, status: e.target.value }))} options={['Active', 'Inactive']} />
-            <TextArea label="Description" rows={3} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Course description..." />
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Price (ETB)" value={editItem?.price || newCourse.price} onChange={e => editItem ? setEditItem(p => ({ ...p, price: e.target.value })) : setNewCourse(p => ({ ...p, price: e.target.value }))} placeholder="500" />
+              <Input label="Duration" value={editItem?.duration || newCourse.duration} onChange={e => editItem ? setEditItem(p => ({ ...p, duration: e.target.value })) : setNewCourse(p => ({ ...p, duration: e.target.value }))} placeholder="12 weeks" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Instructor" value={editItem?.instructor || newCourse.instructor} onChange={e => editItem ? setEditItem(p => ({ ...p, instructor: e.target.value })) : setNewCourse(p => ({ ...p, instructor: e.target.value }))} placeholder="Instructor name" />
+              <Input label="Lessons" type="number" value={editItem?.lessons || newCourse.lessons} onChange={e => editItem ? setEditItem(p => ({ ...p, lessons: e.target.value })) : setNewCourse(p => ({ ...p, lessons: e.target.value }))} placeholder="24" />
+            </div>
+            <Input label="Thumbnail URL" value={editItem?.thumbnail || newCourse.thumbnail} onChange={e => editItem ? setEditItem(p => ({ ...p, thumbnail: e.target.value })) : setNewCourse(p => ({ ...p, thumbnail: e.target.value }))} placeholder="https://images.unsplash.com/..." />
+            <Select label="Status" value={editItem?.is_active !== undefined ? (editItem.is_active ? 'Active' : 'Inactive') : editItem?.status || newCourse.status} onChange={e => { const v = e.target.value; editItem ? setEditItem(p => ({ ...p, status: v, is_active: v === 'Active' })) : setNewCourse(p => ({ ...p, status: v })); }} options={['Active', 'Inactive']} />
+            <TextArea label="Description" rows={3} value={editItem?.short_description || editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, short_description: e.target.value, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Course description..." />
             <div className="flex justify-end gap-3 pt-2">
               <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 dark:border-white/10 rounded-xl text-gray-500 dark:text-white/60 font-bold text-xs hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
-              <button onClick={() => {
-                if (editItem?.id) { setCourses(prev => prev.map(c => c.id === editItem.id ? { ...c, ...editItem } : c)); showToast('Course updated'); }
-                else { setCourses(prev => [...prev, { id: genId(), ...newCourse, students: 0, lessons: 0 }]); showToast('Course created'); }
+              <button onClick={async () => {
+                const payload = {
+                  title: editItem?.title || newCourse.title,
+                  short_description: editItem?.short_description || editItem?.desc || newCourse.desc,
+                  price: parseFloat(editItem?.price || newCourse.price) || 0,
+                  instructor: editItem?.instructor || newCourse.instructor || '',
+                  lessons: parseInt(editItem?.lessons || newCourse.lessons) || null,
+                  duration: editItem?.duration || newCourse.duration || '',
+                  thumbnail: editItem?.thumbnail || newCourse.thumbnail || '',
+                  is_active: editItem?.is_active !== undefined ? editItem.is_active : (editItem?.status || newCourse.status) === 'Active',
+                  category_id: editItem?.category_id || editItem?.category?.id || parseInt(newCourse.category) || null,
+                };
+                try {
+                  if (editItem?.id) {
+                    if (adminCourses.length) {
+                      await api.put(`/admin/courses/${editItem.id}/`, payload);
+                    } else {
+                      setCourses(prev => prev.map(c => c.id === editItem.id ? { ...c, ...editItem } : c));
+                    }
+                    showToast('Course updated');
+                  } else {
+                    if (adminCourses.length) {
+                      await api.post('/admin/courses/', payload);
+                    } else {
+                      setCourses(prev => [...prev, { id: genId(), ...newCourse, students: 0, lessons: Number(newCourse.lessons) || 0 }]);
+                    }
+                    showToast('Course created');
+                  }
+                  if (adminCourses.length) fetchAdminCourses();
+                } catch (err) {
+                  const msg = err?.response?.data?.title?.[0] || err?.response?.data?.detail || err?.response?.data?.category_id?.[0] || 'Failed to save course';
+                  showToast(msg, 'error');
+                }
                 setShowModal(null); setEditItem(null);
               }} className="px-6 py-3 bg-[#f89f29] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
             </div>
@@ -782,6 +1031,88 @@ export default function AdminDashboard() {
         </Modal>
       )}
 
+      {lightboxImg && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[70] flex items-center justify-center bg-black/90 backdrop-blur-sm" onClick={() => setLightboxImg(null)}>
+          <button onClick={() => setLightboxImg(null)} className="absolute top-4 right-4 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all z-10"><X size={24} /></button>
+          <a href={lightboxImg} download className="absolute top-4 right-16 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all z-10"><Download size={20} /></a>
+          <motion.img initial={{ scale: 0.8 }} animate={{ scale: 1 }} src={lightboxImg} alt="Payment Proof" className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg" onClick={e => e.stopPropagation()} />
+        </motion.div>
+      )}
+
+      {paymentDetail && (
+        <Modal title="Payment Details" onClose={() => setPaymentDetail(null)}>
+          <div className="space-y-6">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-white/5">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#f89f29] to-[#15c8fb] flex items-center justify-center text-white font-black text-xl">
+                {(paymentDetail.full_name || 'U')[0]}
+              </div>
+              <div className="flex-1">
+                <h4 className="text-xl font-bold text-gray-900 dark:text-white">{paymentDetail.full_name}</h4>
+                <p className="text-sm text-gray-500 dark:text-white/40">{paymentDetail.email}</p>
+              </div>
+              <StatusBadge status={paymentDetail.status} />
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              {[
+                { icon: <Phone size={16} />, label: 'Phone', value: paymentDetail.phone },
+                { icon: <Mail size={16} />, label: 'Email', value: paymentDetail.email },
+                { icon: <BookOpen size={16} />, label: 'Course', value: paymentDetail.course_title },
+                { icon: <Calendar size={16} />, label: 'Submitted', value: paymentDetail.submitted_at ? new Date(paymentDetail.submitted_at).toLocaleDateString() : '-' },
+              ].map((item, i) => (
+                <div key={i} className="p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-white/30 text-[10px] uppercase tracking-wider font-bold mb-1">{item.icon} {item.label}</div>
+                  <p className="text-gray-900 dark:text-white font-semibold">{item.value}</p>
+                </div>
+              ))}
+            </div>
+            {paymentDetail.proof_file && (
+              <div className="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                <div className="flex items-center gap-2 text-gray-400 dark:text-white/30 text-[10px] uppercase tracking-wider font-bold mb-2"><Eye size={16} /> Payment Proof</div>
+                {getMediaUrl(paymentDetail.proof_file).match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) ? (
+                  <div className="relative group cursor-pointer" onClick={() => setLightboxImg(getMediaUrl(paymentDetail.proof_file))}>
+                    <img src={getMediaUrl(paymentDetail.proof_file)} alt="Payment Proof" className="w-full max-h-72 object-contain rounded-lg group-hover:brightness-75 transition-all" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="px-3 py-1.5 bg-black/60 text-white text-[10px] font-bold rounded-lg backdrop-blur-sm">Click to enlarge</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <a href={getMediaUrl(paymentDetail.proof_file)} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-3 bg-[#15c8fb]/10 text-[#15c8fb] font-bold text-xs rounded-xl hover:bg-[#15c8fb]/20 transition-all">
+                      <FileText size={16} /> View File
+                    </a>
+                    <a href={getMediaUrl(paymentDetail.proof_file)} download className="p-3 rounded-xl bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/10 transition-all">
+                      <Download size={16} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+            <div className="flex gap-3 pt-2">
+              <button onClick={async () => {
+                try {
+                  await api.put(`/admin/payments/${paymentDetail.id}/approve/`);
+                  showToast(`${paymentDetail.full_name}'s payment approved`);
+                  setPaymentDetail(null);
+                  fetchApiPayments();
+                } catch (err) {
+                  showToast(err?.response?.data?.detail || 'Failed to approve', 'error');
+                }
+              }} disabled={(paymentDetail.status || '').toLowerCase() !== 'pending'} className="flex-1 py-3 bg-green-600 text-white font-black text-xs rounded-xl hover:bg-green-700 transition-all flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"><CheckCircle size={16} /> Approve</button>
+              <button onClick={async () => {
+                try {
+                  await api.put(`/admin/payments/${paymentDetail.id}/reject/`);
+                  showToast(`${paymentDetail.full_name}'s payment rejected`);
+                  setPaymentDetail(null);
+                  fetchApiPayments();
+                } catch (err) {
+                  showToast(err?.response?.data?.detail || 'Failed to reject', 'error');
+                }
+              }} disabled={(paymentDetail.status || '').toLowerCase() !== 'pending'} className="flex-1 py-3 bg-red-600 text-white font-black text-xs rounded-xl hover:bg-red-700 transition-all flex items-center justify-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"><XCircle size={16} /> Reject</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {selectedItem?.type === 'registration' && (
         <Modal title="Registration Details" onClose={() => setSelectedItem(null)}>
           <div className="space-y-6">
@@ -805,6 +1136,12 @@ export default function AdminDashboard() {
                   <p className="text-gray-900 dark:text-white font-semibold">{item.value}</p>
                 </div>
               ))}
+              {selectedItem.data.id_proof && (
+                <div className="col-span-2 p-3 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-white/30 text-[10px] uppercase tracking-wider font-bold mb-1"><Image size={16} /> Identity Proof</div>
+                  <img src={selectedItem.data.id_proof} alt="ID Proof" className="w-full max-h-48 object-contain rounded-lg" />
+                </div>
+              )}
             </div>
             <div className="flex gap-3">
               <button onClick={() => { setRegistrations(prev => prev.map(r => r.id === selectedItem.data.id ? { ...r, status: 'Approved' } : r)); setSelectedItem(null); showToast('Registration approved'); }} className="flex-1 py-3 bg-green-600 text-white font-black text-xs rounded-xl hover:bg-green-700 transition-all flex items-center justify-center gap-2"><CheckCircle size={16} /> Approve</button>
@@ -852,7 +1189,7 @@ export default function AdminDashboard() {
         </nav>
 
         <div className="p-4 border-t border-gray-200 dark:border-white/5 shrink-0">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 dark:text-red-400/60 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all"><LogOut size={18} /> Logout</button>
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 dark:text-red-400/60 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all"><LogOut size={18} /> Logout</button>
         </div>
       </motion.aside>
 
@@ -873,7 +1210,51 @@ export default function AdminDashboard() {
               <Bell size={18} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#f89f29] rounded-full" />
             </button>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f89f29] to-[#15c8fb] flex items-center justify-center text-white font-black text-xs">A</div>
+            <div className="relative">
+              <button
+                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                className="w-9 h-9 rounded-full bg-gradient-to-br from-[#f89f29] to-[#15c8fb] flex items-center justify-center text-white font-black text-xs hover:scale-105 transition-transform cursor-pointer"
+              >
+                {(user?.full_name || 'A')[0]}
+              </button>
+              <AnimatePresence>
+                {profileMenuOpen && (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-40"
+                      onClick={() => setProfileMenuOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 w-48 z-50 bg-white dark:bg-[#0c0c0c] border border-gray-200 dark:border-white/10 rounded-xl shadow-2xl shadow-black/10 overflow-hidden"
+                    >
+                      <div className="px-4 py-3 border-b border-gray-100 dark:border-white/5">
+                        <p className="text-xs font-bold text-gray-900 dark:text-white truncate">{user?.full_name}</p>
+                        <p className="text-[10px] text-gray-500 dark:text-white/40 truncate">{user?.email}</p>
+                      </div>
+                      <button
+                        onClick={() => { setActiveTab('users'); setProfileMenuOpen(false); }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-gray-700 dark:text-white/70 hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
+                      >
+                        <UserCog size={14} /> Profile
+                      </button>
+                      <button
+                        onClick={() => { setProfileMenuOpen(false); handleLogout(); }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/5 transition-all border-t border-gray-100 dark:border-white/5"
+                      >
+                        <LogOut size={14} /> Logout
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </header>
 
