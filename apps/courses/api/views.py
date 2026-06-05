@@ -2,6 +2,7 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from drf_spectacular.utils import extend_schema
 
 from apps.courses.services import CourseService
 from apps.courses.permissions import IsAdmin
@@ -10,7 +11,7 @@ from apps.courses.api.serializers import CategorySerializer
 from apps.courses.services import CategoryService
 
 
-
+@extend_schema(tags=["Courses"])
 class PublicCourseListView(generics.ListAPIView):
     """GET /api/v1/courses/"""
     serializer_class = CourseListSerializer
@@ -23,6 +24,7 @@ class PublicCourseListView(generics.ListAPIView):
         return CourseService.get_published_courses()
 
 
+@extend_schema(tags=["Courses"])
 class PublicCourseDetailView(generics.RetrieveAPIView):
     """GET /api/v1/courses/{id}/"""
     serializer_class = CourseDetailSerializer
@@ -33,6 +35,7 @@ class PublicCourseDetailView(generics.RetrieveAPIView):
 
 
 
+@extend_schema(tags=["Courses"])
 class PublicCategoryListView(generics.ListAPIView):
     """GET /api/v1/categories/"""
     serializer_class = CategorySerializer
@@ -42,6 +45,7 @@ class PublicCategoryListView(generics.ListAPIView):
         return CategoryService.get_all_categories()
 
 
+@extend_schema(tags=["Courses"])
 class PublicCategoryDetailView(generics.RetrieveAPIView):
     """GET /api/v1/categories/{id}/"""
     serializer_class = CategorySerializer
@@ -51,6 +55,7 @@ class PublicCategoryDetailView(generics.RetrieveAPIView):
         return CategoryService.get_category_detail(self.kwargs['pk'])
 
 
+@extend_schema(tags=["Courses"])
 class AdminCategoryListCreateView(generics.ListCreateAPIView):
     """GET + POST /api/v1/admin/categories/"""
     permission_classes = [IsAuthenticated, IsAdmin]
@@ -60,6 +65,7 @@ class AdminCategoryListCreateView(generics.ListCreateAPIView):
         return CategoryService.get_all_categories()
 
 
+@extend_schema(tags=["Courses"])
 class AdminCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
     """GET + PUT + PATCH + DELETE /api/v1/admin/categories/{id}/"""
     permission_classes = [IsAuthenticated, IsAdmin]
@@ -72,6 +78,7 @@ class AdminCategoryDetailView(generics.RetrieveUpdateDestroyAPIView):
         CategoryService.delete_category(instance)
 
 
+@extend_schema(tags=["Courses"])
 class AdminCourseListCreateView(generics.ListCreateAPIView):
     """GET + POST /api/v1/admin/courses/"""
     permission_classes = [IsAuthenticated, IsAdmin]
@@ -81,6 +88,7 @@ class AdminCourseListCreateView(generics.ListCreateAPIView):
         return CourseService.get_all_courses()
 
 
+@extend_schema(tags=["Courses"])
 class AdminCourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     """GET + PUT + PATCH + DELETE /api/v1/admin/courses/{id}/"""
     permission_classes = [IsAuthenticated, IsAdmin]

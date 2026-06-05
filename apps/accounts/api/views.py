@@ -18,6 +18,7 @@ from apps.accounts.api.serializers import (
 
 User = get_user_model()
 
+@extend_schema(tags=["Account"])
 class RegisterView(generics.CreateAPIView):
     """
     Register a new user in the system. Role defaults to 'student'.
@@ -27,7 +28,7 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (permissions.AllowAny,)
 
-    @extend_schema(responses={201: RegisterResponseSerializer})
+    @extend_schema(responses={201: RegisterResponseSerializer}, tags=["Account"])
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -44,7 +45,7 @@ class RegisterView(generics.CreateAPIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 
-@extend_schema(responses={200: LoginResponseSerializer})
+@extend_schema(responses={200: LoginResponseSerializer}, tags=["Account"])
 class LoginView(TokenObtainPairView):
     """
     Obtain JWT access and refresh token pair along with user details.
@@ -52,6 +53,7 @@ class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     permission_classes = (permissions.AllowAny,)
 
+@extend_schema(tags=["Account"])
 class LogoutView(APIView):
     """
     Blacklist the provided refresh token to logout the user.
@@ -59,7 +61,7 @@ class LogoutView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = LogoutSerializer
 
-    @extend_schema(request=LogoutSerializer, responses={200: dict, 400: dict})
+    @extend_schema(request=LogoutSerializer, responses={200: dict, 400: dict}, tags=["Account"])
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -77,6 +79,7 @@ class LogoutView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+@extend_schema(tags=["Account"])
 class ProfileView(generics.RetrieveUpdateAPIView):
     """
     Retrieve or update the authenticated user's profile.
