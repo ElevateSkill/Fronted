@@ -103,6 +103,7 @@ export default function UserDashboard() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
     if (activeTab === 'payment') {
       fetchEnrollments();
       fetchPayments();
@@ -110,7 +111,7 @@ export default function UserDashboard() {
     if (activeTab === 'settings') {
       fetchPayments();
     }
-  }, [activeTab]);
+  }, [activeTab, user]);
 
   const fetchEnrollments = async () => {
     try {
@@ -140,10 +141,15 @@ export default function UserDashboard() {
   };
 
   useEffect(() => {
+    if (!user) return;
     if (activeTab === 'courses' || activeTab === 'home') {
       fetchAllEnrollments();
     }
-  }, [activeTab]);
+  }, [activeTab, user]);
+
+  useEffect(() => {
+    if (user) fetchAllEnrollments();
+  }, [user]);
 
   const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 

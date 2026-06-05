@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Code2, Palette, BrainCircuit, Rocket, Users, Clock, Star, ArrowRight, ChevronRight, GraduationCap, Award } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Code2, Palette, BrainCircuit, Rocket, Users, Clock, Star, ArrowRight, ChevronRight, GraduationCap, Award, Loader, CheckCircle } from 'lucide-react';
 import { loadData } from '../data/dataStore';
 import { api } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const iconMap = [<Code2 size={28} />, <Palette size={28} />, <BrainCircuit size={28} />, <Rocket size={28} />];
 const colorMap = ['#15c8fb', '#f89f29', '#17c966', '#15c8fb'];
@@ -36,7 +38,11 @@ const defaultCourses = [
 ];
 
 export default function Courses() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [fetchedCourses, setFetchedCourses] = useState([]);
+  const [enrollingId, setEnrollingId] = useState(null);
+  const [enrollSuccessId, setEnrollSuccessId] = useState(null);
 
   useEffect(() => {
     api.get('/courses/')
@@ -46,6 +52,7 @@ export default function Courses() {
 
   const stored = loadData('courses');
   const courses = fetchedCourses.length ? fetchedCourses.map((c, i) => ({
+    id: c.id,
     title: c.title,
     category: c.category?.name || c.category || '',
     desc: c.short_description || '',
@@ -58,6 +65,24 @@ export default function Courses() {
     color: colorMap[i % colorMap.length],
     price: c.price ? `${c.price} ETB` : '',
   })) : (stored.length ? stored : defaultCourses);
+
+  const handleEnroll = async (course) => {
+    if (!user) {
+      navigate(`/register?courseId=${course.id || ''}`);
+      return;
+    }
+    setEnrollingId(course.id || course.title);
+    try {
+      await api.post('/enrollments/', { course: course.id });
+      setEnrollSuccessId(course.id || course.title);
+      setTimeout(() => navigate('/dashboard'), 1200);
+    } catch (err) {
+      const msg = err?.response?.data?.course?.[0] || err?.response?.data?.detail || 'Failed to enroll';
+      alert(msg);
+    } finally {
+      setEnrollingId(null);
+    }
+  };
   return (
     <div id="courses" className="relative w-full bg-gray-50 dark:bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
       <div className="absolute top-1/3 right-0 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
@@ -133,8 +158,18 @@ export default function Courses() {
                     <span className="text-sm text-gray-400 dark:text-gray-500 line-through font-medium">{course.price === '500 ETB' ? '550' : course.price === '450 ETB' ? '500' : course.price === '600 ETB' ? '700' : '650'} ETB</span>
                     <span className="text-xl font-black text-gray-900 dark:text-white block leading-none mt-0.5">{course.price}</span>
                   </div>
-                  <button className="flex items-center gap-1.5 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black text-[10px] rounded-xl hover:bg-[#15c8fb] dark:hover:bg-[#15c8fb] hover:text-white dark:hover:text-white transition-all duration-300 uppercase tracking-wider shadow-md">
-                    Enroll <ChevronRight size={13} />
+                  <button
+                    onClick={() => handleEnroll(course)}
+                    disabled={enrollingId === (course.id || course.title)}
+                    className="flex items-center gap-1.5 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black text-[10px] rounded-xl hover:bg-[#15c8fb] dark:hover:bg-[#15c8fb] hover:text-white dark:hover:text-white transition-all duration-300 uppercase tracking-wider shadow-md disabled:opacity-50"
+                  >
+                    {enrollSuccessId === (course.id || course.title) ? (
+                      <><CheckCircle size={13} /> Enrolled</>
+                    ) : enrollingId === (course.id || course.title) ? (
+                      <><Loader size={13} className="animate-spin" /> Enrolling</>
+                    ) : (
+                      <><ChevronRight size={13} /> Enroll</>
+                    )}
                   </button>
                 </div>
               </div>

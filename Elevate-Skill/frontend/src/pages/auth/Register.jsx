@@ -66,6 +66,12 @@ export default function Register() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const courseId = params.get('courseId');
+    if (courseId) setSelectedCourseId(courseId);
+  }, []);
+
+  useEffect(() => {
     api.get('/courses/')
       .then(res => setCourses(res.data))
       .catch(() => {});
