@@ -108,8 +108,18 @@ export default function Landing() {
           />
         </AnimatePresence>
         <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} z-[1]`} />
-        <div className="absolute inset-0 bg-black/50 z-[2]" />
-        <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,0.4)] z-[2]" />
+        <div className="absolute inset-0 bg-black/60 z-[2]" />
+        <motion.div
+          animate={{
+            boxShadow: [
+              "inset 0 0 100px rgba(0,0,0,0.5), inset 0 0 300px rgba(0,0,0,0.3)",
+              "inset 0 0 200px rgba(0,0,0,0.7), inset 0 0 400px rgba(0,0,0,0.4)",
+              "inset 0 0 100px rgba(0,0,0,0.5), inset 0 0 300px rgba(0,0,0,0.3)",
+            ]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 z-[2] pointer-events-none"
+        />
       </div>
 
       <div className="relative z-10 flex flex-col justify-center items-center h-screen w-full px-6">
@@ -127,16 +137,16 @@ export default function Landing() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/10 mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/10 mb-8 shadow-lg"
             >
               <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: slide.color }} />
-              <span className="text-[10px] font-bold text-white/80 uppercase tracking-[0.2em]">{slide.highlight}</span>
+              <span className="text-[10px] font-bold text-white/90 uppercase tracking-[0.2em] drop-shadow-md">{slide.highlight}</span>
             </motion.div>
 
-            <h1 className="text-[clamp(2.8rem,7vw,5.5rem)] font-black tracking-tight text-white leading-[1.05] mb-4">
+            <h1 className="text-[clamp(2.8rem,7vw,5.5rem)] font-black tracking-tight text-white leading-[1.05] mb-4 drop-shadow-2xl [text-shadow:0_4px_30px_rgba(0,0,0,0.5)]">
               {slide.title}
               <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/70">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/70 drop-shadow-2xl [text-shadow:0_4px_30px_rgba(0,0,0,0.5)]">
                 {slide.highlight}
               </span>
             </h1>
@@ -145,7 +155,7 @@ export default function Landing() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
-              className="max-w-2xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-4 text-white/80"
+              className="max-w-2xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-4 text-white/90 drop-shadow-lg [text-shadow:0_2px_20px_rgba(0,0,0,0.4)]"
             >
               {slide.subtitle}
             </motion.p>
@@ -154,7 +164,7 @@ export default function Landing() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.45 }}
-              className="text-sm text-white/50 font-serif italic mb-10"
+              className="text-sm text-white/60 font-serif italic mb-10 drop-shadow-md [text-shadow:0_2px_15px_rgba(0,0,0,0.4)]"
             >
               {slide.amharicTitle}
             </motion.p>
@@ -167,13 +177,13 @@ export default function Landing() {
             >
               <Link
                 to="/register"
-                className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group px-8 py-4 rounded-full shadow-2xl"
+                className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group px-8 py-4 rounded-full shadow-2xl shadow-black/30"
                 style={{ backgroundColor: slide.color }}
               >
                 {slide.ctaIcon}
                 {slide.cta}
               </Link>
-              <Link to="/dashboard" className="flex items-center gap-2 px-6 py-4 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 font-bold text-xs tracking-widest uppercase transition-all">
+              <Link to="/dashboard" className="flex items-center gap-2 px-6 py-4 rounded-full border border-white/30 text-white/80 hover:text-white hover:border-white/60 font-bold text-xs tracking-widest uppercase transition-all shadow-xl shadow-black/20 bg-white/10 backdrop-blur">
                 STUDENT PORTAL
               </Link>
             </motion.div>
@@ -182,7 +192,7 @@ export default function Landing() {
       </div>
 
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6">
-        <button onClick={prev} className="p-3 rounded-full border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-all hover:bg-white/5">
+        <button onClick={prev} className="p-3 rounded-full border border-white/30 text-white/70 hover:text-white hover:border-white/60 transition-all hover:bg-white/10 shadow-lg shadow-black/20">
           <ChevronLeft size={20} />
         </button>
         <div className="flex items-center gap-3">
@@ -190,16 +200,16 @@ export default function Landing() {
             <button
               key={i}
               onClick={() => goTo(i)}
-              className={`h-1.5 rounded-full transition-all duration-500 ${i === current ? 'w-10' : 'w-1.5'} ${i === current ? 'bg-white' : 'bg-white/30 hover:bg-white/50'}`}
+              className={`h-1.5 rounded-full transition-all duration-500 drop-shadow-md ${i === current ? 'w-10' : 'w-1.5'} ${i === current ? 'bg-white' : 'bg-white/40 hover:bg-white/70'}`}
             />
           ))}
         </div>
-        <button onClick={next} className="p-3 rounded-full border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition-all hover:bg-white/5">
+        <button onClick={next} className="p-3 rounded-full border border-white/30 text-white/70 hover:text-white hover:border-white/60 transition-all hover:bg-white/10 shadow-lg shadow-black/20">
           <ChevronRight size={20} />
         </button>
       </div>
 
-      <div className="absolute bottom-8 right-8 z-20 text-[10px] font-bold text-white/30 tracking-widest">
+      <div className="absolute bottom-8 right-8 z-20 text-[10px] font-bold text-white/50 tracking-widest drop-shadow-lg">
         {String(current + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
       </div>
 
@@ -213,7 +223,7 @@ export default function Landing() {
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
-          className="text-white/30"
+          className="text-white/50 drop-shadow-lg"
         >
           <Mouse size={20} />
         </motion.div>

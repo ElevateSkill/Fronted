@@ -120,35 +120,61 @@ export default function Login() {
 
       {/* LEFT PANEL - Enhanced Carousel */}
       <div className="hidden lg:flex lg:w-[46%] relative overflow-hidden bg-black">
-        {/* Shadow glow on background */}
+        {/* Animated deep shadow glow on background */}
         <motion.div
-          animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.02, 1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 shadow-[inset_0_0_150px_rgba(21,200,251,0.15),inset_0_0_300px_rgba(248,159,41,0.08)] z-[2] pointer-events-none"
+          animate={{
+            opacity: [0.2, 0.5, 0.3, 0.6, 0.2],
+            scale: [1, 1.03, 0.98, 1.02, 1],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 shadow-[inset_0_0_100px_rgba(21,200,251,0.2),inset_0_0_250px_rgba(248,159,41,0.12),inset_0_0_400px_rgba(0,0,0,0.3)] z-[2] pointer-events-none"
         />
         <AnimatePresence mode="popLayout">
           <motion.img
             key={current}
             src={slides[current].url}
             alt={slides[current].title}
-            initial={{ opacity: 0, scale: 1.15, filter: "brightness(0.5) saturate(0.7)" }}
+            initial={{ opacity: 0, scale: 1.15, filter: "brightness(0.4) saturate(0.6)" }}
             animate={{
               opacity: 1,
               scale: 1.05,
-              filter: "brightness(0.9) saturate(1.1)",
-              x: [0, -10, 0, 10, 0]
+              filter: "brightness(0.85) saturate(1.1)",
+              x: [0, -8, 0, 8, 0]
             }}
-            exit={{ opacity: 0, scale: 0.85, filter: "brightness(0.4) saturate(0.6)" }}
+            exit={{ opacity: 0, scale: 0.85, filter: "brightness(0.3) saturate(0.5)" }}
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0 w-full h-full object-cover"
           />
         </AnimatePresence>
         
-        {/* Shadow overlay for depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent z-[1]" />
-        <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,0.5)] z-[1]" />
-        <div className="absolute inset-0 bg-[radial-gradient(#ffffff12_1px,transparent_1px)] bg-[length:8px_8px] z-[1]" />
+        {/* Animated deep shadow overlay for depth */}
+        <motion.div
+          animate={{
+            opacity: [0.6, 0.8, 0.5, 0.7, 0.6],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/30 to-black/90 z-[1]"
+        />
+        <motion.div
+          animate={{
+            opacity: [0.4, 0.6, 0.3, 0.5, 0.4],
+          }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-[1]"
+        />
+        <motion.div
+          animate={{
+            boxShadow: [
+              "inset 0 0 100px rgba(0,0,0,0.6), inset 0 0 300px rgba(0,0,0,0.3)",
+              "inset 0 0 150px rgba(0,0,0,0.8), inset 0 0 400px rgba(0,0,0,0.4)",
+              "inset 0 0 80px rgba(0,0,0,0.5), inset 0 0 250px rgba(0,0,0,0.3)",
+              "inset 0 0 100px rgba(0,0,0,0.6), inset 0 0 300px rgba(0,0,0,0.3)",
+            ]
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 z-[1] pointer-events-none"
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] bg-[length:10px_10px] z-[1]" />
 
         <div className="relative z-10 p-6 xl:p-10 flex flex-col justify-between h-full w-full">
           {/* Logo Section */}
