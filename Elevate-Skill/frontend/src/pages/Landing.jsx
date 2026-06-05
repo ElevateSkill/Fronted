@@ -108,7 +108,8 @@ export default function Landing() {
           />
         </AnimatePresence>
         <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient} z-[1]`} />
-        <div className="absolute inset-0 bg-black/45 dark:bg-black/60 z-[2]" />
+        <div className="absolute inset-0 bg-black/50 z-[2]" />
+        <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,0.4)] z-[2]" />
       </div>
 
       <div className="relative z-10 flex flex-col justify-center items-center h-screen w-full px-6">
@@ -144,7 +145,7 @@ export default function Landing() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.35 }}
-              className="max-w-2xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-4 text-white/60"
+              className="max-w-2xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-4 text-white/80"
             >
               {slide.subtitle}
             </motion.p>
@@ -153,7 +154,7 @@ export default function Landing() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.45 }}
-              className="text-sm text-white/30 font-serif italic mb-10"
+              className="text-sm text-white/50 font-serif italic mb-10"
             >
               {slide.amharicTitle}
             </motion.p>

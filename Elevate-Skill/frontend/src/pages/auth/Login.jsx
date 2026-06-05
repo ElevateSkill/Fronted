@@ -312,6 +312,15 @@ export default function Login() {
           transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
           className="absolute inset-0 bg-gradient-to-br from-[#15c8fb]/5 via-transparent to-[#f89f29]/5 bg-[length:200%_200%] pointer-events-none"
         />
+        {/* Back Button */}
+        <Link
+          to="/"
+          className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-white/10 backdrop-blur border border-gray-200 dark:border-white/10 text-gray-700 dark:text-white/80 hover:bg-white dark:hover:bg-white/20 transition-all text-sm font-bold shadow-lg"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </Link>
+
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -329,7 +338,7 @@ export default function Login() {
               </div>
               <div>
                 <h1 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Welcome back</h1>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">Sign in to continue your journey</p>
+                <p className="text-gray-500 dark:text-white/60 mt-1">Sign in to continue your journey</p>
               </div>
             </div>
 
@@ -351,9 +360,9 @@ export default function Login() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">Username / Email</label>
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-white/70">Username / Email</label>
                 <div className="relative group">
-                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-all" />
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30 group-focus-within:text-[#15c8fb] transition-all" />
                   <input
                     type="text"
                     value={username}
@@ -361,20 +370,20 @@ export default function Login() {
                     required
                     autoComplete="username"
                     placeholder="your@domain.com"
-                    className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400"
+                    className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.12] rounded-2xl focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400 dark:placeholder:text-white/30 dark:text-white"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
-                  <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">Password</label>
+                  <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-white/70">Password</label>
                   <Link to="/forgot-password" className="text-xs text-[#15c8fb] hover:text-[#0fa3d4] font-medium transition-colors">
                     Forgot password?
                   </Link>
                 </div>
                 <div className="relative group">
-                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-all" />
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30 group-focus-within:text-[#15c8fb] transition-all" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
@@ -382,12 +391,12 @@ export default function Login() {
                     required
                     autoComplete="current-password"
                     placeholder="••••••••"
-                    className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400"
+                    className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.12] rounded-2xl focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400 dark:placeholder:text-white/30 dark:text-white"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30 hover:text-gray-600 dark:hover:text-white/60"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -402,7 +411,7 @@ export default function Login() {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4 accent-[#15c8fb] rounded"
                   />
-                  <span className="text-gray-500 dark:text-gray-400">Keep me signed in</span>
+                  <span className="text-gray-500 dark:text-white/70">Keep me signed in</span>
                 </label>
               </div>
 
@@ -430,9 +439,9 @@ export default function Login() {
 
             {/* Divider */}
             <div className="my-8 relative flex items-center">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/10 to-transparent" />
-              <span className="px-6 text-xs uppercase tracking-widest text-gray-400 dark:text-gray-500 font-mono">or continue with</span>
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/10 to-transparent" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/20 to-transparent" />
+              <span className="px-6 text-xs uppercase tracking-widest text-gray-400 dark:text-white/50 font-mono">or continue with</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/20 to-transparent" />
             </div>
 
             {/* Social Logins */}
@@ -442,8 +451,8 @@ export default function Login() {
                   key={idx}
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => alert(`Login with ${social.label} (demo)`)} // Replace with real OAuth
-                  className="h-12 border border-gray-200 dark:border-white/10 rounded-2xl flex items-center justify-center gap-2 hover:border-gray-300 dark:hover:border-white/20 transition-colors"
+                  onClick={() => alert(`Login with ${social.label} (demo)`)}
+                  className="h-12 border border-gray-200 dark:border-white/15 rounded-2xl flex items-center justify-center gap-2 hover:border-gray-300 dark:hover:border-white/30 transition-colors bg-white dark:bg-white/[0.03]"
                 >
                   <social.icon size={20} style={{ color: social.color }} />
                 </motion.button>
@@ -452,7 +461,7 @@ export default function Login() {
 
             {/* Register Link */}
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-white/60">
                 New here?{' '}
                 <Link to="/register" className="font-semibold text-[#f89f29] hover:text-orange-500 transition-colors">
                   Create an account →
@@ -462,7 +471,7 @@ export default function Login() {
           </div>
 
           {/* Trust Signals */}
-          <div className="mt-8 flex justify-center gap-8 text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+          <div className="mt-8 flex justify-center gap-8 text-[10px] text-gray-400 dark:text-white/40 font-mono">
             <div>GDPR</div>
             <div>ISO 27001</div>
             <div>SOC 2</div>

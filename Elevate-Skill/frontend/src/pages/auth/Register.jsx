@@ -27,7 +27,7 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
       animate={{ opacity: 1, y: 0 }}
       className={span ? 'md:col-span-2' : ''}
     >
-      <label className="text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1 block uppercase tracking-wider">
+      <label className="text-[10px] font-bold text-gray-600 dark:text-white/70 mb-1 block uppercase tracking-wider">
         {label}
       </label>
       <div className="relative group">
@@ -45,13 +45,13 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
           required
           autoComplete={name === 'password' ? 'new-password' : name === 'email' ? 'email' : 'off'}
           placeholder={placeholder}
-          className={`w-full ${Icon ? 'pl-11' : 'pl-4'} ${isShowable ? 'pr-11' : 'pr-4'} py-3.5 bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400 dark:placeholder:text-white/30`}
+          className={`w-full ${Icon ? 'pl-11' : 'pl-4'} ${isShowable ? 'pr-11' : 'pr-4'} py-3.5 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.12] rounded-2xl focus:outline-none focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400 dark:placeholder:text-white/30 dark:text-white`}
         />
         {isShowable && (
           <button
             type="button"
             onClick={() => setLocalShow(!localShow)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30 hover:text-gray-600 dark:hover:text-white/60"
           >
             {localShow ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -230,6 +230,14 @@ export default function Register() {
 
       {/* RIGHT FORM PANEL */}
       <div className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
+        {/* Back Button */}
+        <Link
+          to="/"
+          className="absolute top-6 left-6 z-20 flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 dark:bg-white/10 backdrop-blur border border-gray-200 dark:border-white/10 text-gray-700 dark:text-white/80 hover:bg-white dark:hover:bg-white/20 transition-all text-sm font-bold shadow-lg"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
+          Back
+        </Link>
         <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -245,8 +253,8 @@ export default function Register() {
                 <img src={logoJpg} alt="Logo" className="w-16 h-16 rounded-xl" />
               </div>
               <div>
-                <h1 className="text-4xl font-black tracking-tighter">Join ElevateSkill</h1>
-                <p className="text-gray-500 dark:text-gray-400">One form • Instant enrollment</p>
+                <h1 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Join ElevateSkill</h1>
+                <p className="text-gray-500 dark:text-white/60">One form • Instant enrollment</p>
               </div>
             </div>
 
@@ -296,7 +304,7 @@ export default function Register() {
               >
                 <div className="flex items-center gap-2 mb-4">
                   <BookOpen size={18} className="text-[#f89f29]" />
-                  <p className="text-sm font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">Course & Payment</p>
+                  <p className="text-sm font-semibold uppercase tracking-widest text-gray-500 dark:text-white/70">Course & Payment</p>
                 </div>
 
                 <div className="space-y-5">
@@ -305,7 +313,7 @@ export default function Register() {
                     <select
                       value={selectedCourseId}
                       onChange={e => setSelectedCourseId(e.target.value)}
-                      className="w-full pl-11 pr-4 py-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 text-base appearance-none"
+                      className="w-full pl-11 pr-4 py-4 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.12] rounded-2xl focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 text-base appearance-none dark:text-white"
                     >
                       <option value="">Select a course...</option>
                       {courses.map(c => (
@@ -316,11 +324,11 @@ export default function Register() {
                     </select>
                   </div>
 
-                  <label className={`group flex items-center gap-4 p-5 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 hover:border-[#f89f29] bg-white dark:bg-white/5 ${proofFile ? 'border-green-400 bg-green-50 dark:bg-green-500/5' : 'border-gray-200 dark:border-white/10'}`}>
-                    <Upload size={28} className="text-gray-400 group-hover:text-[#f89f29] transition-colors" />
+                  <label className={`group flex items-center gap-4 p-5 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 hover:border-[#f89f29] bg-white dark:bg-white/[0.04] ${proofFile ? 'border-green-400 bg-green-50 dark:bg-green-500/5' : 'border-gray-200 dark:border-white/[0.12]'}`}>
+                    <Upload size={28} className="text-gray-400 dark:text-white/30 group-hover:text-[#f89f29] transition-colors" />
                     <div className="flex-1">
-                      <p className="font-medium">{proofFile ? proofFile.name : "Upload Payment Proof"}</p>
-                      <p className="text-xs text-gray-400">JPG, PNG or PDF • Max 5MB</p>
+                      <p className="font-medium dark:text-white">{proofFile ? proofFile.name : "Upload Payment Proof"}</p>
+                      <p className="text-xs text-gray-400 dark:text-white/40">JPG, PNG or PDF • Max 5MB</p>
                     </div>
                     {proofFile && <CheckCircle size={24} className="text-green-500" />}
                     <input
@@ -355,7 +363,7 @@ export default function Register() {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-white/60">
                 Already have an account?{' '}
                 <Link to="/login" className="font-bold text-[#15c8fb] hover:text-[#0fa3d4]">Sign in</Link>
               </p>
