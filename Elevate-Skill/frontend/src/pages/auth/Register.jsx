@@ -5,10 +5,16 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import {
   Mail, Lock, User, IdCard, Phone,
-  ArrowRight, TriangleAlert, Sparkles, Eye, EyeOff, CheckCircle,
-  BookOpen, Upload, Loader
+  ArrowRight, TriangleAlert, Sparkles, Eye, EyeOff,
+  CheckCircle, BookOpen, Upload, Loader, Check,
+  AlertTriangle, ShieldCheck
 } from 'lucide-react';
 import logoJpg from '../../assets/logo.jpg';
+
+const steps = [
+  { id: 1, label: "Personal Info" },
+  { id: 2, label: "Course & Payment" }
+];
 
 function InputField({ name, label, type = 'text', Icon, placeholder, span = false, showToggle = false, form, onChange }) {
   const [localShow, setLocalShow] = useState(false);
@@ -16,11 +22,20 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
   const inputType = isShowable ? (localShow ? 'text' : 'password') : type;
 
   return (
-    <div className={span ? 'md:col-span-2' : ''}>
-      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1.5 block">{label}</label>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={span ? 'md:col-span-2' : ''}
+    >
+      <label className="text-[10px] font-bold text-gray-600 dark:text-gray-400 mb-1 block uppercase tracking-wider">
+        {label}
+      </label>
       <div className="relative group">
         {Icon && (
-          <Icon size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-colors" />
+          <Icon
+            size={18}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-all duration-300"
+          />
         )}
         <input
           name={name}
@@ -30,43 +45,41 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
           required
           autoComplete={name === 'password' ? 'new-password' : name === 'email' ? 'email' : 'off'}
           placeholder={placeholder}
-          className={`w-full ${Icon ? 'pl-10' : 'pl-3.5'} ${isShowable ? 'pr-10' : 'pr-3.5'} py-3 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.10] rounded-xl focus:outline-none focus:border-[#15c8fb]/60 focus:ring-2 focus:ring-[#15c8fb]/15 transition-all dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-white/30`}
+          className={`w-full ${Icon ? 'pl-11' : 'pl-4'} ${isShowable ? 'pr-11' : 'pr-4'} py-3.5 bg-white dark:bg-white/[0.05] border border-gray-200 dark:border-white/10 rounded-2xl focus:outline-none focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400 dark:placeholder:text-white/30`}
         />
         {isShowable && (
           <button
             type="button"
             onClick={() => setLocalShow(!localShow)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-            tabIndex={-1}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
           >
-            {localShow ? <EyeOff size={16} /> : <Eye size={16} />}
+            {localShow ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export default function Register() {
   const [form, setForm] = useState({
-    email: '',
-    full_name: '',
-    username: '',
-    phone_number: '',
-    password: '',
-    confirm_password: ''
+    email: '', full_name: '', username: '', phone_number: '',
+    password: '', confirm_password: ''
   });
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState('');
   const [msg, setMsg] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [proofFile, setProofFile] = useState(null);
+
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
 
+  // Pre-fill course if coming from link
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
+    const params = new URLSearchParams(window.location.search);
     const courseId = params.get('courseId');
     if (courseId) setSelectedCourseId(courseId);
   }, []);
@@ -74,77 +87,67 @@ export default function Register() {
   useEffect(() => {
     api.get('/courses/')
       .then(res => setCourses(res.data))
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setMsg(null);
 
     if (form.password !== form.confirm_password) {
       setMsg({ type: 'error', text: 'Passwords do not match.' });
       return;
     }
-
     if (!selectedCourseId) {
       setMsg({ type: 'error', text: 'Please select a course.' });
       return;
     }
-
     if (!proofFile) {
       setMsg({ type: 'error', text: 'Please upload payment proof.' });
       return;
     }
 
-    if (proofFile.size > 5 * 1024 * 1024) {
-      setMsg({ type: 'error', text: 'Proof file is too large. Max 5MB.' });
-      return;
-    }
-
     setLoading(true);
-    setMsg(null);
 
     try {
-      setStep('Creating account...');
-      const { confirm_password: _cf, ...payload } = form;
+      setStep('Creating your account...');
+      const { confirm_password: _, ...payload } = form;
       const regResult = await registerUser(payload);
-      const userId = regResult?.user;
+      const userId = regResult?.user?.id || regResult?.user;
 
-      if (!userId) {
-        throw new Error('Registration failed');
-      }
-
-      setStep('Enrolling in course...');
+      setStep('Enrolling you in the course...');
       const enrollRes = await api.post('/enrollments/', { course: Number(selectedCourseId) });
       const enrollmentId = enrollRes.data?.id;
 
-      setStep('Submitting payment proof...');
+      setStep('Uploading payment proof...');
       const formData = new FormData();
       formData.append('enrollment_id', enrollmentId);
       formData.append('proof_file', proofFile);
       formData.append('full_name', form.full_name);
       formData.append('email', form.email);
       formData.append('phone', form.phone_number);
+
       await api.post('/payments/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      const role = regResult?.user?.role || 'student';
-      navigate(role?.toLowerCase() === 'admin' ? '/admin' : '/dashboard');
+      setMsg({ type: 'success', text: 'Registration successful! Welcome aboard 🎉' });
+
+      setTimeout(() => {
+        const role = regResult?.user?.role || 'student';
+        navigate(role.toLowerCase() === 'admin' ? '/admin' : '/dashboard');
+      }, 1800);
     } catch (err) {
       const errorData = err?.response?.data;
       let errorMessage = 'Something went wrong. Please try again.';
 
-      if (typeof errorData === 'object') {
+      if (errorData?.detail) errorMessage = errorData.detail;
+      else if (typeof errorData === 'object') {
         const firstKey = Object.keys(errorData)[0];
         const val = errorData[firstKey];
         errorMessage = Array.isArray(val) ? val[0] : val;
-        if (firstKey === 'detail') errorMessage = val;
-      } else if (typeof errorData === 'string') {
-        errorMessage = errorData;
-      } else if (err.message) {
-        errorMessage = err.message;
       }
 
       setMsg({ type: 'error', text: errorMessage });
@@ -155,180 +158,206 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#020202] overflow-hidden font-sans">
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-black">
+    <div className="min-h-screen flex bg-gradient-to-br from-[#f0f4f8] via-[#e6ebf3] to-[#d1d9e8] dark:from-[#0a0a0a] dark:via-[#020202] dark:to-[#111111] overflow-hidden font-sans relative">
+      {/* Background Ornaments */}
+      <div className="absolute inset-0 pointer-events-none">
+        <motion.div animate={{ rotate: 360 }} transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-52 -left-52 w-[700px] h-[700px] border border-[#15c8fb]/10 rounded-full" />
+        <motion.div animate={{ rotate: -360 }} transition={{ duration: 160, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-64 -right-64 w-[800px] h-[800px] border border-[#f89f29]/10 rounded-full" />
+      </div>
+
+      {/* LEFT BRAND PANEL - Enhanced */}
+      <div className="hidden lg:flex lg:w-[46%] relative overflow-hidden bg-black">
         <img
           src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070"
           alt="Learning"
-          className="absolute inset-0 w-full h-full object-cover scale-105"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/75 to-black/40 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[length:5px_5px] z-[1]" />
 
-        <div className="relative z-10 p-12 xl:p-16 flex flex-col justify-between w-full">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg">
-              <img src={logoJpg} alt="Elevate Skill" className="w-7 h-7 rounded-lg object-cover" />
+        <div className="relative z-10 p-8 xl:p-12 flex flex-col justify-between h-full w-full">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-5">
+            <div className="relative w-[17rem] h-[17rem] rounded-[3.5rem] bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center shadow-2xl overflow-hidden">
+              <img src={logoJpg} alt="Elevate Skill" className="w-[14.5rem] h-[14.5rem] rounded-3xl object-cover" />
             </div>
-            <span className="text-xs font-black tracking-wide text-white/80">
-              Elevate<span className="text-[#15c8fb]">Skill</span>
-            </span>
+            <div>
+              <span className="text-6xl xl:text-7xl font-black tracking-[-3px] text-white">Elevate<span className="text-[#15c8fb]">Skill</span></span>
+              <p className="text-white/60 text-sm font-mono tracking-widest -mt-1">ACADEMY</p>
+            </div>
           </motion.div>
 
           <div className="space-y-6">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur border border-white/20 rounded-full mb-6">
-                <Sparkles size={12} className="text-[#f89f29]" />
-                <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest">Register & Enroll</span>
-              </div>
-              <h1 className="text-5xl font-black text-white leading-[1.05] tracking-tight">
-                JOIN + ENROLL<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#15c8fb] to-[#f89f29]">ONE STEP</span>
-              </h1>
-              <p className="text-base text-white/60 font-medium leading-relaxed max-w-md mt-5">
-                Create your account, pick a course, and submit payment — all in one go.
-              </p>
-            </motion.div>
+            <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/10 backdrop-blur-3xl border border-white/30 rounded-3xl">
+              <Sparkles size={20} className="text-[#f89f29]" />
+              <span className="text-sm font-bold uppercase tracking-widest text-white">One Form. Full Access.</span>
+            </div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="flex items-center gap-6">
-              {['Register', 'Enroll', 'Pay'].map((tag, i) => (
-                <span key={tag} className="text-xs font-black uppercase tracking-[0.2em] text-white/50">
-                  {tag}{i < 2 ? ' →' : ''}
-                </span>
+            <h1 className="text-5xl xl:text-6xl font-black tracking-tighter text-white leading-none">
+              Start Your<br />
+              <span className="bg-gradient-to-r from-[#15c8fb] via-white to-[#f89f29] bg-clip-text text-transparent">Engineering Journey</span>
+            </h1>
+
+            <p className="text-lg text-white/80 max-w-md">
+              Create your account, choose a course, and complete enrollment in minutes.
+            </p>
+
+            <div className="flex gap-4">
+              {['Register', 'Select Course', 'Pay & Enroll'].map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  className="text-sm font-medium text-white/70 flex items-center gap-2"
+                >
+                  <div className="w-5 h-px bg-white/40" /> {item}
+                </motion.div>
               ))}
-            </motion.div>
+            </div>
           </div>
 
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="text-[10px] text-white/30 font-mono">
-            Elevate Skill · Project-Based Platform
-          </motion.p>
+          <div className="flex items-center gap-4 text-sm">
+            <ShieldCheck size={28} className="text-[#15c8fb]" />
+            <div className="text-xs font-mono text-white/70">
+              SECURE • ENCRYPTED • VERIFIED
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative">
-        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-[#15c8fb]/10 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-1/3 -right-32 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[150px] pointer-events-none" />
-
+      {/* RIGHT FORM PANEL */}
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-lg"
+          initial={{ opacity: 0, y: 30, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-2xl"
         >
-          <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:p-10 shadow-2xl shadow-black/5 dark:shadow-black/40 relative overflow-hidden">
+          <div className="bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-3xl border border-gray-200 dark:border-white/10 rounded-3xl p-8 md:p-10 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#15c8fb] via-[#f89f29] to-[#15c8fb]" />
 
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f89f29]/20 to-[#15c8fb]/20 border border-[#15c8fb]/20 flex items-center justify-center">
-                <img src={logoJpg} alt="Elevate Skill" className="w-7 h-7 rounded-lg object-cover" />
+            {/* Header */}
+            <div className="flex items-center gap-6 mb-8">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f89f29]/10 to-[#15c8fb]/10 flex items-center justify-center border border-[#15c8fb]/20">
+                <img src={logoJpg} alt="Logo" className="w-16 h-16 rounded-xl" />
               </div>
               <div>
-                <h1 className="text-lg font-black tracking-tight text-gray-900 dark:text-white">
-                  Register & Enroll
-                </h1>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">
-                  Account + Course + Payment — one form
-                </p>
+                <h1 className="text-4xl font-black tracking-tighter">Join ElevateSkill</h1>
+                <p className="text-gray-500 dark:text-gray-400">One form • Instant enrollment</p>
               </div>
+            </div>
+
+            {/* Progress Steps */}
+            <div className="flex gap-2 mb-8">
+              {steps.map((s, i) => (
+                <motion.div
+                  key={s.id}
+                  onClick={() => setCurrentStep(s.id)}
+                  className={`flex-1 h-1.5 rounded-full cursor-pointer transition-all ${currentStep >= s.id ? 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29]' : 'bg-gray-200 dark:bg-white/10'}`}
+                />
+              ))}
             </div>
 
             <AnimatePresence mode="wait">
               {msg && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className={`mb-5 p-3.5 rounded-xl text-sm font-semibold flex items-start gap-3 border ${
-                    msg.type === 'success'
-                      ? 'bg-green-50 dark:bg-green-500/10 border-green-200 dark:border-green-500/20 text-green-700 dark:text-green-400'
-                      : 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400'
-                  }`}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={`mb-6 p-4 rounded-2xl text-sm flex gap-3 border ${msg.type === 'success'
+                    ? 'bg-green-50 dark:bg-green-500/10 border-green-300 dark:border-green-500/30 text-green-700 dark:text-green-400'
+                    : 'bg-red-50 dark:bg-red-500/10 border-red-300 dark:border-red-500/30 text-red-700 dark:text-red-400'
+                    }`}
                 >
-                  {msg.type === 'error' ? (
-                    <TriangleAlert size={16} className="shrink-0 mt-0.5" />
-                  ) : (
-                    <CheckCircle size={16} className="shrink-0 mt-0.5" />
-                  )}
+                  {msg.type === 'success' ? <CheckCircle size={22} /> : <AlertTriangle size={22} />}
                   <span>{msg.text}</span>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField name="full_name" label="Full Name" Icon={IdCard} placeholder="Enter your full name" span form={form} onChange={onChange} />
-              <InputField name="username" label="Username" Icon={User} placeholder="Choose a username" form={form} onChange={onChange} />
-              <InputField name="phone_number" label="Phone Number" type="tel" Icon={Phone} placeholder="+251 911 234 567" form={form} onChange={onChange} />
-              <InputField name="email" label="Email Address" type="email" Icon={Mail} placeholder="your@email.com" span form={form} onChange={onChange} />
-              <InputField name="password" label="Password" type="password" Icon={Lock} placeholder="Create a password" showToggle form={form} onChange={onChange} />
-              <InputField name="confirm_password" label="Confirm Password" type="password" Icon={Lock} placeholder="Repeat your password" showToggle form={form} onChange={onChange} />
-
-              <div className="md:col-span-2 border-t border-gray-200 dark:border-white/[0.06] pt-4 mt-1">
-                <p className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-1.5">
-                  <BookOpen size={14} className="text-[#f89f29]" /> Select Course &amp; Submit Payment
-                </p>
+            <form onSubmit={onSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <InputField name="full_name" label="Full Name" Icon={IdCard} placeholder="John Doe" form={form} onChange={onChange} />
+                <InputField name="username" label="Username" Icon={User} placeholder="johndoe" form={form} onChange={onChange} />
+                <InputField name="phone_number" label="Phone Number" type="tel" Icon={Phone} placeholder="+251 9XX XXX XXX" form={form} onChange={onChange} />
+                <InputField name="email" label="Email Address" type="email" Icon={Mail} placeholder="you@example.com" span form={form} onChange={onChange} />
+                <InputField name="password" label="Password" type="password" Icon={Lock} placeholder="••••••••" showToggle form={form} onChange={onChange} />
+                <InputField name="confirm_password" label="Confirm Password" type="password" Icon={Lock} placeholder="••••••••" showToggle form={form} onChange={onChange} />
               </div>
 
-              <div className="md:col-span-2 relative">
-                <BookOpen size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
-                <select
-                  value={selectedCourseId}
-                  onChange={e => setSelectedCourseId(e.target.value)}
-                  required
-                  className="w-full pl-10 pr-3.5 py-3 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.10] rounded-xl focus:outline-none focus:border-[#f89f29]/60 focus:ring-2 focus:ring-[#f89f29]/15 transition-all dark:text-white text-sm appearance-none"
-                >
-                  <option value="">-- Choose a course --</option>
-                  {courses.map(c => (
-                    <option key={c.id} value={c.id}>{c.title} {c.price ? `- ${c.price}` : ''}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Course & Payment Section */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="md:col-span-2 border-t border-gray-200 dark:border-white/10 pt-6"
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <BookOpen size={18} className="text-[#f89f29]" />
+                  <p className="text-sm font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">Course & Payment</p>
+                </div>
 
-              <div className="md:col-span-2">
-                <label className={`flex items-center gap-3 px-4 py-3 border-2 border-dashed border-gray-200 dark:border-white/[0.10] rounded-xl cursor-pointer hover:border-[#f89f29]/50 transition-all bg-gray-50 dark:bg-white/[0.06] group ${proofFile ? 'border-green-400 dark:border-green-500/50 bg-green-50 dark:bg-green-500/5' : ''}`}>
-                  <Upload size={18} className="text-gray-400 group-hover:text-[#f89f29] transition-colors shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-gray-600 dark:text-gray-300">
-                      {proofFile ? proofFile.name : 'Upload payment proof (PDF, JPG, PNG)'}
-                    </p>
-                    <p className="text-[10px] text-gray-400 dark:text-white/30">Max 5MB</p>
+                <div className="space-y-5">
+                  <div className="relative">
+                    <BookOpen size={18} className="absolute left-4 top-4 text-gray-400 pointer-events-none" />
+                    <select
+                      value={selectedCourseId}
+                      onChange={e => setSelectedCourseId(e.target.value)}
+                      className="w-full pl-11 pr-4 py-4 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 text-base appearance-none"
+                    >
+                      <option value="">Select a course...</option>
+                      {courses.map(c => (
+                        <option key={c.id} value={c.id}>
+                          {c.title} {c.price ? `— ${c.price} ETB` : ''}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                  {proofFile && <CheckCircle size={16} className="text-green-500 shrink-0" />}
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*,.pdf"
-                    onChange={e => {
-                      const f = e.target.files[0];
-                      if (f) setProofFile(f);
-                    }}
-                  />
-                </label>
-              </div>
 
-              <button
-                disabled={loading}
+                  <label className={`group flex items-center gap-4 p-5 border-2 border-dashed rounded-2xl cursor-pointer transition-all duration-300 hover:border-[#f89f29] bg-white dark:bg-white/5 ${proofFile ? 'border-green-400 bg-green-50 dark:bg-green-500/5' : 'border-gray-200 dark:border-white/10'}`}>
+                    <Upload size={28} className="text-gray-400 group-hover:text-[#f89f29] transition-colors" />
+                    <div className="flex-1">
+                      <p className="font-medium">{proofFile ? proofFile.name : "Upload Payment Proof"}</p>
+                      <p className="text-xs text-gray-400">JPG, PNG or PDF • Max 5MB</p>
+                    </div>
+                    {proofFile && <CheckCircle size={24} className="text-green-500" />}
+                    <input
+                      type="file"
+                      accept="image/*,.pdf"
+                      className="hidden"
+                      onChange={e => e.target.files?.[0] && setProofFile(e.target.files[0])}
+                    />
+                  </label>
+                </div>
+              </motion.div>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.985 }}
                 type="submit"
-                className="md:col-span-2 w-full bg-gradient-to-r from-[#f89f29] to-[#e08e1f] text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-[#f89f29]/25 hover:shadow-[#f89f29]/40 hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2.5 mt-2 py-3.5"
+                disabled={loading}
+                className="w-full py-4 mt-4 bg-gradient-to-r from-[#f89f29] via-[#e08e1f] to-[#f89f29] text-white font-semibold text-lg rounded-2xl shadow-xl shadow-[#f89f29]/30 hover:shadow-[#f89f29]/50 flex items-center justify-center gap-3 disabled:opacity-70 transition-all"
               >
                 {loading ? (
-                  <span className="flex items-center gap-2.5">
-                    <Loader size={16} className="animate-spin" />
+                  <>
+                    <Loader size={22} className="animate-spin" />
                     {step || 'Processing...'}
-                  </span>
+                  </>
                 ) : (
                   <>
-                    Register & Enroll
-                    <ArrowRight size={16} />
+                    Create Account & Enroll
+                    <ArrowRight size={22} />
                   </>
                 )}
-              </button>
+              </motion.button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/[0.06] text-center">
+            <div className="mt-8 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Already have an account?{' '}
-                <Link to="/login" className="font-bold text-[#f89f29] hover:text-[#e08e1f] transition-colors">
-                  Sign In
-                </Link>
+                <Link to="/login" className="font-bold text-[#15c8fb] hover:text-[#0fa3d4]">Sign in</Link>
               </p>
             </div>
           </div>

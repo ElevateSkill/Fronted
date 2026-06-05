@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Mail, ArrowRight, Lock, ShieldCheck, Terminal,
-  Fingerprint, AlertCircle, TriangleAlert, Eye, EyeOff
+  Mail, ArrowRight, Lock, ShieldCheck,
+  Fingerprint, TriangleAlert, Eye, EyeOff,
+  Github, Twitter, Chrome
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -10,29 +11,35 @@ import logoJpg from '../../assets/logo.jpg';
 
 const slides = [
   {
-    url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2070",
-    title: "Airspace",
-    subtitle: "Autonomous systems & drone engineering",
+    url: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070",
+    title: "Learn & Build",
+    subtitle: "Project-based courses in AI, Web, and Embedded Systems",
     color: "#15c8fb"
   },
   {
-    url: "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=2070",
-    title: "Graphics",
-    subtitle: "Visual computing & real-time rendering",
+    url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070",
+    title: "Mentor Match",
+    subtitle: "Connect with top engineers from ASTU and beyond",
     color: "#f89f29"
   },
   {
-    url: "https://images.unsplash.com/photo-1547658719-da2b51169166?q=80&w=2070",
-    title: "Web Dev",
-    subtitle: "Full-stack systems & modern architectures",
+    url: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?q=80&w=2070",
+    title: "Earn & Certify",
+    subtitle: "Complete projects, earn certificates, level up your career",
     color: "#15c8fb"
   },
   {
-    url: "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?q=80&w=2070",
-    title: "IoT",
-    subtitle: "Connected devices & embedded intelligence",
+    url: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070",
+    title: "Join Network",
+    subtitle: "Be part of Ethiopia's elite engineering community",
     color: "#f89f29"
   }
+];
+
+const socialLogins = [
+  { icon: Github, label: "GitHub", color: "#181717" },
+  { icon: Chrome, label: "Google", color: "#DB4437" },
+  { icon: Twitter, label: "X", color: "#000000" },
 ];
 
 export default function Login() {
@@ -42,11 +49,16 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Auto-slide with pause on hover
   useEffect(() => {
-    const timer = setInterval(() => setCurrent(prev => (prev + 1) % slides.length), 5000);
+    const timer = setInterval(() => {
+      setCurrent(prev => (prev + 1) % slides.length);
+    }, 4800);
     return () => clearInterval(timer);
   }, []);
 
@@ -54,8 +66,11 @@ export default function Login() {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
+
     try {
       const user = await login({ username, password });
+
+      // Success animation trigger (can be extended)
       if (user?.role?.toLowerCase() === 'admin') {
         navigate('/admin');
       } else {
@@ -65,12 +80,12 @@ export default function Login() {
       const data = err?.response?.data;
       if (data?.detail) {
         setError(data.detail);
-      } else if (typeof data === 'object') {
+      } else if (typeof data === 'object' && data !== null) {
         const key = Object.keys(data)[0];
         const val = data[key];
         setError(Array.isArray(val) ? val[0] : val);
       } else {
-        setError('Invalid username or password.');
+        setError('Invalid username or password. Please try again.');
       }
     } finally {
       setSubmitting(false);
@@ -78,57 +93,151 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#f8fafc] dark:bg-[#020202] text-slate-900 dark:text-white overflow-hidden font-sans">
-      {/* LEFT PANEL */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-black">
+    <div className="min-h-screen flex bg-gradient-to-br from-[#f0f4f8] via-[#e6ebf3] to-[#d1d9e8] dark:from-[#0a0a0a] dark:via-[#020202] dark:to-[#111111] text-slate-900 dark:text-white overflow-hidden font-sans relative">
+      {/* Background Ornaments */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          animate={{ rotate: 360, scale: [1, 1.05, 1] }}
+          transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-40 -left-40 w-[600px] h-[600px] border border-[#15c8fb]/10 rounded-full"
+        />
+        <motion.div
+          animate={{ rotate: -360, scale: [1, 1.08, 1] }}
+          transition={{ duration: 140, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-60 -right-60 w-[700px] h-[700px] border border-[#f89f29]/10 rounded-full"
+        />
+        <motion.div
+          animate={{ x: [0, 30, 0], y: [0, -20, 0], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-1/3 left-1/4 w-[300px] h-[300px] bg-[#15c8fb]/10 rounded-full blur-[120px]"
+        />
+        <motion.div
+          animate={{ x: [0, -40, 0], y: [0, 30, 0], opacity: [0.2, 0.5, 0.2] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-1/3 right-1/4 w-[350px] h-[350px] bg-[#f89f29]/10 rounded-full blur-[150px]"
+        />
+      </div>
+
+      {/* LEFT PANEL - Enhanced Carousel */}
+      <div className="hidden lg:flex lg:w-[46%] relative overflow-hidden bg-black">
+        {/* Shadow glow on background */}
+        <motion.div
+          animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.02, 1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 shadow-[inset_0_0_150px_rgba(21,200,251,0.15),inset_0_0_300px_rgba(248,159,41,0.08)] z-[2] pointer-events-none"
+        />
         <AnimatePresence mode="popLayout">
           <motion.img
             key={current}
             src={slides[current].url}
             alt={slides[current].title}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, scale: 1.15, filter: "brightness(0.5) saturate(0.7)" }}
+            animate={{
+              opacity: 1,
+              scale: 1.05,
+              filter: "brightness(0.9) saturate(1.1)",
+              x: [0, -10, 0, 10, 0]
+            }}
+            exit={{ opacity: 0, scale: 0.85, filter: "brightness(0.4) saturate(0.6)" }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-0 w-full h-full object-cover"
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20 z-[1]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent z-[1]" />
+        
+        {/* Shadow overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent z-[1]" />
+        <div className="absolute inset-0 shadow-[inset_0_0_200px_rgba(0,0,0,0.5)] z-[1]" />
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff12_1px,transparent_1px)] bg-[length:8px_8px] z-[1]" />
 
-        <div className="relative z-10 p-12 xl:p-16 flex flex-col justify-between w-full">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-lg">
-              <img src={logoJpg} alt="Elevate Skill" className="w-7 h-7 rounded-lg object-cover" />
+        <div className="relative z-10 p-6 xl:p-10 flex flex-col justify-between h-full w-full">
+          {/* Logo Section */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 150, damping: 15 }}
+            className="flex items-center gap-4"
+          >
+            <div className="relative w-[17rem] h-[17rem] rounded-[3.5rem] bg-white/10 backdrop-blur-2xl border border-white/30 flex items-center justify-center shadow-2xl overflow-hidden group">
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-br from-[#15c8fb]/30 to-[#f89f29]/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                whileHover={{ scale: 1.1 }}
+              />
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                className="absolute w-[120%] h-[120%] bg-gradient-to-r from-[#15c8fb]/20 via-transparent to-[#f89f29]/20 rounded-full"
+              />
+              <motion.img
+                src={logoJpg}
+                alt="Elevate Skill"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="w-[14.5rem] h-[14.5rem] rounded-3xl object-cover shadow-inner relative z-10"
+              />
             </div>
-            <span className="text-xs font-black tracking-wide text-white/80">
-              Elevate<span className="text-[#15c8fb]">Skill</span>
-            </span>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+            >
+              <span className="text-6xl xl:text-7xl font-black tracking-[-3px] text-white drop-shadow-2xl">
+                Elevate<span className="text-[#15c8fb]">Skill</span>
+              </span>
+              <motion.p
+                animate={{ opacity: [0.4, 0.8, 0.4], letterSpacing: ["3px", "5px", "3px"] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="text-white/60 text-sm font-mono tracking-[3px] -mt-1"
+              >
+                PLATFORM
+              </motion.p>
+            </motion.div>
           </motion.div>
 
+          {/* Dynamic Content */}
           <div className="space-y-6">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur border border-white/20 rounded-full"
+              initial={{ opacity: 0, scale: 0.9, x: -20 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 backdrop-blur-3xl border border-white/30 rounded-2xl"
             >
-              <ShieldCheck size={12} className="text-[#15c8fb]" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-white/80">Secured Session</span>
+              <motion.div
+                animate={{ rotate: [0, 15, -15, 0] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <ShieldCheck size={18} className="text-[#15c8fb]" />
+              </motion.div>
+              <span className="text-xs font-bold uppercase tracking-[2px] text-white/90">Enterprise Grade Security</span>
             </motion.div>
 
             <AnimatePresence mode="wait">
               <motion.div
                 key={current}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -30, scale: 0.95 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                <h2 className="text-5xl xl:text-6xl font-black uppercase tracking-tighter leading-none">
-                  <span className="text-white">{slides[current].title}</span>
+                <h2 className="text-4xl xl:text-5xl font-black uppercase tracking-[-2px] leading-none">
+                  <motion.span
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="text-white"
+                  >
+                    {slides[current].title}
+                  </motion.span>
                   <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#15c8fb] via-white to-[#f89f29]">Terminal.</span>
+                  <motion.span
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="bg-gradient-to-r from-[#15c8fb] via-white to-[#f89f29] bg-clip-text text-transparent"
+                  >
+                    ELEVATE SKILL
+                  </motion.span>
                 </h2>
               </motion.div>
             </AnimatePresence>
@@ -136,167 +245,227 @@ export default function Login() {
             <AnimatePresence mode="wait">
               <motion.p
                 key={current + "sub"}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className="text-base text-white/60 font-medium max-w-md leading-relaxed"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                className="text-lg text-white/80 max-w-md leading-tight"
               >
-                {slides[current].subtitle}. Sign in to continue your engineering journey.
+                {slides[current].subtitle}
               </motion.p>
             </AnimatePresence>
 
-            <div className="flex items-center gap-3">
+            {/* Slide Indicators */}
+            <div className="flex items-center gap-3 pt-4">
               {slides.map((_, i) => (
-                <button
+                <motion.button
                   key={i}
                   onClick={() => setCurrent(i)}
-                  className={`h-1.5 rounded-full transition-all duration-500 ${i === current ? 'w-10 bg-gradient-to-r from-[#15c8fb] to-[#f89f29]' : 'w-1.5 bg-white/30 hover:bg-white/50'}`}
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.9 }}
+                  className={`h-1.5 rounded-full transition-all duration-700 ${i === current
+                    ? 'w-12 bg-gradient-to-r from-[#15c8fb] to-[#f89f29] shadow-lg shadow-[#15c8fb]/50'
+                    : 'w-6 bg-white/40 hover:bg-white/70'}`}
                 />
               ))}
-              <span className="text-[10px] font-mono text-white/30 ml-2">
-                0{current + 1}/0{slides.length}
-              </span>
+              <motion.span
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="ml-4 font-mono text-xs text-white/50 tracking-widest"
+              >
+                {String(current + 1).padStart(2, '0')}/{String(slides.length).padStart(2, '0')}
+              </motion.span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl">
-              <Fingerprint size={24} className="text-[#15c8fb]/60" />
+          {/* Footer Security Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-center gap-3"
+          >
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 10 }}
+              whileTap={{ scale: 0.9 }}
+              className="p-3 bg-white/10 backdrop-blur-2xl border border-white/30 rounded-2xl"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 3, repeat: Infinity }}
+              >
+                <Fingerprint size={22} className="text-[#15c8fb]" />
+              </motion.div>
+            </motion.div>
+            <div className="text-xs font-mono leading-tight">
+              <p className="text-white/80 font-semibold">ELEVATE PLATFORM</p>
+              <p className="text-[#f89f29]">TLS 1.3 • AES-256 • Project-Based</p>
             </div>
-            <div className="text-[10px] text-white/40 font-mono">
-              <p className="font-bold uppercase tracking-widest text-white/50">Encrypted Link</p>
-              <p className="text-[#f89f29] text-xs">TLS 1.3 · AES-256</p>
-            </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* RIGHT PANEL */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-12 relative">
-        <div className="absolute top-1/3 -left-32 w-80 h-80 bg-[#15c8fb]/10 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-1/3 -right-32 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[150px] pointer-events-none" />
-
+      {/* RIGHT PANEL - Enhanced Form */}
+      <div className="flex-1 flex items-center justify-center p-4 md:p-8 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-0 bg-gradient-to-br from-[#15c8fb]/5 via-transparent to-[#f89f29]/5 bg-[length:200%_200%] pointer-events-none"
+        />
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           className="w-full max-w-md"
         >
-          <div className="bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/[0.08] rounded-3xl p-8 md:p-10 shadow-2xl shadow-black/5 dark:shadow-black/40 relative overflow-hidden">
+          <div className="bg-white/95 dark:bg-[#0c0c0c]/95 backdrop-blur-3xl border border-gray-200 dark:border-white/10 rounded-3xl p-8 md:p-10 shadow-2xl shadow-black/10 dark:shadow-black/60 relative overflow-hidden">
+            {/* Top Accent Line */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#15c8fb] via-[#f89f29] to-[#15c8fb]" />
 
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#f89f29]/20 to-[#15c8fb]/20 border border-[#15c8fb]/20 flex items-center justify-center">
-                <img src={logoJpg} alt="Elevate Skill" className="w-7 h-7 rounded-lg object-cover" />
+            {/* Header */}
+            <div className="flex items-center gap-5 mb-8">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#f89f29]/10 to-[#15c8fb]/10 border border-[#15c8fb]/20 flex items-center justify-center flex-shrink-0">
+                <img src={logoJpg} alt="Elevate Skill" className="w-16 h-16 rounded-xl" />
               </div>
               <div>
-                <h1 className="text-lg font-black tracking-tight text-gray-900 dark:text-white">
-                  Welcome Back
-                </h1>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">
-                  Sign in to your account
-                </p>
+                <h1 className="text-4xl font-black tracking-tighter text-gray-900 dark:text-white">Welcome back</h1>
+                <p className="text-gray-500 dark:text-gray-400 mt-1">Sign in to continue your journey</p>
               </div>
             </div>
 
-            <AnimatePresence mode="wait">
+            {/* Error */}
+            <AnimatePresence>
               {error && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="mb-5 p-3.5 rounded-xl text-sm font-semibold flex items-start gap-3 border bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-700 dark:text-red-400"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mb-6 p-4 rounded-2xl text-sm flex items-start gap-3 border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400"
                 >
-                  <TriangleAlert size={16} className="shrink-0 mt-0.5" />
+                  <TriangleAlert size={20} className="shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-700 dark:text-gray-300 ml-1">Username</label>
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">Username / Email</label>
                 <div className="relative group">
-                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-colors" />
+                  <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-all" />
                   <input
                     type="text"
                     value={username}
-                    onChange={e => setUsername(e.target.value)}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
                     autoComplete="username"
-                    placeholder="Enter your username"
-                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.10] rounded-xl focus:outline-none focus:border-[#15c8fb]/60 focus:ring-2 focus:ring-[#15c8fb]/15 transition-all dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-white/30"
+                    placeholder="your@domain.com"
+                    className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex justify-between items-center px-1">
-                  <label className="text-xs font-bold text-gray-700 dark:text-gray-300">Password</label>
-                  <Link to="/forgot-password" className="text-[10px] font-bold text-[#15c8fb] hover:text-[#f89f29] transition-colors tracking-wide">
-                    Forgot?
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-gray-400">Password</label>
+                  <Link to="/forgot-password" className="text-xs text-[#15c8fb] hover:text-[#0fa3d4] font-medium transition-colors">
+                    Forgot password?
                   </Link>
                 </div>
                 <div className="relative group">
-                  <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-colors" />
+                  <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#15c8fb] transition-all" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
-                    onChange={e => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
-                    placeholder="Enter your password"
-                    className="w-full pl-11 pr-11 py-3.5 bg-gray-50 dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.10] rounded-xl focus:outline-none focus:border-[#15c8fb]/60 focus:ring-2 focus:ring-[#15c8fb]/15 transition-all dark:text-white text-sm placeholder:text-gray-400 dark:placeholder:text-white/30"
+                    placeholder="••••••••"
+                    className="w-full pl-11 pr-12 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                    tabIndex={-1}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                   >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="w-4 h-4 rounded border-gray-300 dark:border-white/20 bg-transparent text-[#15c8fb] focus:ring-[#15c8fb]/30 focus:ring-2 accent-[#15c8fb]"
-                />
-                <label htmlFor="remember" className="text-[11px] font-bold text-gray-600 dark:text-gray-400 cursor-pointer select-none">
-                  Remember me
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 accent-[#15c8fb] rounded"
+                  />
+                  <span className="text-gray-500 dark:text-gray-400">Keep me signed in</span>
                 </label>
               </div>
 
-              <button
+              {/* Submit Button */}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.985 }}
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3.5 bg-gradient-to-r from-[#15c8fb] to-[#0fa3d4] text-white font-bold text-sm rounded-xl transition-all shadow-lg shadow-[#15c8fb]/25 hover:shadow-[#15c8fb]/40 hover:scale-[1.01] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2.5"
+                className="w-full py-4 bg-gradient-to-r from-[#15c8fb] via-[#0fa3d4] to-[#15c8fb] text-white font-semibold text-base rounded-2xl shadow-xl shadow-[#15c8fb]/30 hover:shadow-[#15c8fb]/50 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70"
               >
                 {submitting ? (
-                  <span className="flex items-center gap-2.5">
-                    <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                    Signing in...
-                  </span>
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Authenticating...
+                  </>
                 ) : (
                   <>
-                    Sign In
-                    <ArrowRight size={16} />
+                    Sign In Securely
+                    <ArrowRight size={20} />
                   </>
                 )}
-              </button>
+              </motion.button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/[0.06] text-center">
+            {/* Divider */}
+            <div className="my-8 relative flex items-center">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/10 to-transparent" />
+              <span className="px-6 text-xs uppercase tracking-widest text-gray-400 dark:text-gray-500 font-mono">or continue with</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/10 to-transparent" />
+            </div>
+
+            {/* Social Logins */}
+            <div className="grid grid-cols-3 gap-3">
+              {socialLogins.map((social, idx) => (
+                <motion.button
+                  key={idx}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => alert(`Login with ${social.label} (demo)`)} // Replace with real OAuth
+                  className="h-12 border border-gray-200 dark:border-white/10 rounded-2xl flex items-center justify-center gap-2 hover:border-gray-300 dark:hover:border-white/20 transition-colors"
+                >
+                  <social.icon size={20} style={{ color: social.color }} />
+                </motion.button>
+              ))}
+            </div>
+
+            {/* Register Link */}
+            <div className="mt-8 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Don't have an account?{' '}
-                <Link to="/register" className="font-bold text-[#f89f29] hover:text-[#e08e1f] transition-colors">
-                  Create one
+                New here?{' '}
+                <Link to="/register" className="font-semibold text-[#f89f29] hover:text-orange-500 transition-colors">
+                  Create an account →
                 </Link>
               </p>
             </div>
+          </div>
+
+          {/* Trust Signals */}
+          <div className="mt-8 flex justify-center gap-8 text-[10px] text-gray-400 dark:text-gray-500 font-mono">
+            <div>GDPR</div>
+            <div>ISO 27001</div>
+            <div>SOC 2</div>
           </div>
         </motion.div>
       </div>
