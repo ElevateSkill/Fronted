@@ -47,7 +47,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div id="home" className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] dark:bg-[#050505] transition-colors duration-700">
+    <div id="home" className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] dark:bg-[#f8fafc] transition-colors duration-700">
       {/* --- FULLSCREEN IMAGE WITH OVERLAY --- */}
       <div className="absolute inset-0 z-0">
         <motion.img
@@ -62,7 +62,7 @@ export default function Landing() {
           style={{ zIndex: 1 }}
         />
         {/* Subtle dark overlay for readability */}
-        <div className="absolute inset-0 bg-black/40 dark:bg-black/60" style={{zIndex:2}} />
+        <div className="absolute inset-0 bg-black/40 dark:bg-black/40" style={{zIndex:2}} />
       </div>
 
       {/* --- OVERLAID CONTENT --- */}
