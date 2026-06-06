@@ -1,41 +1,30 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChevronDown, Lightbulb, PenTool, Target, 
+import { motion } from 'framer-motion';
+import {
+  ChevronDown, Lightbulb, PenTool, Target,
   Users, Star, ArrowRight, CheckCircle2, Sparkles
 } from 'lucide-react';
 
-// const partners = [
-//   { name: "Google", logo: "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" },
-//   { name: "Netflix", logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" },
-//   { name: "Stripe", logo: "https://upload.wikimedia.org/wikipedia/commons/c/cb/Stripe_Logo%2C_revised_2016.svg" },
-//   { name: "Figma", logo: "https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg" },
-//   { name: "Apple", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" },
-//   { name: "OpenAI", logo: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" },
-//   { name: "Amazon", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
-//   { name: "GitHub", logo: "https://upload.wikimedia.org/wikipedia/commons/c/c2/GitHub_Logo.svg" },
-// ];
-
 const partners = [
-  { 
-    name: "Telebirr", 
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5QSx1OlYRx97RD-tL2RlsOEVH1cC03-FGRQ&s" 
+  {
+    name: "Telebirr",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5QSx1OlYRx97RD-tL2RlsOEVH1cC03-FGRQ&s"
   },
-  { 
-    name: "Ethio Telecom", 
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDCFNUCLWzR6RnHyk5bOzGnzG_rcgwvaF7w&s" 
+  {
+    name: "Ethio Telecom",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDCFNUCLWzR6RnHyk5bOzGnzG_rcgwvaF7w&s"
   },
-  { 
-    name: "INSA", 
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4J-NYGjwxfcd__QckqaNtiwfZqh0DjasONg&s" 
+  {
+    name: "INSA",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4J-NYGjwxfcd__QckqaNtiwfZqh0DjasONg&s"
   },
-  { 
-    name: "ASTU", 
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFeqX05EIfOZcZQtK_ICejDFf2NA9owk1d_g&s" 
+  {
+    name: "ASTU",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFeqX05EIfOZcZQtK_ICejDFf2NA9owk1d_g&s"
   },
-  { 
-    name: "MoI", 
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_jpQpNR1h27E-Hfe7XCdrMIdyPDZBED2WUw&s" 
+  {
+    name: "MoI",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_jpQpNR1h27E-Hfe7XCdrMIdyPDZBED2WUw&s"
   }
 ];
 
@@ -63,11 +52,19 @@ const mainServices = [
     desc: "We value your time as much as our craft. Our agile workflow ensures that complex milestones are met with precision, delivering 'ready-to-market' products exactly when promised.",
     icon: <Target size={32} />,
     image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800",
+  },
+  {
+    id: 4,
+    title: "ONE TO ONE MENTORING",
+    short: "Strict deadlines with uncompromising quality.",
+    desc: "We value your time as much as our craft. Our agile workflow ensures that complex milestones are met with precision, delivering 'ready-to-market' products exactly when promised.",
+    icon: <Target size={32} />,
+    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800",
   }
 ];
 
 export default function Services() {
-  const [activeService, setActiveService] = useState(null);
+  const [activeService, setActiveService] = useState();
 
   const toggleService = (id) => {
     setActiveService(activeService === id ? null : id);
@@ -82,15 +79,11 @@ export default function Services() {
 
   return (
     <div id="services" className="relative w-full bg-[#f8fafc] dark:bg-black py-16 md:py-24 sm:px-6 overflow-hidden transition-colors duration-500 font-sans">
-      
-      {/* Decorative Background Elements */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#f89f29]/10 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        
-        {/* --- PARTNERS SECTION (The "Amazing View") --- */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -99,84 +92,66 @@ export default function Services() {
         >
           <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white/95 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] backdrop-blur-3xl shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5 rounded-3xl">
             <div className="flex-none max-w-xs">
-                <div className="flex items-center gap-3 mb-2 justify-center lg:justify-start">
-                    <span className="w-8 h-[2px] bg-[#15c8fb]" />
-                    <span className="text-[#15c8fb] font-bold uppercase tracking-widest text-xs">Collaboration Network</span>
-                </div>
-                {/* <h3 className="text-3xl font-black text-slate-900 dark:text-white leading-tight mb-2">
-                    Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-white">Industry</span> Partners.
-                </h3> */}
+              <div className="flex items-center gap-3 mb-2 justify-center lg:justify-start">
+                <span className="w-8 h-[2px] bg-[#15c8fb]" />
+                <span className="text-[#15c8fb] font-bold uppercase tracking-widest text-xs">Collaboration Network</span>
+              </div>
             </div>
-            
-            {/* The Animated Infinite Scroll */}
+
             <div className="flex-grow w-full lg:w-auto relative group">
               <div className="overflow-hidden relative mask-image-gradient">
                 <div className="animate-loop-partners flex space-x-12 md:space-x-16 py-4">
                   {[...partners, ...partners].map((partner, index) => (
-                    <motion.div 
-                      key={`${partner.name}-${index}`} 
+                    <motion.div
+                      key={`${partner.name}-${index}`}
                       whileHover={{ scale: 1.05, y: -5 }}
                       className="flex-none flex items-center justify-center h-16 w-24 md:w-44 group-hover:cursor-pointer transition-transform"
                     >
-                      <img 
-                        src={partner.logo} 
-                        alt={`${partner.name} logo`} 
-                        className="h-auto max-h-full max-w-full object-contain filter dark:brightness-75 transition-all group-hover:brightness-100 opacity-80 dark:opacity-70 group-hover:opacity-100 drop-shadow-lg" 
+                      <img
+                        src={partner.logo}
+                        alt={`${partner.name} logo`}
+                        className="h-auto max-h-full max-w-full object-contain filter dark:brightness-75 transition-all group-hover:brightness-100 opacity-80 dark:opacity-70 group-hover:opacity-100 drop-shadow-lg"
                       />
                     </motion.div>
                   ))}
                 </div>
               </div>
-              
             </div>
           </div>
         </motion.div>
 
-
-        {/* --- EXPERTISE SECTION --- */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mx-2 gap-10 mb-16 md:mb-24">
           <div className="max-w-3xl text-center lg:text-left">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex items-center justify-center lg:justify-start gap-3 mb-4"
-            >
-              <span className="h-[2px] w-12 bg-[#f89f29]" />
-              <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs md:text-sm">Our Expertise</span>
-            </motion.div>
-            
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight"
             >
-              Solutions For <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#15c8fb] to-[#f89f29]">Growth</span>.
+              Solutions For GROWTH
             </motion.h2>
           </div>
 
-          {/* Social Proof Join Button */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             className="flex flex-col items-center lg:items-end gap-5 bg-white/95 dark:bg-white/[0.06] p-6 rounded-3xl backdrop-blur-md border border-slate-200 dark:border-white/[0.08] shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5"
           >
             <div className="flex justify-between">
-                <div className="flex -space-x-3">
+              <div className="flex -space-x-3">
                 {users.map((url, i) => (
-                    <motion.img 
-                        key={i} 
-                        whileHover={{ y: -5, zIndex: 10 }}
-                        src={url} 
-                        className="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white dark:border-black shadow-xl cursor-pointer" 
-                        alt="user" 
-                    />
+                  <motion.img
+                    key={i}
+                    whileHover={{ y: -5, zIndex: 10 }}
+                    src={url}
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white dark:border-black shadow-xl cursor-pointer"
+                    alt="user"
+                  />
                 ))}
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] border-4 border-white dark:border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
-                    24k+
+                  24k+
                 </div>
-                </div>
+              </div>
             </div>
             <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#15c8fb] to-[#0fa3d4] hover:brightness-110 text-white font-bold rounded-2xl shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
               <span className="relative z-10">JOIN PLATFORM</span>
@@ -186,96 +161,73 @@ export default function Services() {
           </motion.div>
         </div>
 
-        {/* --- SERVICES INTERACTIVE GRID --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 relative">
-          
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 relative">
           {mainServices.map((service, idx) => (
-            <motion.div 
+            <motion.div
               key={service.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
               viewport={{ once: true, margin: "-100px" }}
               layout
-               className={`group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 border ${
-                activeService === service.id 
-                ? 'bg-white dark:bg-black/60 border-[#15c8fb] shadow-2xl shadow-[#15c8fb]/10' 
-                : 'bg-white/95 dark:bg-white/[0.06] border-transparent hover:border-slate-200 dark:hover:border-white/[0.12] shadow-xl shadow-slate-900/5 dark:shadow-white/5'
+              className={`group relative overflow-hidden rounded-[0rem] transition-all duration-500 border ${
+                activeService === service.id
+                  ? 'bg-white dark:bg-black/60 border-[#15c8fb] shadow-2xl shadow-[#15c8fb]/10'
+                  : 'bg-white/95 dark:bg-white/[0.06] border-transparent hover:border-slate-200 dark:hover:border-white/[0.12] shadow-xl shadow-slate-900/5 dark:shadow-white/5'
               }`}
             >
-              {/* Image Header */}
               <div className="h-52 w-full overflow-hidden relative">
-                <img 
-                    src={service.image} 
-                    className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700" 
-                    alt={service.title} 
+                <img
+                  src={service.image}
+                  className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                  alt={service.title}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className={`absolute top-6 right-6 p-3 rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 text-white shadow-lg shadow-black/20`}>
-                    {React.cloneElement(service.icon, { size: 24 })}
-                </div>
+                {/* <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" /> */}
               </div>
 
               <div className="p-8">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-[#15c8fb] transition-colors tracking-tight">{service.title}</h3>
-                <p className="text-slate-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
-                  {service.short}
-                </p>
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-[#15c8fb] transition-colors tracking-tight">
+                  {service.title}
+                </h3>
 
-                {/* Dropdown Button */}
-                <button 
+                {/* <button
                   onClick={() => toggleService(service.id)}
                   className={`flex items-center justify-between w-full p-4 rounded-2xl transition-all duration-300 ${
-                    activeService === service.id 
-                    ? 'bg-[#15c8fb] text-white' 
-                    : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/15'
+                    activeService === service.id
+                      ? 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20'
+                      : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/15'
                   }`}
                 >
-                  <span className="font-bold text-xs uppercase tracking-[0.2em]">Explore Service</span>
+                  <span className="font-bold text-xs uppercase tracking-[0.2em]">
+                    {activeService === service.id ? 'Active Service' : 'Explore Service'}
+                  </span>
                   <motion.div
                     animate={{ rotate: activeService === service.id ? 180 : 0 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
                     <ChevronDown size={20} />
                   </motion.div>
-                </button>
+                </button> */}
 
-                {/* Collapsible Content */}
-                <AnimatePresence>
-                  {activeService === service.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="pt-8 space-y-6 relative z-10">
-                        <div className="relative p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-white dark:from-white/5 dark:to-black/40 border border-slate-200 dark:border-white/[0.06]">
-                            <Sparkles className="absolute -top-3 -left-3 text-[#f89f29]" size={20} />
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-gray-300 italic font-medium">
-                            "{service.desc}"
-                            </p>
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-4">
-                           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#f89f29]/10 to-[#f89f29]/5 dark:from-[#f89f29]/15 dark:to-transparent text-[10px] font-black text-[#f89f29] border border-[#f89f29]/20">
-                              24/7 PRIORITY
-                           </div>
-                           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#15c8fb]/10 to-[#15c8fb]/5 dark:from-[#15c8fb]/15 dark:to-transparent text-[10px] font-black text-[#15c8fb] border border-[#15c8fb]/20">
-                              ELITE RATING
-                           </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <motion.div
+                  initial={false}
+                  animate={{ opacity: activeService === service.id ? 1 : 0.7 }}
+                  transition={{ duration: 0.25 }}
+                  className="pt-8 space-y-6 relative z-10"
+                >
+                  <div className="relative p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-white dark:from-white/5 dark:to-black/40 border border-slate-200 dark:border-white/[0.06]">
+                    {/* <Sparkles className="absolute -top-3 -left-3 text-[#f89f29]" size={20} /> */}
+                    <p className="text-sm leading-relaxed text-slate-600 dark:text-gray-300 italic font-medium">
+                      "{service.desc}"
+                    </p>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Bottom Banner */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -283,11 +235,10 @@ export default function Services() {
         >
           <div className="bg-white dark:bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20 rounded-[2.9rem]">
             <div className="text-center lg:text-left">
-              {/* <h4 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">Ready to elevate?</h4> */}
               <p className="text-slate-600 dark:text-gray-300 text-lg max-w-md">Join 24,000+ visionaries scaling their digital presence today.</p>
             </div>
-            
-            <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">              
+
+            <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
               <button className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white rounded-2xl font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
                 GET STARTED NOW
                 <ArrowRight className="group-hover:rotate-[-45deg] transition-transform" />
@@ -302,15 +253,18 @@ export default function Services() {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
+
         .animate-loop-partners {
           animation: loop-partners 20s linear infinite;
         }
+
         .animate-loop-partners:hover {
-            animation-play-state: paused;
+          animation-play-state: paused;
         }
+
         .mask-image-gradient {
-            mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+          mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+          -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
         }
       `}</style>
     </div>
