@@ -2,6 +2,8 @@ from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 
+from utils.ratelimit import api_ratelimit
+
 from apps.enrollments.api.serializers import (
     EnrollmentSerializer,
     EnrollmentCreateSerializer,
@@ -16,6 +18,10 @@ class EnrollmentCreateView(generics.CreateAPIView):
     """
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = EnrollmentCreateSerializer
+
+    @api_ratelimit(key='user', rate='30/h')
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
     @extend_schema(
         request=EnrollmentCreateSerializer,

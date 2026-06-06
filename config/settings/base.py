@@ -5,6 +5,55 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-aw#r2z^)dk9c73($r0c#%)8#ejvh#d9)u899h*(l@du!doyj$(")
 
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+CORS_ALLOW_CREDENTIALS = True
+
+# Prevent browsers from MIME-sniffing
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Prevent clickjacking
+X_FRAME_OPTIONS = 'DENY'
+
+# Enable browser XSS filter
+SECURE_BROWSER_XSS_FILTER = True
+
+import sys
+IS_TESTING = 'test' in sys.argv
+
+if IS_TESTING:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+else:
+    CACHE_BACKEND = os.environ.get('CACHE_BACKEND', 'locmem')
+
+    if CACHE_BACKEND == 'redis':
+        CACHES = {
+            'default': {
+                'BACKEND': 'django_redis.cache.RedisCache',
+                'LOCATION': os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                    'COMPRESSOR': 'django_redis.compressor.zlib.ZlibCompressor',
+                },
+                'KEY_PREFIX': 'elevate',
+                'TIMEOUT': 300,
+            }
+        }
+    else:
+        CACHES = {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+                'LOCATION': 'elevate-lms-cache',
+            }
+        }
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -106,20 +155,20 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "EXCEPTION_HANDLER": "utils.ratelimit.ratelimit_exception_handler",
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
 
 # Simple JWT Settings
 from datetime import timedelta
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
-    "UPDATE_LAST_LOGIN": True,
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
 }
 
 # Swagger Spectacular Settings

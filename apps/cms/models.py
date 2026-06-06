@@ -65,6 +65,11 @@ class Testimonial(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['is_active']),
+        ]
+
     def __str__(self):
         return f"{self.student_name} ({self.rating}★)"
 
@@ -78,6 +83,9 @@ class FAQ(models.Model):
 
     class Meta:
         ordering = ['order', 'created_at']
+        indexes = [
+            models.Index(fields=['is_active', 'order']),
+        ]
 
     def __str__(self):
         return self.question

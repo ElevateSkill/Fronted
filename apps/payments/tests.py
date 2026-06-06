@@ -16,6 +16,12 @@ from apps.payments.models import Payment
 from apps.payments.services import PaymentService
 
 User = get_user_model()
+def get_results(resp):
+    if isinstance(resp.data, dict) and 'results' in resp.data:
+        return resp.data['results']
+    return resp.data
+
+
 class PaymentsTests(APITestCase):
     @classmethod
     def setUpClass(cls):
@@ -184,7 +190,7 @@ class PaymentsTests(APITestCase):
         response = self.client.get(self.admin_payment_list_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(get_results(response)), 2)
 
     def test_only_admin_can_access_admin_payment_list(self):
         self.auth_as(self.student)

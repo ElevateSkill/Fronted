@@ -4,6 +4,64 @@ Base path: `/api/v1/`
 
 Authentication: JWT Bearer (`Authorization: Bearer <access_token>`). Public endpoints allow anonymous access.
 
+## Global Conventions
+
+### Paginated List Responses
+
+All **list** endpoints that use a `ListAPIView` return a paginated envelope:
+
+```json
+{
+  "count": 42,
+  "next": "http://localhost:8000/api/v1/courses/?page=2",
+  "previous": null,
+  "results": [ ... ]
+}
+```
+
+- Default page size: **20**. Use `?page=<n>` to paginate.
+- `?page_size=<n>` is supported on endpoints with `StandardPagination` or `SmallPagination` (max 100 / 50).
+- **Exceptions — non-paginated endpoints** (return raw JSON, not an envelope):
+  - `GET /api/v1/admin/dashboard/` — fixed structure
+  - `GET /api/v1/homepage/` — fixed structure
+  - `GET /api/v1/payments/` (student list) — raw array
+
+### Rate Limiting
+
+Sensitive endpoints are rate-limited. Exceeding the limit returns:
+
+```json
+HTTP 429 Too Many Requests
+{ "detail": "Too many requests. Please slow down." }
+```
+
+| Endpoint | Limit |
+|---|---|
+| `POST /api/v1/auth/register/` | 10 requests / hour per IP |
+| `POST /api/v1/auth/login/` | 10 requests / hour per IP |
+| `POST /api/v1/payments/` | 20 requests / hour per user |
+| `POST /api/v1/enrollments/` | 30 requests / hour per user |
+
+### Input Sanitization
+
+All user-supplied free-text fields are sanitized server-side using `bleach` (strips HTML tags and attributes) before being persisted. Affected fields:
+
+- Payment: `full_name`, `email`, `phone`
+- Testimonial: `student_name`, `message`
+- FAQ: `question`, `answer`
+
+Clients should NOT rely on HTML being preserved in these fields.
+
+### Security Headers
+
+Every response includes:
+
+| Header | Value |
+|---|---|
+| `X-Content-Type-Options` | `nosniff` |
+| `X-Frame-Options` | `DENY` |
+| `X-XSS-Protection` | `1; mode=block` |
+
 Summary of available endpoints (by area):
 
 - Accounts
@@ -108,6 +166,7 @@ Detailed endpoint descriptions, request/response examples and behaviour
 ```
 
 - Notes: validation errors return 400. Default role is `student`.
+- **Rate limit**: 10 requests / hour per IP. Exceeding returns `429`.
 
 ### Login
 
@@ -116,6 +175,7 @@ Detailed endpoint descriptions, request/response examples and behaviour
 - Body: `{ "username": "...", "password": "..." }`
 - Response 200: `{ "access": "...", "refresh": "...", "user": {...} }`
 - Errors: 401 for invalid credentials.
+- **Rate limit**: 10 requests / hour per IP. Exceeding returns `429`.
 
 ### Logout
 
@@ -156,8 +216,9 @@ Detailed endpoint descriptions, request/response examples and behaviour
   - `category`: filter by category id
   - `category__slug`: filter by category slug
   - `ordering`: ordering e.g. `-created_at`
-- Response 200: array of course summaries (CourseListSerializer)
+- Response 200: **paginated envelope** with `results` array of course summaries (CourseListSerializer)
 - Visibility rule: returns only courses with `is_active=True` AND `is_published=True`.
+- **Caching**: response is cached for **2 minutes**. Stale data is expected within this window.
 
 ### Course Detail (Public)
 
@@ -290,24 +351,30 @@ proof_file: <file>
 
 - Accepted proof file types: PDF, JPG, PNG
 - Maximum proof file size: 5MB
+- **File validation (two-layer)**:
+  - Layer 1: `Content-Type` header must be `application/pdf`, `image/jpeg`, or `image/png`.
+  - Layer 2: File magic bytes are checked (`%PDF` for PDFs; `imghdr`/Pillow for images). A spoofed `Content-Type` with mismatching content returns `400`.
+- **Filename guard**: filenames containing `..`, `/`, or `\` are rejected with `400 Bad Request`.
 - Response 201 Created: payment object with `status=pending`
+- **Rate limit**: 20 requests / hour per user.
 - Notes:
   - The enrollment must exist, belong to the authenticated student, and still be `pending`.
   - Payments are always created with `status=pending`.
+  - Text fields (`full_name`, `email`, `phone`) are HTML-sanitized before storage.
 
 ### List My Payments
 
 - Method: GET
 - URL: `/api/v1/payments/`
 - Auth: Bearer access token (student role required)
-- Response 200 OK: array of payment objects for the authenticated student only
+- Response 200 OK: **raw array** (not paginated) of payment objects for the authenticated student only
 
 ### Admin List Payments
 
 - Method: GET
 - URL: `/api/v1/admin/payments/`
 - Auth: Bearer access token (admin role required)
-- Response 200 OK: array of all payment objects
+- Response 200 OK: **paginated envelope** (page size: 10, max 50)
 
 ### Approve Payment
 
@@ -391,6 +458,7 @@ proof_file: <file>
   - Returns only `is_active=True` testimonials and FAQs.
   - FAQs are ordered by `order` ascending, then `created_at`.
   - Singleton sections (hero, about, site_settings) are auto-initialized with defaults if they don't exist yet.
+  - **Caching**: response is cached for **5 minutes**. Stale data is expected within this window.
 
 ### Hero Section (Admin)
 
@@ -459,6 +527,7 @@ proof_file: <file>
 
 - List / Create: `GET|POST /api/v1/admin/testimonials/`
 - Detail / Update / Delete: `GET|PUT|PATCH|DELETE /api/v1/admin/testimonials/{id}/`
+- List response: **paginated envelope** (page size: 20)
 - Auth: JWT + admin role
 - Request Body (POST/PUT, JSON or multipart/form-data):
   - `student_name` (string, required)
@@ -486,6 +555,7 @@ proof_file: <file>
 
 - List / Create: `GET|POST /api/v1/admin/faqs/`
 - Detail / Update / Delete: `GET|PUT|PATCH|DELETE /api/v1/admin/faqs/{id}/`
+- List response: **paginated envelope** (page size: 20)
 - Auth: JWT + admin role
 - Request Body (POST/PUT, JSON):
   - `question` (string, required, max 500 chars)
@@ -637,24 +707,28 @@ All admin endpoints below require JWT Bearer authentication with an admin role.
   }
   ```
 - Notes:
-  - All metrics are computed fresh on every request (no caching in MVP).
+  - All metrics are computed fresh on every request (**not cached** — always returns live data).
   - `recent_enrollments` returns the latest 10, ordered by enrollment date descending.
   - `active_courses` counts only courses where both `is_active=True` and `is_published=True`.
   - `total_students` counts only users with `role='student'` (excludes admins).
   - Payment counts cover all three statuses: `pending`, `approved`, `rejected`.
+  - Response is **not paginated** (fixed structure).
 
 ---
 
 ## Errors and Status Codes
 
-- 200 OK — successful GET/PUT/PATCH
-- 201 Created — successful POST
-- 204 No Content — successful DELETE
-- 400 Bad Request — validation errors
-- 401 Unauthorized — missing/invalid token for protected endpoints
-- 403 Forbidden — authenticated but lacking admin role
-- 404 Not Found — missing resource or course not public
-- 413 Payload Too Large — may occur at the server/proxy layer for oversized uploads
+| Code | Meaning |
+|---|---|
+| 200 OK | Successful GET / PUT / PATCH |
+| 201 Created | Successful POST |
+| 204 No Content | Successful DELETE |
+| 400 Bad Request | Validation errors (field errors or business rule violations) |
+| 401 Unauthorized | Missing or invalid JWT token |
+| 403 Forbidden | Authenticated but insufficient role (e.g. student accessing admin endpoint) |
+| 404 Not Found | Resource not found or course not publicly visible |
+| 413 Payload Too Large | File exceeds server/proxy size limit |
+| 429 Too Many Requests | Rate limit exceeded — `{ "detail": "Too many requests. Please slow down." }` |
 
 ---
 
@@ -664,3 +738,25 @@ All admin endpoints below require JWT Bearer authentication with an admin role.
 - Slugs are auto-generated; clients must not provide `slug` fields when creating/updating.
 - Use `category__slug` filter to provide human-readable category filtering.
 - Payment proof uploads are handled with multipart form requests and stored under `media/payments/proofs/` in development.
+
+## JWT Token Lifetime
+
+| Token | Lifetime | Notes |
+|---|---|---|
+| Access | 60 minutes | Short-lived; use for all API calls |
+| Refresh | 7 days | Used to obtain new access tokens; rotated on use |
+
+- Rotation is enabled: each use of a refresh token issues a new refresh token and blacklists the old one.
+- Clients must store the new `refresh` token returned on each token refresh call.
+
+## Database Indexes (Performance)
+
+The following fields are indexed for query performance:
+
+| Model | Indexed Fields |
+|---|---|
+| `Course` | `(is_active, is_published)`, `category`, `-created_at` |
+| `Enrollment` | `(student, status)`, `course`, `-enrolled_at` |
+| `Payment` | `(student, status)`, `status`, `-submitted_at` |
+| `Testimonial` | `is_active` |
+| `FAQ` | `(is_active, order)` |

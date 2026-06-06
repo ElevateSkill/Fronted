@@ -14,6 +14,10 @@ from apps.cms.api.serializers import (
     FAQSerializer,
     HomepageSerializer,
 )
+from utils.pagination import StandardPagination
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from utils.cache import CACHE_HOMEPAGE
 
 
 @extend_schema(tags=["CMS Admin"])
@@ -57,10 +61,12 @@ class AdminSiteSettingsView(generics.RetrieveUpdateAPIView):
 
 # ─ Public Homepage ────────────────────────────────
 
+@method_decorator(cache_page(CACHE_HOMEPAGE), name='dispatch')
 @extend_schema(tags=["CMS Public"])
 class HomepageView(APIView):
     """GET /api/v1/homepage/"""
     permission_classes = [AllowAny]
+    pagination_class = None
 
     def get(self, request):
         data = HomepageService.get_homepage_data()
@@ -75,9 +81,15 @@ class AdminTestimonialListCreateView(generics.ListCreateAPIView):
     """GET + POST /api/v1/admin/testimonials/"""
     serializer_class = TestimonialSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = StandardPagination
 
     def get_queryset(self):
         return TestimonialService.get_all_testimonials()
+
+    def perform_create(self, serializer):
+        from utils.sanitize import sanitize_dict
+        sanitize_dict(serializer.validated_data, ['student_name', 'message'])
+        serializer.save()
 
 
 @extend_schema(tags=["CMS Admin"])
@@ -100,9 +112,15 @@ class AdminFAQListCreateView(generics.ListCreateAPIView):
     """GET + POST /api/v1/admin/faqs/"""
     serializer_class = FAQSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = StandardPagination
 
     def get_queryset(self):
         return FAQService.get_all_faqs()
+
+    def perform_create(self, serializer):
+        from utils.sanitize import sanitize_dict
+        sanitize_dict(serializer.validated_data, ['question', 'answer'])
+        serializer.save()
 
 
 @extend_schema(tags=["CMS Admin"])

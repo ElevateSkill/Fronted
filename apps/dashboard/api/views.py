@@ -12,6 +12,7 @@ from apps.dashboard.api.serializers import DashboardSerializer
 class AdminDashboardView(APIView):
     """GET /api/v1/admin/dashboard/"""
     permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = None
 
     def get(self, request):
         metrics = DashboardService.get_dashboard_metrics()

@@ -20,6 +20,8 @@ class CmsService:
         return SiteSettings.load()
 
 
+from utils.sanitize import sanitize_dict
+
 # ─ Dynamic Content Services ──────────────────────
 
 class TestimonialService:
@@ -32,6 +34,11 @@ class TestimonialService:
     def get_all_testimonials():
         """Admin: all testimonials regardless of status."""
         return Testimonial.objects.all().order_by('-created_at')
+
+    @staticmethod
+    def create_testimonial(data):
+        data = sanitize_dict(data, ['student_name', 'message'])
+        return Testimonial.objects.create(**data)
 
     @staticmethod
     def delete_testimonial(instance):
@@ -48,6 +55,11 @@ class FAQService:
     def get_all_faqs():
         """Admin: all FAQs regardless of status."""
         return FAQ.objects.all().order_by('order', 'created_at')
+
+    @staticmethod
+    def create_faq(data):
+        data = sanitize_dict(data, ['question', 'answer'])
+        return FAQ.objects.create(**data)
 
     @staticmethod
     def delete_faq(instance):

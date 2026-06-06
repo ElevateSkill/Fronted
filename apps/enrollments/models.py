@@ -36,6 +36,11 @@ class Enrollment(models.Model):
     class Meta:
         ordering = ["-created_at"]
         unique_together = ("student", "course")
+        indexes = [
+            models.Index(fields=['student', 'status']),
+            models.Index(fields=['course']),
+            models.Index(fields=['-created_at']),
+        ]
 
     def __str__(self):
         return f"{self.student.username} - {self.course.title} ({self.status})"

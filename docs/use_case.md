@@ -16,10 +16,12 @@ Flow:
 3. Use `access` token in header `Authorization: Bearer <access>` for authenticated endpoints
 4. Profile: `GET /api/v1/profile/` to retrieve; `PUT /api/v1/profile/` to update (can include `password` change)
 
-Auth rules:
+Auth rules & Security:
 
 - Register and Login: public
 - Profile: JWT required
+- **Rate limiting**: Registration and Login are limited to 10 requests / hour per IP.
+- **Input sanitization**: Free-text profile fields are sanitized server-side (HTML stripped).
 
 2. Admin Course Management (create → publish → manage)
 
@@ -52,6 +54,7 @@ Discovery Flow:
 1. List: `GET /api/v1/courses/` to browse published & active courses
    - Filter by category: `?category=1` or `?category__slug=programming`
    - Search: `?search=django`
+   - Note: The response is **paginated** and **cached** for 2 minutes.
 2. Detail: `GET /api/v1/courses/{id}/` — shows full course content
 
 Enrollment Flow:
@@ -60,7 +63,8 @@ Enrollment Flow:
 2. Enroll: Student calls `POST /api/v1/enrollments/` with `{ "course": <course_id> }` to create an enrollment.
    - Outcome: 201 Created with initial `pending` status.
    - Guards: Checks for course active/published status and prevents duplicate enrollments.
-3. List: Student views all their current enrollments via `GET /api/v1/my-enrollments/`.
+   - **Rate limit**: 30 requests / hour per user.
+3. List: Student views all their current enrollments via `GET /api/v1/my-enrollments/`. (Returns a **paginated** response).
 
 Notes & Requirements
 
@@ -78,9 +82,12 @@ Student flow:
 1. Student logs in and creates an enrollment for an active, published course.
 2. Student submits payment proof with `POST /api/v1/payments/` using `multipart/form-data`.
 3. Include `enrollment_id`, `full_name`, `email`, `phone`, and `proof_file`.
+   - **Input sanitization**: Text fields (`full_name`, `email`, `phone`) are sanitized to strip HTML.
 4. The backend validates that the enrollment belongs to the student and is still `pending`.
 5. The backend accepts only PDF, JPG, or PNG files up to 5MB.
+   - **File validation**: Deep validation checks file magic bytes and rejects spoofed content types or malicious filenames.
 6. A payment record is created with `status=pending` and can be listed later with `GET /api/v1/payments/`.
+   - **Rate limit**: Submissions are limited to 20 requests / hour per user.
 
 Admin flow:
 
@@ -110,6 +117,7 @@ Flow:
 2. Response includes: hero section, about section, site settings, active testimonials, and active FAQs.
 3. Only testimonials and FAQs with `is_active=True` are returned.
 4. FAQs are ordered by `order` ascending, then `created_at`.
+5. **Caching**: The entire homepage response is cached for 5 minutes.
 
 ### 5b. Static Content Management (Admin)
 
@@ -142,6 +150,8 @@ Notes:
 
 - `rating` is validated server-side to be between 1 and 5; invalid values return 400.
 - Setting `is_active=false` hides the testimonial from the public homepage without deleting it.
+- **Input sanitization**: Text fields (`student_name`, `message`) are sanitized to strip HTML.
+- **Pagination**: The admin list endpoint returns a paginated envelope.
 
 ### 5d. FAQ Management (Admin)
 
@@ -160,6 +170,8 @@ Notes:
 
 - Use the `order` field to control display sequence; lower values appear first.
 - Setting `is_active=false` hides the FAQ from the public homepage without deleting it.
+- **Input sanitization**: Text fields (`question`, `answer`) are sanitized to strip HTML.
+- **Pagination**: The admin list endpoint returns a paginated envelope.
 
 Auth rules (all CMS admin endpoints):
 
@@ -179,8 +191,8 @@ Admin flow:
 
 Student/Public consumption flow:
 
-1. Student logs in, views published announcements on `GET /api/v1/announcements/`.
-2. Public users browse published news posts on `GET /api/v1/news/` (no JWT token required).
+1. Student logs in, views published announcements on `GET /api/v1/announcements/`. (Returns a **paginated** response).
+2. Public users browse published news posts on `GET /api/v1/news/` (no JWT token required, returns a **paginated** response).
 
 Auth rules:
 

@@ -9,6 +9,12 @@ from apps.announcements.models import Announcement, NewsPost
 User = get_user_model()
 
 
+def get_results(resp):
+    if isinstance(resp.data, dict) and 'results' in resp.data:
+        return resp.data['results']
+    return resp.data
+
+
 class AnnouncementsModelTests(APITestCase):
     """
     Test Announcements model features and ordering.
@@ -84,7 +90,7 @@ class AnnouncementsApiTests(APITestCase):
         response = self.client.get(self.admin_list_create_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Admins should see both published and unpublished
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(get_results(response)), 2)
 
     def test_admin_create_announcement(self):
         self.auth_as(self.admin)
@@ -138,8 +144,9 @@ class AnnouncementsApiTests(APITestCase):
         response = self.client.get(self.student_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Students should only see published announcements
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["id"], self.pub_announcement.id)
+        results = get_results(response)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], self.pub_announcement.id)
 
     def test_student_list_requires_jwt(self):
         response = self.client.get(self.student_list_url)
@@ -225,7 +232,7 @@ class NewsPostApiTests(APITestCase):
         response = self.client.get(self.admin_list_create_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Admins should see both draft and published posts
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(get_results(response)), 2)
 
     def test_admin_create_news(self):
         self.auth_as(self.admin)
@@ -281,5 +288,6 @@ class NewsPostApiTests(APITestCase):
         response = self.client.get(self.public_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         # Should only see published news posts
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["id"], self.pub_news.id)
+        results = get_results(response)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], self.pub_news.id)

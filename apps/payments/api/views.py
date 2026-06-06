@@ -5,6 +5,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from utils.ratelimit import api_ratelimit
+
+from utils.pagination import SmallPagination
 from apps.payments.api.serializers import PaymentListSerializer, PaymentSubmitSerializer
 from apps.payments.permissions import IsAdmin, IsStudent
 from apps.payments.services import PaymentService
@@ -15,6 +18,7 @@ class StudentPaymentView(APIView):
     parser_classes = [MultiPartParser, FormParser]
     permission_classes = [IsAuthenticated, IsStudent]
 
+    @api_ratelimit(key='user', rate='20/h')
     @extend_schema(request=PaymentSubmitSerializer, responses={201: PaymentSubmitSerializer}, tags=["Payments"])
     def post(self, request):
         serializer = PaymentSubmitSerializer(data=request.data)
@@ -39,6 +43,7 @@ class StudentPaymentView(APIView):
 class AdminPaymentListView(generics.ListAPIView):
     serializer_class = PaymentListSerializer
     permission_classes = [IsAuthenticated, IsAdmin]
+    pagination_class = SmallPagination
 
     def get_queryset(self):
         return PaymentService.get_all_payments()

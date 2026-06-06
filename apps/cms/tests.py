@@ -9,6 +9,12 @@ from apps.cms.models import HeroSection, About, SiteSettings, Testimonial, FAQ
 User = get_user_model()
 
 
+def get_results(resp):
+    if isinstance(resp.data, dict) and 'results' in resp.data:
+        return resp.data['results']
+    return resp.data
+
+
 class CmsModelTests(APITestCase):
     """
     Test that the singleton pattern works correctly at the model layer.
@@ -250,7 +256,7 @@ class AdminTestimonialApiTests(APITestCase):
         Testimonial.objects.create(student_name="B", message="m", rating=3, is_active=False)
         resp = self.client.get(self.list_url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp.data), 2)  # admin sees all
+        self.assertEqual(len(get_results(resp)), 2)  # admin sees all
 
     def test_update_testimonial(self):
         self.auth_as(self.admin)
@@ -310,7 +316,7 @@ class AdminFAQApiTests(APITestCase):
         FAQ.objects.create(question="Q2", answer="A2", is_active=False)
         resp = self.client.get(self.list_url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp.data), 2)  # admin sees all
+        self.assertEqual(len(get_results(resp)), 2)  # admin sees all
 
     def test_update_faq(self):
         self.auth_as(self.admin)
@@ -332,8 +338,9 @@ class AdminFAQApiTests(APITestCase):
         FAQ.objects.create(question="Second", answer="B", order=2)
         FAQ.objects.create(question="First", answer="A", order=1)
         resp = self.client.get(self.list_url)
-        self.assertEqual(resp.data[0]["question"], "First")
-        self.assertEqual(resp.data[1]["question"], "Second")
+        results = get_results(resp)
+        self.assertEqual(results[0]["question"], "First")
+        self.assertEqual(results[1]["question"], "Second")
 
 
 class HomepageApiTests(APITestCase):
