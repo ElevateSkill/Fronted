@@ -61,6 +61,9 @@ Summary of available endpoints (by area):
     - `GET|POST /api/v1/admin/news/` — list/create news posts
     - `GET|PUT|PATCH|DELETE /api/v1/admin/news/{id}/` — retrieve/update/delete news post
 
+- Dashboard & Analytics (Admin only)
+  - `GET /api/v1/admin/dashboard/` — aggregated admin dashboard metrics
+
 - API Schema & Docs (project-level)
   - `GET /api/v1/schema/` — OpenAPI schema (JSON)
   - `GET /api/v1/schema/swagger-ui/` — Swagger UI
@@ -599,6 +602,46 @@ All admin endpoints below require JWT Bearer authentication with an admin role.
 - Retrieve: `GET /api/v1/admin/news/{id}/`
 - Update: `PUT|PATCH /api/v1/admin/news/{id}/`
 - Delete: `DELETE /api/v1/admin/news/{id}/`
+
+---
+
+## Dashboard & Analytics
+
+### Admin Dashboard
+
+- Method: GET
+- URL: `/api/v1/admin/dashboard/`
+- Auth: JWT + admin role
+- Response 200 OK (example):
+  ```json
+  {
+    "total_students": 142,
+    "total_courses": 18,
+    "active_courses": 11,
+    "total_enrollments": 309,
+    "payments": {
+      "pending": 24,
+      "approved": 271,
+      "rejected": 14
+    },
+    "recent_enrollments": [
+      {
+        "id": 309,
+        "student_username": "john_doe",
+        "student_full_name": "John Doe",
+        "course_title": "Python for Beginners",
+        "status": "pending",
+        "enrolled_at": "2026-06-05T14:32:00+00:00"
+      }
+    ]
+  }
+  ```
+- Notes:
+  - All metrics are computed fresh on every request (no caching in MVP).
+  - `recent_enrollments` returns the latest 10, ordered by enrollment date descending.
+  - `active_courses` counts only courses where both `is_active=True` and `is_published=True`.
+  - `total_students` counts only users with `role='student'` (excludes admins).
+  - Payment counts cover all three statuses: `pending`, `approved`, `rejected`.
 
 ---
 

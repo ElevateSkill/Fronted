@@ -30,6 +30,9 @@ urlpatterns = [
         # Announcements & News endpoints
         path("", include("apps.announcements.api.urls")),
         
+        # Dashboard endpoints
+        path("", include("apps.dashboard.api.urls")),
+        
         # OpenAPI Schema and API Documentation endpoints
         path("schema/", SpectacularAPIView.as_view(), name="schema"),
         path("schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),

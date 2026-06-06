@@ -187,3 +187,27 @@ Auth rules:
 - All admin CRUD endpoints require JWT + `role == 'admin'`.
 - Student announcements list requires JWT.
 - Public news list requires no authentication.
+
+7. Dashboard & Analytics
+
+- Actors: Admin user (must have `role == 'admin'`)
+- Purpose: Give admins a single-endpoint overview of platform health — student counts, course counts, payment status breakdown, and recent enrollment activity.
+
+Flow:
+
+1. Admin obtains JWT via `POST /api/v1/auth/login/`.
+2. Admin calls `GET /api/v1/admin/dashboard/` to retrieve aggregated metrics.
+3. Response includes:
+   - `total_students` — count of users with `role='student'`
+   - `total_courses` — count of all courses
+   - `active_courses` — count of courses that are both `is_active=True` and `is_published=True`
+   - `total_enrollments` — count of all enrollment records
+   - `payments` — breakdown by status (`pending`, `approved`, `rejected`)
+   - `recent_enrollments` — latest 10 enrollments with student name, course title, status, and date
+
+Notes:
+
+- All metrics are computed fresh on every request (no caching in MVP).
+- This app has no models — it only reads from `accounts`, `courses`, `enrollments`, and `payments`.
+- Students receive 403 Forbidden; unauthenticated users receive 401 Unauthorized.
+
