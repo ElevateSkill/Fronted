@@ -24,6 +24,9 @@ urlpatterns = [
         # Payments endpoints
         path("", include("apps.payments.api.urls")),
         
+        # CMS endpoints
+        path("", include("apps.cms.api.urls")),
+        
         # OpenAPI Schema and API Documentation endpoints
         path("schema/", SpectacularAPIView.as_view(), name="schema"),
         path("schema/swagger-ui/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
