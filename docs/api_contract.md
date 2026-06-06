@@ -42,6 +42,18 @@ Summary of available endpoints (by area):
   - `GET|PUT /api/v1/admin/about/` — retrieve/update about section details
   - `GET|PUT /api/v1/admin/site-settings/` — retrieve/update site settings details
 
+- Announcements & News
+  - Student / Public
+    - `GET /api/v1/announcements/` — list published announcements (requires JWT)
+    - `GET /api/v1/announcements/{id}/` — detail of a published announcement (requires JWT)
+    - `GET /api/v1/news/` — list published news posts (public, no auth)
+    - `GET /api/v1/news/{id}/` — detail of a published news post (public, no auth)
+  - Admin (requires JWT + user.role == 'admin')
+    - `GET|POST /api/v1/admin/announcements/` — list/create announcements
+    - `GET|PUT|PATCH|DELETE /api/v1/admin/announcements/{id}/` — retrieve/update/delete announcement
+    - `GET|POST /api/v1/admin/news/` — list/create news posts
+    - `GET|PUT|PATCH|DELETE /api/v1/admin/news/{id}/` — retrieve/update/delete news post
+
 - API Schema & Docs (project-level)
   - `GET /api/v1/schema/` — OpenAPI schema (JSON)
   - `GET /api/v1/schema/swagger-ui/` — Swagger UI
@@ -374,6 +386,102 @@ All endpoints below require JWT Bearer authentication with an admin role. Single
     "updated_at": "2026-06-06T09:19:35Z"
   }
   ```
+
+---
+
+## Announcements & News
+
+### Student & Public Feeds
+
+#### List Announcements
+- Method: GET
+- URL: `/api/v1/announcements/`
+- Auth: Bearer access token (IsAuthenticated)
+- Response 200 OK: array of announcement objects (only published ones, `is_published=True`)
+- Example response:
+  ```json
+  [
+    {
+      "id": 1,
+      "title": "Welcome to Semester 2",
+      "content": "Classes begin on Monday.",
+      "date": "2026-06-06T12:00:00Z",
+      "is_published": true,
+      "created_by": {
+        "id": 2,
+        "username": "admin1",
+        "email": "admin1@test.com",
+        "full_name": "Admin One",
+        "role": "admin"
+      },
+      "created_at": "2026-06-06T12:00:00Z",
+      "updated_at": "2026-06-06T12:00:00Z"
+    }
+  ]
+  ```
+
+#### List News Posts
+- Method: GET
+- URL: `/api/v1/news/`
+- Auth: None (Public endpoint)
+- Response 200 OK: array of news post objects (only published ones, `status='published'`)
+- Example response:
+  ```json
+  [
+    {
+      "id": 1,
+      "title": "LMS Launching Soon",
+      "excerpt": "Short description",
+      "content": "This is the full news post body.",
+      "image": null,
+      "author": {
+        "id": 2,
+        "username": "admin1",
+        "email": "admin1@test.com",
+        "full_name": "Admin One",
+        "role": "admin"
+      },
+      "status": "published",
+      "created_at": "2026-06-06T12:00:00Z",
+      "updated_at": "2026-06-06T12:00:00Z"
+    }
+  ]
+  ```
+
+### Admin Endpoints
+
+All admin endpoints below require JWT Bearer authentication with an admin role.
+
+#### Admin Announcements CRUD
+- List: `GET /api/v1/admin/announcements/`
+- Create: `POST /api/v1/admin/announcements/`
+  - Body:
+    ```json
+    {
+      "title": "New Alert",
+      "content": "This is an alert.",
+      "is_published": true
+    }
+    ```
+- Retrieve: `GET /api/v1/admin/announcements/{id}/`
+- Update: `PUT|PATCH /api/v1/admin/announcements/{id}/`
+- Delete: `DELETE /api/v1/admin/announcements/{id}/`
+
+#### Admin News Posts CRUD
+- List: `GET /api/v1/admin/news/`
+- Create: `POST /api/v1/admin/news/` (can be multipart/form-data for image upload)
+  - Body:
+    ```json
+    {
+      "title": "New Post Title",
+      "excerpt": "New excerpt",
+      "content": "New post full content.",
+      "status": "published"
+    }
+    ```
+- Retrieve: `GET /api/v1/admin/news/{id}/`
+- Update: `PUT|PATCH /api/v1/admin/news/{id}/`
+- Delete: `DELETE /api/v1/admin/news/{id}/`
 
 ---
 

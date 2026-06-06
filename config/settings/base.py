@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "apps.enrollments",
     "apps.payments",
     "apps.cms",
+    "apps.announcements",
 ]
 
 MIDDLEWARE = [

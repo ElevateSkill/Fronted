@@ -114,3 +114,26 @@ Flow:
 Auth rules:
 
 - All admin CMS endpoints require JWT + `role == 'admin'`. Anonymous users get 401 Unauthorized, and student users get 403 Forbidden.
+
+6. Announcements & News Management
+
+- Actors: Admin user (must have `role == 'admin'`), Students (JWT required for announcements), Public (no auth for news)
+- Purpose: Let admins post updates and news, students view announcements, and the public read news posts.
+
+Admin flow:
+
+1. Admin obtains JWT via login.
+2. Admin creates an announcement via `POST /api/v1/admin/announcements/` with title, content, and `is_published=True`.
+3. Admin creates a news post via `POST /api/v1/admin/news/` with title, excerpt, content, and `status='published'`.
+4. Admin can edit or delete announcements/news posts via the respective `/api/v1/admin/...` detail endpoints.
+
+Student/Public consumption flow:
+
+1. Student logs in, views published announcements on `GET /api/v1/announcements/`.
+2. Public users browse published news posts on `GET /api/v1/news/` (no JWT token required).
+
+Auth rules:
+
+- All admin CRUD endpoints require JWT + `role == 'admin'`.
+- Student announcements list requires JWT.
+- Public news list requires no authentication.
