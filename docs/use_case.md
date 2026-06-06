@@ -97,7 +97,21 @@ Notes & Requirements
 - Non-pending payments cannot be approved or rejected.
 - Payment moderation must update enrollment state through the enrollment service, not duplicate status logic in the payment layer.
 
-5. Static Content Management (CMS)
+5. Content Management (CMS)
+
+### 5a. Public Homepage
+
+- Actors: Any visitor (anonymous or authenticated)
+- Purpose: Provide a single endpoint that aggregates all homepage content for the frontend.
+
+Flow:
+
+1. Frontend calls `GET /api/v1/homepage/` (no authentication required).
+2. Response includes: hero section, about section, site settings, active testimonials, and active FAQs.
+3. Only testimonials and FAQs with `is_active=True` are returned.
+4. FAQs are ordered by `order` ascending, then `created_at`.
+
+### 5b. Static Content Management (Admin)
 
 - Actors: Admin user (must have `role == 'admin'`)
 - Purpose: Manage static content of the website (Hero section, About section, and Site Settings) through singleton instances.
@@ -111,6 +125,43 @@ Flow:
    - Note: Background images and illustrations are uploaded via multipart form data requests.
    - Any attempt to create another record is blocked by the singleton model pattern (the database always holds a single row with ID = 1).
 
-Auth rules:
+### 5c. Testimonial Management (Admin)
+
+- Actors: Admin user (must have `role == 'admin'`)
+- Purpose: Manage student testimonials displayed on the homepage.
+
+Flow:
+
+1. Admin logs in and obtains JWT.
+2. List all testimonials: `GET /api/v1/admin/testimonials/` — returns all records including inactive ones.
+3. Create testimonial: `POST /api/v1/admin/testimonials/` with `student_name`, `message`, `rating` (1–5), and optional `student_image`.
+4. Update testimonial: `PUT|PATCH /api/v1/admin/testimonials/{id}/` — e.g. toggle `is_active` to hide/show on homepage.
+5. Delete testimonial: `DELETE /api/v1/admin/testimonials/{id}/` — permanently removes the record.
+
+Notes:
+
+- `rating` is validated server-side to be between 1 and 5; invalid values return 400.
+- Setting `is_active=false` hides the testimonial from the public homepage without deleting it.
+
+### 5d. FAQ Management (Admin)
+
+- Actors: Admin user (must have `role == 'admin'`)
+- Purpose: Manage frequently asked questions displayed on the homepage.
+
+Flow:
+
+1. Admin logs in and obtains JWT.
+2. List all FAQs: `GET /api/v1/admin/faqs/` — returns all records including inactive ones, ordered by `order`.
+3. Create FAQ: `POST /api/v1/admin/faqs/` with `question`, `answer`, and optional `order` (default 0).
+4. Update FAQ: `PUT|PATCH /api/v1/admin/faqs/{id}/` — change content or reorder by updating `order`.
+5. Delete FAQ: `DELETE /api/v1/admin/faqs/{id}/` — permanently removes the record.
+
+Notes:
+
+- Use the `order` field to control display sequence; lower values appear first.
+- Setting `is_active=false` hides the FAQ from the public homepage without deleting it.
+
+Auth rules (all CMS admin endpoints):
 
 - All admin CMS endpoints require JWT + `role == 'admin'`. Anonymous users get 401 Unauthorized, and student users get 403 Forbidden.
+

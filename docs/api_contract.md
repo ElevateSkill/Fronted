@@ -37,10 +37,17 @@ Summary of available endpoints (by area):
     - `PUT /api/v1/admin/payments/{id}/approve/` — approve a pending payment and activate its enrollment
     - `PUT /api/v1/admin/payments/{id}/reject/` — reject a pending payment and cancel its enrollment
 
-- CMS (Static Content - Admin only)
-  - `GET|PUT /api/v1/admin/hero/` — retrieve/update hero section details
-  - `GET|PUT /api/v1/admin/about/` — retrieve/update about section details
-  - `GET|PUT /api/v1/admin/site-settings/` — retrieve/update site settings details
+- CMS
+  - Public
+    - `GET /api/v1/homepage/` — aggregated homepage data (hero, about, settings, testimonials, FAQs)
+  - Admin (requires JWT + user.role == 'admin')
+    - `GET|PUT /api/v1/admin/hero/` — retrieve/update hero section details
+    - `GET|PUT /api/v1/admin/about/` — retrieve/update about section details
+    - `GET|PUT /api/v1/admin/site-settings/` — retrieve/update site settings details
+    - `GET|POST /api/v1/admin/testimonials/` — list all / create testimonial
+    - `GET|PUT|PATCH|DELETE /api/v1/admin/testimonials/{id}/` — retrieve/update/delete testimonial
+    - `GET|POST /api/v1/admin/faqs/` — list all / create FAQ
+    - `GET|PUT|PATCH|DELETE /api/v1/admin/faqs/{id}/` — retrieve/update/delete FAQ
 
 - API Schema & Docs (project-level)
   - `GET /api/v1/schema/` — OpenAPI schema (JSON)
@@ -311,14 +318,70 @@ proof_file: <file>
 
 ---
 
-## CMS (Static Content - Admin only)
+## CMS
 
-All endpoints below require JWT Bearer authentication with an admin role. Singletons are automatically initialized with default values upon first request if they do not already exist.
+### Homepage (Public)
 
-### Hero Section
+- Method: GET
+- URL: `/api/v1/homepage/`
+- Auth: None (public)
+- Response 200 OK (example):
+  ```json
+  {
+    "hero": {
+      "title": "Welcome to Elevate Skill",
+      "subtitle": "Grow your professional skills today.",
+      "background_image": "http://localhost:8000/media/cms/hero/bg.png",
+      "cta_text": "Explore Courses",
+      "cta_link": "/courses/",
+      "updated_at": "2026-06-06T09:19:35Z"
+    },
+    "about": {
+      "title": "About Elevate Skill",
+      "content": "We are a top-tier learning platform.",
+      "image": null,
+      "updated_at": "2026-06-06T09:19:35Z"
+    },
+    "site_settings": {
+      "site_name": "Elevate Skill LMS",
+      "contact_info": "support@elevateskill.com",
+      "bank_details": "...",
+      "payment_instructions": "...",
+      "updated_at": "2026-06-06T09:19:35Z"
+    },
+    "testimonials": [
+      {
+        "id": 1,
+        "student_name": "Alice",
+        "student_image": null,
+        "message": "Great course!",
+        "rating": 5,
+        "is_active": true,
+        "created_at": "2026-06-06T09:19:35Z"
+      }
+    ],
+    "faqs": [
+      {
+        "id": 1,
+        "question": "How do I enroll?",
+        "answer": "Click the Enroll button on any course page.",
+        "order": 1,
+        "is_active": true,
+        "created_at": "2026-06-06T09:19:35Z"
+      }
+    ]
+  }
+  ```
+- Notes:
+  - Returns only `is_active=True` testimonials and FAQs.
+  - FAQs are ordered by `order` ascending, then `created_at`.
+  - Singleton sections (hero, about, site_settings) are auto-initialized with defaults if they don't exist yet.
+
+### Hero Section (Admin)
 
 - Method: GET, PUT
 - URL: `/api/v1/admin/hero/`
+- Auth: JWT + admin role
 - Request Body (PUT, multipart/form-data or JSON):
   - `title` (string, optional)
   - `subtitle` (string, optional)
@@ -337,10 +400,11 @@ All endpoints below require JWT Bearer authentication with an admin role. Single
   }
   ```
 
-### About Section
+### About Section (Admin)
 
 - Method: GET, PUT
 - URL: `/api/v1/admin/about/`
+- Auth: JWT + admin role
 - Request Body (PUT, multipart/form-data or JSON):
   - `title` (string, optional)
   - `content` (string, optional)
@@ -355,10 +419,11 @@ All endpoints below require JWT Bearer authentication with an admin role. Single
   }
   ```
 
-### Site Settings
+### Site Settings (Admin)
 
 - Method: GET, PUT
 - URL: `/api/v1/admin/site-settings/`
+- Auth: JWT + admin role
 - Request Body (PUT, JSON):
   - `site_name` (string, optional)
   - `contact_info` (string, optional)
@@ -374,6 +439,58 @@ All endpoints below require JWT Bearer authentication with an admin role. Single
     "updated_at": "2026-06-06T09:19:35Z"
   }
   ```
+
+### Testimonials (Admin)
+
+- List / Create: `GET|POST /api/v1/admin/testimonials/`
+- Detail / Update / Delete: `GET|PUT|PATCH|DELETE /api/v1/admin/testimonials/{id}/`
+- Auth: JWT + admin role
+- Request Body (POST/PUT, JSON or multipart/form-data):
+  - `student_name` (string, required)
+  - `student_image` (file upload, optional)
+  - `message` (string, required)
+  - `rating` (integer, required, 1–5)
+  - `is_active` (boolean, optional, default `true`)
+- Response object:
+  ```json
+  {
+    "id": 1,
+    "student_name": "Alice",
+    "student_image": null,
+    "message": "Great course!",
+    "rating": 5,
+    "is_active": true,
+    "created_at": "2026-06-06T09:19:35Z"
+  }
+  ```
+- Notes:
+  - Admin list returns all testimonials regardless of `is_active`.
+  - `rating` is validated to be between 1 and 5 inclusive; invalid values return 400.
+
+### FAQs (Admin)
+
+- List / Create: `GET|POST /api/v1/admin/faqs/`
+- Detail / Update / Delete: `GET|PUT|PATCH|DELETE /api/v1/admin/faqs/{id}/`
+- Auth: JWT + admin role
+- Request Body (POST/PUT, JSON):
+  - `question` (string, required, max 500 chars)
+  - `answer` (string, required)
+  - `order` (integer, optional, default `0`) — controls display order
+  - `is_active` (boolean, optional, default `true`)
+- Response object:
+  ```json
+  {
+    "id": 1,
+    "question": "How do I enroll?",
+    "answer": "Click the Enroll button on any course page.",
+    "order": 1,
+    "is_active": true,
+    "created_at": "2026-06-06T09:19:35Z"
+  }
+  ```
+- Notes:
+  - Admin list returns all FAQs regardless of `is_active`.
+  - FAQs are ordered by `order` ascending, then `created_at`.
 
 ---
 
