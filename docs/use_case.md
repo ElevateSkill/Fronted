@@ -96,3 +96,21 @@ Notes & Requirements
 - Only admins can view or moderate all payments.
 - Non-pending payments cannot be approved or rejected.
 - Payment moderation must update enrollment state through the enrollment service, not duplicate status logic in the payment layer.
+
+5. Static Content Management (CMS)
+
+- Actors: Admin user (must have `role == 'admin'`)
+- Purpose: Manage static content of the website (Hero section, About section, and Site Settings) through singleton instances.
+
+Flow:
+
+1. Admin obtains JWT via `POST /api/v1/auth/login/` (login as admin).
+2. Retrieve Static Content: Admin calls `GET /api/v1/admin/hero/` (or `/admin/about/` or `/admin/site-settings/`) to view the current configuration.
+   - Note: If no record has been created in the database yet, the service layer automatically initializes the singleton record with default/empty fields and returns 200 OK.
+3. Update Static Content: Admin calls `PUT /api/v1/admin/hero/` (or `/admin/about/` or `/admin/site-settings/`) to update one or more fields.
+   - Note: Background images and illustrations are uploaded via multipart form data requests.
+   - Any attempt to create another record is blocked by the singleton model pattern (the database always holds a single row with ID = 1).
+
+Auth rules:
+
+- All admin CMS endpoints require JWT + `role == 'admin'`. Anonymous users get 401 Unauthorized, and student users get 403 Forbidden.

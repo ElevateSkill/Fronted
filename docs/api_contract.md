@@ -37,6 +37,11 @@ Summary of available endpoints (by area):
     - `PUT /api/v1/admin/payments/{id}/approve/` — approve a pending payment and activate its enrollment
     - `PUT /api/v1/admin/payments/{id}/reject/` — reject a pending payment and cancel its enrollment
 
+- CMS (Static Content - Admin only)
+  - `GET|PUT /api/v1/admin/hero/` — retrieve/update hero section details
+  - `GET|PUT /api/v1/admin/about/` — retrieve/update about section details
+  - `GET|PUT /api/v1/admin/site-settings/` — retrieve/update site settings details
+
 - API Schema & Docs (project-level)
   - `GET /api/v1/schema/` — OpenAPI schema (JSON)
   - `GET /api/v1/schema/swagger-ui/` — Swagger UI
@@ -303,6 +308,72 @@ proof_file: <file>
   - Payment becomes `rejected`.
   - Linked enrollment becomes `cancelled` through `EnrollmentService.update_enrollment_status(...)`.
 - Response 200 OK: updated payment object
+
+---
+
+## CMS (Static Content - Admin only)
+
+All endpoints below require JWT Bearer authentication with an admin role. Singletons are automatically initialized with default values upon first request if they do not already exist.
+
+### Hero Section
+
+- Method: GET, PUT
+- URL: `/api/v1/admin/hero/`
+- Request Body (PUT, multipart/form-data or JSON):
+  - `title` (string, optional)
+  - `subtitle` (string, optional)
+  - `background_image` (file upload, optional)
+  - `cta_text` (string, optional)
+  - `cta_link` (string, optional)
+- Response 200 OK (example):
+  ```json
+  {
+    "title": "Welcome to Elevate Skill",
+    "subtitle": "Grow your professional skills today.",
+    "background_image": "http://localhost:8000/media/cms/hero/bg.png",
+    "cta_text": "Explore Courses",
+    "cta_link": "/courses/",
+    "updated_at": "2026-06-06T09:19:35Z"
+  }
+  ```
+
+### About Section
+
+- Method: GET, PUT
+- URL: `/api/v1/admin/about/`
+- Request Body (PUT, multipart/form-data or JSON):
+  - `title` (string, optional)
+  - `content` (string, optional)
+  - `image` (file upload, optional)
+- Response 200 OK (example):
+  ```json
+  {
+    "title": "About Elevate Skill",
+    "content": "We are a top-tier learning platform.",
+    "image": "http://localhost:8000/media/cms/about/about.png",
+    "updated_at": "2026-06-06T09:19:35Z"
+  }
+  ```
+
+### Site Settings
+
+- Method: GET, PUT
+- URL: `/api/v1/admin/site-settings/`
+- Request Body (PUT, JSON):
+  - `site_name` (string, optional)
+  - `contact_info` (string, optional)
+  - `bank_details` (string, optional)
+  - `payment_instructions` (string, optional)
+- Response 200 OK (example):
+  ```json
+  {
+    "site_name": "Elevate Skill LMS",
+    "contact_info": "support@elevateskill.com",
+    "bank_details": "Bank of Elevate, Acct: 123456789",
+    "payment_instructions": "Please upload a copy of the payment receipt.",
+    "updated_at": "2026-06-06T09:19:35Z"
+  }
+  ```
 
 ---
 
