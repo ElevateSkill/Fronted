@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.cms.models import HeroSection, About, SiteSettings
+from apps.cms.models import HeroSection, About, SiteSettings, Testimonial, FAQ
 
 User = get_user_model()
 
@@ -43,6 +43,49 @@ class CmsModelTests(APITestCase):
         settings2.save()
         self.assertEqual(SiteSettings.objects.count(), 1)
         self.assertEqual(SiteSettings.objects.first().site_name, "Second Site")
+
+
+class TestimonialModelTests(APITestCase):
+    """Test Testimonial model behaviour."""
+
+    def test_create_testimonial(self):
+        t = Testimonial.objects.create(
+            student_name="Alice", message="Great course!", rating=5
+        )
+        self.assertEqual(str(t), "Alice (5★)")
+        self.assertTrue(t.is_active)
+
+    def test_rating_validators(self):
+        """Rating outside 1-5 should fail full_clean validation."""
+        t = Testimonial(student_name="Bob", message="Bad", rating=0)
+        with self.assertRaises(Exception):
+            t.full_clean()
+
+        t2 = Testimonial(student_name="Bob", message="Bad", rating=6)
+        with self.assertRaises(Exception):
+            t2.full_clean()
+
+    def test_valid_ratings_pass(self):
+        for r in [1, 3, 5]:
+            t = Testimonial(student_name="Test", message="msg", rating=r)
+            t.full_clean()  # should not raise
+
+
+class FAQModelTests(APITestCase):
+    """Test FAQ model behaviour."""
+
+    def test_create_faq(self):
+        faq = FAQ.objects.create(question="What is this?", answer="A platform.")
+        self.assertEqual(str(faq), "What is this?")
+        self.assertTrue(faq.is_active)
+        self.assertEqual(faq.order, 0)
+
+    def test_ordering(self):
+        faq2 = FAQ.objects.create(question="Second", answer="B", order=2)
+        faq1 = FAQ.objects.create(question="First", answer="A", order=1)
+        faqs = list(FAQ.objects.all())
+        self.assertEqual(faqs[0].question, "First")
+        self.assertEqual(faqs[1].question, "Second")
 
 
 class CmsApiTests(APITestCase):
@@ -146,3 +189,194 @@ class CmsApiTests(APITestCase):
         self.assertEqual(resp.data["contact_info"], "admin@elevate.com")
         self.assertEqual(resp.data["bank_details"], "Bank of Elevate")
         self.assertEqual(resp.data["payment_instructions"], "Send receipt after transfer.")
+
+
+class AdminTestimonialApiTests(APITestCase):
+    """Test admin CRUD for Testimonials."""
+
+    def setUp(self):
+        self.list_url = reverse("admin-testimonial-list")
+        self.student = User.objects.create_user(
+            username="student1", email="s@test.com",
+            password="pass123", full_name="Student", role="student",
+        )
+        self.admin = User.objects.create_user(
+            username="admin1", email="a@test.com",
+            password="pass123", full_name="Admin", role="admin",
+        )
+
+    def auth_as(self, user):
+        refresh = RefreshToken.for_user(user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+
+    def detail_url(self, pk):
+        return reverse("admin-testimonial-detail", args=[pk])
+
+    # ── Auth / Permission ──
+
+    def test_requires_auth(self):
+        self.assertEqual(self.client.get(self.list_url).status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_blocks_students(self):
+        self.auth_as(self.student)
+        self.assertEqual(self.client.get(self.list_url).status_code, status.HTTP_403_FORBIDDEN)
+
+    # ── CRUD ──
+
+    def test_create_testimonial(self):
+        self.auth_as(self.admin)
+        payload = {"student_name": "Alice", "message": "Awesome!", "rating": 5}
+        resp = self.client.post(self.list_url, payload, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.data["student_name"], "Alice")
+        self.assertEqual(resp.data["rating"], 5)
+        self.assertTrue(resp.data["is_active"])
+
+    def test_create_invalid_rating(self):
+        self.auth_as(self.admin)
+        resp = self.client.post(self.list_url, {
+            "student_name": "Bob", "message": "Bad", "rating": 0
+        }, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+        resp = self.client.post(self.list_url, {
+            "student_name": "Bob", "message": "Bad", "rating": 6
+        }, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_list_all_testimonials(self):
+        self.auth_as(self.admin)
+        Testimonial.objects.create(student_name="A", message="m", rating=5, is_active=True)
+        Testimonial.objects.create(student_name="B", message="m", rating=3, is_active=False)
+        resp = self.client.get(self.list_url)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.data), 2)  # admin sees all
+
+    def test_update_testimonial(self):
+        self.auth_as(self.admin)
+        t = Testimonial.objects.create(student_name="Old", message="m", rating=3)
+        resp = self.client.patch(self.detail_url(t.pk), {"student_name": "New"}, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["student_name"], "New")
+
+    def test_delete_testimonial(self):
+        self.auth_as(self.admin)
+        t = Testimonial.objects.create(student_name="Del", message="m", rating=4)
+        resp = self.client.delete(self.detail_url(t.pk))
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Testimonial.objects.count(), 0)
+
+
+class AdminFAQApiTests(APITestCase):
+    """Test admin CRUD for FAQs."""
+
+    def setUp(self):
+        self.list_url = reverse("admin-faq-list")
+        self.student = User.objects.create_user(
+            username="student1", email="s@test.com",
+            password="pass123", full_name="Student", role="student",
+        )
+        self.admin = User.objects.create_user(
+            username="admin1", email="a@test.com",
+            password="pass123", full_name="Admin", role="admin",
+        )
+
+    def auth_as(self, user):
+        refresh = RefreshToken.for_user(user)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+
+    def detail_url(self, pk):
+        return reverse("admin-faq-detail", args=[pk])
+
+    def test_requires_auth(self):
+        self.assertEqual(self.client.get(self.list_url).status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_blocks_students(self):
+        self.auth_as(self.student)
+        self.assertEqual(self.client.get(self.list_url).status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_faq(self):
+        self.auth_as(self.admin)
+        resp = self.client.post(self.list_url, {
+            "question": "How to enroll?", "answer": "Click enroll.", "order": 1
+        }, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp.data["question"], "How to enroll?")
+        self.assertEqual(resp.data["order"], 1)
+
+    def test_list_all_faqs(self):
+        self.auth_as(self.admin)
+        FAQ.objects.create(question="Q1", answer="A1", is_active=True)
+        FAQ.objects.create(question="Q2", answer="A2", is_active=False)
+        resp = self.client.get(self.list_url)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.data), 2)  # admin sees all
+
+    def test_update_faq(self):
+        self.auth_as(self.admin)
+        faq = FAQ.objects.create(question="Old?", answer="Old.")
+        resp = self.client.patch(self.detail_url(faq.pk), {"question": "New?"}, format="json")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["question"], "New?")
+
+    def test_delete_faq(self):
+        self.auth_as(self.admin)
+        faq = FAQ.objects.create(question="Del?", answer="Del.")
+        resp = self.client.delete(self.detail_url(faq.pk))
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(FAQ.objects.count(), 0)
+
+    def test_faq_ordering(self):
+        """FAQs should be returned ordered by 'order' ascending."""
+        self.auth_as(self.admin)
+        FAQ.objects.create(question="Second", answer="B", order=2)
+        FAQ.objects.create(question="First", answer="A", order=1)
+        resp = self.client.get(self.list_url)
+        self.assertEqual(resp.data[0]["question"], "First")
+        self.assertEqual(resp.data[1]["question"], "Second")
+
+
+class HomepageApiTests(APITestCase):
+    """Test the public /api/v1/homepage/ endpoint."""
+
+    def setUp(self):
+        self.url = reverse("homepage")
+
+    def test_homepage_is_public(self):
+        """No auth required."""
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_homepage_returns_expected_keys(self):
+        resp = self.client.get(self.url)
+        self.assertIn("hero", resp.data)
+        self.assertIn("about", resp.data)
+        self.assertIn("site_settings", resp.data)
+        self.assertIn("testimonials", resp.data)
+        self.assertIn("faqs", resp.data)
+
+    def test_homepage_only_active_testimonials(self):
+        Testimonial.objects.create(student_name="Active", message="m", rating=5, is_active=True)
+        Testimonial.objects.create(student_name="Hidden", message="m", rating=3, is_active=False)
+        resp = self.client.get(self.url)
+        self.assertEqual(len(resp.data["testimonials"]), 1)
+        self.assertEqual(resp.data["testimonials"][0]["student_name"], "Active")
+
+    def test_homepage_only_active_faqs(self):
+        FAQ.objects.create(question="Visible", answer="Yes", is_active=True)
+        FAQ.objects.create(question="Hidden", answer="No", is_active=False)
+        resp = self.client.get(self.url)
+        self.assertEqual(len(resp.data["faqs"]), 1)
+        self.assertEqual(resp.data["faqs"][0]["question"], "Visible")
+
+    def test_homepage_faq_ordering(self):
+        FAQ.objects.create(question="Second", answer="B", order=2, is_active=True)
+        FAQ.objects.create(question="First", answer="A", order=1, is_active=True)
+        resp = self.client.get(self.url)
+        self.assertEqual(resp.data["faqs"][0]["question"], "First")
+        self.assertEqual(resp.data["faqs"][1]["question"], "Second")
+
+    def test_homepage_empty_when_no_content(self):
+        resp = self.client.get(self.url)
+        self.assertEqual(len(resp.data["testimonials"]), 0)
+        self.assertEqual(len(resp.data["faqs"]), 0)
