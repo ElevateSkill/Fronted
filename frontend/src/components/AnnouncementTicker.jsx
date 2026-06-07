@@ -3,29 +3,26 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Megaphone, X, ChevronRight, Sparkles } from 'lucide-react';
 import useBackendData from '../hooks/useBackendData';
 import { announcementsAPI } from '../services/api';
-import { loadData as loadLocalData } from '../data/dataStore';
 
-// Map local-store field names to the actual backend field names.
+const safeStr = (v, fallback = '') => (v != null && typeof v !== 'object') ? String(v) : fallback;
+
 // Backend announcement: { id, title, content, date, is_published, ... }
-// Local store entry:    { id, title, body, active, ... }
 const adapt = (a) => ({
   id: a.id,
-  title: a.title || 'Update',
-  body: a.body || a.content || '',
+  title: safeStr(a.title, 'Update'),
+  body: safeStr(a.content),
   date: a.date,
-  is_published: a.is_published !== false && a.active !== false
+  is_published: a.is_published !== false
 });
 
 /**
  * AnnouncementTicker — animated top banner driven by the real backend
- * (`GET /api/v1/announcements/`). Falls back to local store data when the
- * API is unreachable.
+ * (`GET /api/v1/announcements/`).
  */
 export default function AnnouncementTicker({ variant = 'marquee' }) {
-  const fallback = (loadLocalData('announcements') || []).map(adapt);
   const { data } = useBackendData(
     () => announcementsAPI.list(),
-    fallback,
+    [],
     { refreshInterval: 60000 }
   );
 

@@ -640,8 +640,8 @@ proof_file: <file>
 - Method: GET
 - URL: `/api/v1/announcements/`
 - Auth: Bearer access token (IsAuthenticated)
-- Response 200 OK: array of announcement objects (only published ones, `is_published=True`)
-- Example response:
+- Response 200 OK: paginated envelope (`{ count, next, previous, results }`) where `results` is an array of announcement objects (only published ones, `is_published=True`)
+- Example response (the `results` array):
   ```json
   [
     {
@@ -667,8 +667,8 @@ proof_file: <file>
 - Method: GET
 - URL: `/api/v1/news/`
 - Auth: None (Public endpoint)
-- Response 200 OK: array of news post objects (only published ones, `status='published'`)
-- Example response:
+- Response 200 OK: paginated envelope (`{ count, next, previous, results }`) where `results` is an array of news post objects (only published ones, `status='published'`)
+- Example response (the `results` array):
   ```json
   [
     {

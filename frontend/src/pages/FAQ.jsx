@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Minus, MessageCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { Plus, Minus, MessageCircle, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useBackendData from '../hooks/useBackendData';
 import { faqsAPI } from '../services/api';
-import { loadData as loadLocalData } from '../data/dataStore';
 
 export default function FAQ() {
-  const fallback = loadLocalData('faqs');
-  const { data: fetched, loading, source } = useBackendData(
+  const { data: faqData, loading, source } = useBackendData(
     () => faqsAPI.active(),
-    fallback
+    []
   );
-  const faqData = fetched.length ? fetched : fallback;
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (

@@ -13,12 +13,9 @@ import {
  UserCheck, UserX, UserCog, Shield, Award,
  ChevronLeft, ChevronRight as ChevronRightIcon, SlidersHorizontal, Zap, EyeOff, X, HelpCircle, CreditCard
 } from 'lucide-react';
-import gr1 from '../../assets/gr1.jpg';
-import gr3 from '../../assets/gr3.jpg';
-import grad2 from '../../assets/grad2.jpg';
 import { loadData, saveData } from '../../data/dataStore';
 import { useAuth } from '../../context/AuthContext';
-import { api, coursesAPI, testimonialsAPI, announcementsAPI, faqsAPI, newsAPI, dashboardAPI, authAPI } from '../../services/api';
+import { api, coursesAPI, testimonialsAPI, announcementsAPI, faqsAPI, newsAPI, categoriesAPI, dashboardAPI, authAPI } from '../../services/api';
 import UsersSection from './sections/Users';
 import PaymentsSection from './sections/Payments';
 import PaymentDetailModal from '../../components/dashboard/PaymentDetailModal';
@@ -117,49 +114,6 @@ const DeleteConfirm = ({ onConfirm, onCancel }) => (
  </Modal>
 );
 
-const initialRegistrations = [
- { id: genId(), name: 'Dawit Mekonnen', email: 'dawit@example.com', phone: '+251 911 234 567', status: 'Pending', date: '2026-06-01', course: 'Full-Stack Web Dev', amount: '500 ETB' },
- { id: genId(), name: 'Selamawit Bekele', email: 'selam@example.com', phone: '+251 922 345 678', status: 'Approved', date: '2026-05-28', course: 'UI/UX Design', amount: '500 ETB' },
- { id: genId(), name: 'Abenezer Lemma', email: 'abenezer@example.com', phone: '+251 933 456 789', status: 'Rejected', date: '2026-05-25', course: 'AI & ML', amount: '500 ETB' },
-];
-const initialUsers = [
- { id: genId(), name: 'Dawit Mekonnen', email: 'dawit@example.com', role: 'Student', status: 'Active', joined: '2026-01-15', courses: 3 },
- { id: genId(), name: 'Selamawit Bekele', email: 'selam@example.com', role: 'Student', status: 'Active', joined: '2026-02-20', courses: 2 },
- { id: genId(), name: 'Admin User', email: 'admin@elevate.com', role: 'Admin', status: 'Active', joined: '2025-12-01', courses: 0 },
-];
-const initialCourses = [
- { id: genId(), title: 'Full-Stack Web Development', category: 'Development', students: 245, lessons: 48, status: 'Active', price: '500 ETB', desc: 'Master React, Node.js, and scalable architectures.' },
- { id: genId(), title: 'UI/UX Design Mastery', category: 'Design', students: 189, lessons: 36, status: 'Active', price: '450 ETB', desc: 'Prototyping and user-centric systems.' },
- { id: genId(), title: 'AI & Machine Learning', category: 'AI', students: 312, lessons: 52, status: 'Active', price: '600 ETB', desc: 'LLMs, Neural Networks, and practical AI.' },
-];
-const initialPosts = [
- { id: genId(), title: 'Why Full-Stack Development is the Future', author: 'Admin', date: '2026-05-20', status: 'Published', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400', excerpt: 'The tech industry is evolving rapidly...' },
- { id: genId(), title: 'UI/UX Trends for 2026', author: 'Admin', date: '2026-05-18', status: 'Draft', image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=400', excerpt: 'Stay ahead of the curve with these trends...' },
-];
-const initialTestimonials = [
- { id: genId(), name: 'Dawit Mekonnen', role: 'Senior Fullstack Engineer', company: 'Addis Tech Hub', text: 'The project-based approach taught me how to architect complex systems. I doubled my salary in six months.', rating: 5, avatar: 'https://i.pravatar.cc/100?img=1' },
- { id: genId(), name: 'Selamawit Bekele', role: 'UI/UX Lead', company: 'Creative Flow Agency', text: 'I learned the psychology of design. The feedback from world-class mentors helped me build a portfolio.', rating: 5, avatar: 'https://i.pravatar.cc/100?img=2' },
-];
-const initialPhotos = [
- { id: genId(), url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400', name: 'coding-session.jpg', size: '2.4 MB', uploaded: '2026-05-20' },
- { id: genId(), url: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=400', name: 'design-workshop.jpg', size: '1.8 MB', uploaded: '2026-05-18' },
- { id: genId(), url: 'https://images.unsplash.com/photo-1523050854058-8df90110c7f1?w=400', name: 'graduation-day.jpg', size: '3.1 MB', uploaded: '2026-05-15' },
- { id: genId(), url: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400', name: 'campus-event.jpg', size: '2.7 MB', uploaded: '2026-05-12' },
- { id: genId(), url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400', name: 'seminar.jpg', size: '1.9 MB', uploaded: '2026-05-10' },
-];
-const initialGalleryAlbums = [
- { id: genId(), name: 'Campus Events 2026', count: 12, cover: 'https://images.unsplash.com/photo-1523050854058-8df90110c7f1?w=400' },
- { id: genId(), name: 'Graduation Ceremony', count: 8, cover: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400' },
- { id: genId(), name: 'Workshops & Seminars', count: 15, cover: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400' },
-];
-const initialAnnouncements = [];
-
-const initialHeroSlides = [
- { id: genId(), image: gr1, title: 'ELEVATE', highlight: 'SKILL', subtitle: 'Project-based learning platform designed for the modern engineer.', cta: 'GET STARTED', color: '#EE8433', active: true },
- { id: genId(), image: gr3, title: 'YOUR', highlight: 'JOURNEY', subtitle: 'From beginner to senior architect. Structured paths that adapt to your pace and goals.', cta: 'EXPLORE PATHS', color: '#3A3992', active: true },
- { id: genId(), image: grad2, title: 'MASTER', highlight: 'CRAFT', subtitle: 'Industry-driven curriculum with real mentors. Code, design, deploy — master the full stack.', cta: 'WATCH NOW', color: '#5A2DA8', active: true },
-];
-
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
 
@@ -174,20 +128,21 @@ export default function AdminDashboard() {
 
  const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
- const [registrations, setRegistrations] = useState(initialRegistrations);
+ const [registrations, setRegistrations] = useState([]);
   const [users, setUsers] = useState(() => {
   const stored = loadData('users');
-  return stored.length ? stored : initialUsers;
+  return stored.length ? stored : [];
   });
   const [userLoading, setUserLoading] = useState(false);
   const [courses, setCourses] = useState(() => loadData('courses'));
   const [posts, setPosts] = useState(() => loadData('posts'));
   const [testimonials, setTestimonials] = useState(() => loadData('testimonials'));
-  const [photos, setPhotos] = useState(initialPhotos);
-  const [galleryAlbums, setGalleryAlbums] = useState(initialGalleryAlbums);
+  const [photos, setPhotos] = useState([]);
+  const [galleryAlbums, setGalleryAlbums] = useState([]);
   const [announcements, setAnnouncements] = useState(() => loadData('announcements'));
-  const [heroSlides, setHeroSlides] = useState(() => loadData('heroSlides').length ? loadData('heroSlides') : initialHeroSlides);
+  const [heroSlides, setHeroSlides] = useState(() => loadData('heroSlides').length ? loadData('heroSlides') : []);
   const [faqs, setFaqs] = useState(() => loadData('faqs'));
+  const [categories, setCategories] = useState([]);
 
   // Auto-persist all data to localStorage
   useEffect(() => {
@@ -204,49 +159,61 @@ export default function AdminDashboard() {
   useEffect(() => {
     const syncFromAPI = async () => {
       try {
-        const [coursesRes, testimonialsRes, postsRes, announcementsRes, faqsRes, statsRes] = await Promise.allSettled([
+        const [coursesRes, testimonialsRes, postsRes, announcementsRes, faqsRes, statsRes, categoriesRes] = await Promise.allSettled([
           coursesAPI.adminList({ page_size: 100 }),
           testimonialsAPI.adminList({ page_size: 100 }),
           newsAPI.adminList({ page_size: 100 }),
           announcementsAPI.adminList({ page_size: 100 }),
           faqsAPI.adminList({ page_size: 100 }),
           dashboardAPI.getStats(),
+          categoriesAPI.adminList({ page_size: 100 }),
         ]);
 
-        if (coursesRes.status === 'fulfilled' && coursesRes.value?.length) {
-          const adapted = coursesRes.value.map(c => ({
-            id: c.id, title: c.title, category: c.category?.name || c.category || '', students: c.students || 0,
+        if (coursesRes.status === 'fulfilled' && coursesRes.value?.results?.length) {
+          const adapted = coursesRes.value.results.map(c => ({
+            id: c.id, title: c.title || '', category: c.category?.name || c.category || '', students: c.students || 0,
             lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price ? `${c.price} ETB` : 'Free',
             desc: c.short_description || c.description || '',
           }));
           setCourses(prev => adapted.length ? adapted : prev);
         }
-        if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value?.length) {
-          const adapted = testimonialsRes.value.map(t => ({
-            id: t.id, name: t.name || t.full_name || '', role: t.role || '', company: t.company || '',
-            text: t.text || t.content || '', rating: t.rating || 5,
-            avatar: t.avatar || `https://i.pravatar.cc/100?img=${t.id}`,
+        if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value?.results?.length) {
+          const adapted = testimonialsRes.value.results.map(t => ({
+            id: t.id, name: t.student_name || '', role: '', company: '',
+            text: t.message || '', rating: t.rating || 5,
+            avatar: t.student_image || '',
             is_active: t.is_active !== false,
           }));
           setTestimonials(prev => adapted.length ? adapted : prev);
         }
-        if (postsRes.status === 'fulfilled' && postsRes.value?.length) {
-          const adapted = postsRes.value.map(p => ({
-            id: p.id, title: p.title, author: p.author?.full_name || p.author || 'Admin',
-            date: p.created_at?.split('T')[0] || p.date || '', status: p.is_published ? 'Published' : 'Draft',
-            image: p.thumbnail || p.image || '', excerpt: p.excerpt || p.content?.substring(0, 150) || '',
+        if (postsRes.status === 'fulfilled' && postsRes.value?.results?.length) {
+          const adapted = postsRes.value.results.map(p => ({
+            id: p.id, title: p.title || '', author: p.author?.full_name || p.author || 'Admin',
+            date: p.created_at?.split('T')[0] || p.date || '', status: p.status === 'published' ? 'Published' : 'Draft',
+            image: p.image || '', excerpt: p.excerpt || p.content?.substring(0, 150) || '',
           }));
           setPosts(prev => adapted.length ? adapted : prev);
         }
-        if (announcementsRes.status === 'fulfilled' && announcementsRes.value?.length) {
-          setAnnouncements(prev => announcementsRes.value.length ? announcementsRes.value : prev);
+        if (announcementsRes.status === 'fulfilled' && announcementsRes.value?.results?.length) {
+          const adapted = announcementsRes.value.results.map(a => ({
+            id: a.id, title: a.title || '', body: a.content || '',
+            date: a.date || a.created_at?.split('T')[0] || '', is_published: a.is_published !== false,
+          }));
+          setAnnouncements(prev => adapted.length ? adapted : prev);
         }
-        if (faqsRes.status === 'fulfilled' && faqsRes.value?.length) {
-          setFaqs(prev => faqsRes.value.length ? faqsRes.value : prev);
+        if (faqsRes.status === 'fulfilled' && faqsRes.value?.results?.length) {
+          const adapted = faqsRes.value.results.map(f => ({
+            id: f.id, question: f.question || '', answer: f.answer || '',
+            order: f.order || 0, is_active: f.is_active !== false,
+          }));
+          setFaqs(prev => adapted.length ? adapted : prev);
         }
         if (statsRes.status === 'fulfilled' && statsRes.value) {
           const s = statsRes.value;
           if (s.total_registrations !== undefined || s.total_users !== undefined) return;
+        }
+        if (categoriesRes.status === 'fulfilled' && categoriesRes.value?.results) {
+          setCategories(categoriesRes.value.results);
         }
       } catch (e) {
         // API unavailable — keep localStorage data
@@ -638,7 +605,7 @@ export default function AdminDashboard() {
  <Input placeholder="Announcement Title" value={newAnnouncement.title} onChange={e => setNewAnnouncement(p => ({ ...p, title: e.target.value }))} />
  <TextArea placeholder="Write your announcement..." rows={4} value={newAnnouncement.body} onChange={e => setNewAnnouncement(p => ({ ...p, body: e.target.value }))} />
  <div className="flex justify-end">
- <button onClick={() => { if (!newAnnouncement.title || !newAnnouncement.body) return; setAnnouncements(prev => [...prev, { ...newAnnouncement, id: genId(), date: new Date().toISOString().split('T')[0] }]); setNewAnnouncement({ title: '', body: '' }); showToast('Announcement published'); }} className="px-6 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-2"><Sparkles size={14} /> Publish</button>
+  <button onClick={async () => { if (!newAnnouncement.title || !newAnnouncement.body) return; try { const created = await announcementsAPI.adminCreate({ title: newAnnouncement.title, content: newAnnouncement.body, is_published: true }); setAnnouncements(prev => [...prev, { ...created, id: created.id, title: created.title, body: created.content || created.body, date: new Date().toISOString().split('T')[0] }]); setNewAnnouncement({ title: '', body: '' }); showToast('Announcement published to backend'); } catch (e) { showToast('Failed to publish', 'error'); } }} className="px-6 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-2"><Sparkles size={14} /> Publish</button>
  </div>
  </div>
  <div className="space-y-4">
@@ -761,17 +728,22 @@ export default function AdminDashboard() {
  <div className="dashboard-layout" style={{ background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)' }}>
  <ToastComp toast={toast} />
  {showModal === 'delete' && selectedItem?.type && (
- <DeleteConfirm onConfirm={() => {
- const { type, id } = selectedItem;
- if (type === 'user') setUsers(prev => prev.filter(u => u.id !== id));
- if (type === 'course') setCourses(prev => prev.filter(c => c.id !== id));
- if (type === 'post') setPosts(prev => prev.filter(p => p.id !== id));
- if (type === 'testimonial') setTestimonials(prev => prev.filter(t => t.id !== id));
- if (type === 'gallery') setGalleryAlbums(prev => prev.filter(a => a.id !== id));
- if (type === 'hero') setHeroSlides(prev => prev.filter(s => s.id !== id));
- showToast('Item deleted');
- setShowModal(null); setSelectedItem(null);
- }} onCancel={() => { setShowModal(null); setSelectedItem(null); }} />
+  <DeleteConfirm onConfirm={async () => {
+    const { type, id } = selectedItem;
+    try {
+      if (type === 'course' && typeof id === 'number') await coursesAPI.adminDelete(id);
+      if (type === 'post' && typeof id === 'number') await newsAPI.adminDelete(id);
+      if (type === 'testimonial' && typeof id === 'number') await testimonialsAPI.adminDelete(id);
+    } catch (e) { /* local-only items won't have API endpoints */ }
+    if (type === 'user') setUsers(prev => prev.filter(u => u.id !== id));
+    if (type === 'course') setCourses(prev => prev.filter(c => c.id !== id));
+    if (type === 'post') setPosts(prev => prev.filter(p => p.id !== id));
+    if (type === 'testimonial') setTestimonials(prev => prev.filter(t => t.id !== id));
+    if (type === 'gallery') setGalleryAlbums(prev => prev.filter(a => a.id !== id));
+    if (type === 'hero') setHeroSlides(prev => prev.filter(s => s.id !== id));
+    showToast('Item deleted');
+    setShowModal(null); setSelectedItem(null);
+  }} onCancel={() => { setShowModal(null); setSelectedItem(null); }} />
  )}
 
  {showModal === 'course' && (
@@ -779,18 +751,32 @@ export default function AdminDashboard() {
  <div className="space-y-4">
  <div className="grid grid-cols-2 gap-4">
  <Input label="Title" value={editItem?.title || newCourse.title} onChange={e => editItem ? setEditItem(p => ({ ...p, title: e.target.value })) : setNewCourse(p => ({ ...p, title: e.target.value }))} placeholder="Course title" />
- <Input label="Category" value={editItem?.category || newCourse.category} onChange={e => editItem ? setEditItem(p => ({ ...p, category: e.target.value })) : setNewCourse(p => ({ ...p, category: e.target.value }))} placeholder="Development" />
+  <Input label="Category" value={editItem?.category || newCourse.category} onChange={e => editItem ? setEditItem(p => ({ ...p, category: e.target.value })) : setNewCourse(p => ({ ...p, category: e.target.value }))} placeholder="Development" />
  </div>
  <Input label="Price" value={editItem?.price || newCourse.price} onChange={e => editItem ? setEditItem(p => ({ ...p, price: e.target.value })) : setNewCourse(p => ({ ...p, price: e.target.value }))} placeholder="500 ETB" />
  <Select label="Status" value={editItem?.status || newCourse.status} onChange={e => editItem ? setEditItem(p => ({ ...p, status: e.target.value })) : setNewCourse(p => ({ ...p, status: e.target.value }))} options={['Active', 'Inactive']} />
  <TextArea label="Description" rows={3} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Course description..." />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setCourses(prev => prev.map(c => c.id === editItem.id ? { ...c, ...editItem } : c)); showToast('Course updated'); }
- else { setCourses(prev => [...prev, { id: genId(), ...newCourse, students: 0, lessons: 0 }]); showToast('Course created'); }
- setShowModal(null); setEditItem(null);
- }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
+  <button onClick={async () => {
+  try {
+    const payload = (item) => {
+      const p = { title: item.title, short_description: item.desc, price: item.price };
+      if (item.category_id) p.category_id = item.category_id;
+      return p;
+    };
+    if (editItem?.id && typeof editItem.id === 'number') {
+      const upd = await coursesAPI.adminUpdate(editItem.id, payload(editItem));
+      setCourses(prev => prev.map(c => c.id === editItem.id ? { ...c, ...upd, status: upd.is_active ? 'Active' : 'Inactive' } : c));
+      showToast('Course saved to backend');
+    } else {
+      const created = await coursesAPI.adminCreate(payload(editItem || newCourse));
+      setCourses(prev => [...prev, { ...created, id: created.id, status: 'Active', students: 0, lessons: created.lessons || 0 }]);
+      showToast('Course created on backend');
+    }
+  } catch (e) { showToast('Failed to save course', 'error'); }
+  setShowModal(null); setEditItem(null);
+  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
  </div>
  </Modal>

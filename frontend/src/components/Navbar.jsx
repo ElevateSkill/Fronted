@@ -36,22 +36,23 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const navLinks = [
-    { name: 'Home', href: '#home' },
-    { 
-      name: 'Courses', 
-      isMega: true,
-      subItems: [
-        { title: 'Web Development', desc: 'React, Node, and scalable architectures.', icon: <Code2 /> },
-        { title: 'UI/UX Design', desc: 'Prototyping and user-centric systems.', icon: <Palette /> },
-        { title: 'AI Engineering', desc: 'LLMs and Neural Networks.', icon: <BrainCircuit /> },
-        { title: 'Cloud Systems', desc: 'Docker, K8s, and AWS.', icon: <Rocket /> },
-      ] 
-    },
-    { name: 'Services', href: '#services' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '#contact' },
-  ];
+    const navLinks = [
+        { name: 'Home', href: '#home' },
+        { 
+            name: 'Courses', 
+            isMega: true,
+            subItems: [
+                { title: 'Web Development', desc: 'React, Node, and scalable architectures.', icon: <Code2 /> },
+                { title: 'UI/UX Design', desc: 'Prototyping and user-centric systems.', icon: <Palette /> },
+                { title: 'AI Engineering', desc: 'LLMs and Neural Networks.', icon: <BrainCircuit /> },
+                { title: 'Cloud Systems', desc: 'Docker, K8s, and AWS.', icon: <Rocket /> },
+            ] 
+        },
+        { name: 'Services', href: '#services' },
+        { name: 'About', href: '/about' },
+        { name: 'Partners', href: '/partners' },
+        { name: 'Contact', href: '#contact' },
+    ];
 
   return (
     <motion.nav 

@@ -96,13 +96,11 @@ export default function Contact() {
             </div>
 
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-100  border border-gray-200 ">
-              <div className="flex -space-x-2">
-                {[1, 2, 3].map((i) => (
-                  <img key={i} src={`https://i.pravatar.cc/40?u=${i}`} className="w-8 h-8 rounded-full border-2 border-gray-100 " alt="" />
-                ))}
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#3A3992] to-[#EE8433] flex items-center justify-center text-white text-[10px] font-bold">
+                ES
               </div>
               <p className="text-[10px] font-bold text-gray-500 ">
-                Trusted by <span className="text-gray-900 ">500+</span> companies worldwide
+                Available <span className="text-gray-900 ">24/7</span> for your support
               </p>
             </div>
           </div>

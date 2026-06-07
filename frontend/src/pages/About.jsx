@@ -3,13 +3,15 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   Users, Globe, ArrowLeft, BadgeCheck, GraduationCap, 
-  Quote, MoveRight, Zap, Sparkles, ChevronRight
+  Quote, MoveRight, Zap, Sparkles, ChevronRight, Loader2, FileText
 } from 'lucide-react';
 import heroMain from '../assets/elevat.jpg';
 import aboutImg from '../assets/grad2.jpg';
 import gr1 from '../assets/gr1.jpg';
 import gr3 from '../assets/gr3.jpg';
 import logoImg from '../assets/logo.jpg';
+import useBackendData from '../hooks/useBackendData';
+import { newsAPI, getMediaUrl } from '../services/api';
 
 const About = () => {
   return (
@@ -112,8 +114,8 @@ const About = () => {
             </p>
             
             <div className="flex flex-wrap gap-12 border-t border-gray-200  pt-12">
-              <Stat count="50K+" label="Active Learners" />
-              <Stat count="450+" label="Master Mentors" />
+              <Stat count="100%" label="Practical Learning" />
+              <Stat count="24/7" label="Support Available" />
               <Stat count="100%" label="Bespoke Curriculum" />
             </div>
           </div>
@@ -201,46 +203,8 @@ const About = () => {
         </div>
       </section>
 
-      {/* 5. FROM OUR BLOG */}
-      <section className="py-32 md:py-40 px-6 max-w-7xl mx-auto border-t border-gray-200">
-         <div className="flex justify-between items-end mb-20">
-            <div>
-              <span className="text-[#EE8433] font-black uppercase tracking-[0.3em] text-xs mb-2 block">Our Journal</span>
-              <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900">From Our Blog</h2>
-            </div>
-            <div className="flex items-center gap-2 text-[#5A2DA8]">
-                <p className="font-bold text-[10px] uppercase tracking-widest">Latest Updates</p>
-                <Zap size={14} fill="currentColor" />
-            </div>
-         </div>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16">
-            <NewsItem date="12.02.26" tag="Milestone" title="Elevate Skill reaches 50,000 active learners globally." />
-            <NewsItem date="28.01.26" tag="Protocol" title="Advanced System Design path launched with NeuralX." />
-         </div>
-
-         <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-4"
-         >
-            <div className="relative h-64 rounded-2xl overflow-hidden group">
-              <img src={gr1} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <p className="absolute bottom-4 left-4 text-white font-bold text-sm">Campus Life</p>
-            </div>
-            <div className="relative h-64 rounded-2xl overflow-hidden group">
-              <img src={aboutImg} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <p className="absolute bottom-4 left-4 text-white font-bold text-sm">Graduation</p>
-            </div>
-            <div className="relative h-64 rounded-2xl overflow-hidden group">
-              <img src={gr3} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-              <p className="absolute bottom-4 left-4 text-white font-bold text-sm">Workshops</p>
-            </div>
-         </motion.div>
-      </section>
+      {/* 5. FROM OUR BLOG — fetched from real API */}
+      <AboutBlogSection />
 
       {/* FOOTER */}
       <footer className="py-20 text-center border-t border-gray-200 ">
@@ -293,5 +257,73 @@ const NewsItem = ({ date, tag, title }) => (
     </div>
   </div>
 );
+
+function AboutBlogSection() {
+  const { data: fetched, loading } = useBackendData(
+    () => newsAPI.list(),
+    []
+  );
+
+  const posts = (fetched || [])
+    .filter((n) => n.status === 'published' || n.status === 'Published')
+    .slice(0, 3);
+
+  if (posts.length === 0 && !loading) return null;
+
+  return (
+    <section className="py-32 md:py-40 px-6 max-w-7xl mx-auto border-t border-gray-200">
+      <div className="flex justify-between items-end mb-20">
+        <div>
+          <span className="text-[#EE8433] font-black uppercase tracking-[0.3em] text-xs mb-2 block">Our Journal</span>
+          <h2 className="text-4xl md:text-5xl font-black tracking-tight text-gray-900">From Our Blog</h2>
+        </div>
+        <div className="flex items-center gap-2 text-[#5A2DA8]">
+          <p className="font-bold text-[10px] uppercase tracking-widest">Latest Updates</p>
+          <Zap size={14} fill="currentColor" />
+        </div>
+      </div>
+
+      {loading && posts.length === 0 ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="text-[#EE8433] animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {posts.map((post, i) => (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="group rounded-2xl bg-gray-100 border border-gray-200 overflow-hidden hover:border-gray-300 transition-all hover:shadow-2xl"
+            >
+              <div className="h-48 overflow-hidden relative">
+                {post.image ? (
+                  <img src={getMediaUrl(post.image)} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[#3A3992]/10 to-[#EE8433]/10 flex items-center justify-center">
+                    <FileText size={40} className="text-gray-300" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              </div>
+              <div className="p-5">
+                <div className="flex items-center gap-4 text-[10px] text-gray-400 mb-3">
+                  <span>{post.created_at?.slice(0, 10) || 'Recent'}</span>
+                  {post.author && (
+                    <span>{typeof post.author === 'object' ? post.author?.full_name : post.author}</span>
+                  )}
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-[#5A2DA8] transition-colors line-clamp-2">{post.title}</h3>
+                <p className="text-xs text-gray-500 mb-4 line-clamp-3 leading-relaxed">{post.excerpt || ''}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 
 export default About;

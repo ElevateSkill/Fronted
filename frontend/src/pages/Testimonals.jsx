@@ -4,38 +4,30 @@ import { Quote, Star, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useBackendData from '../hooks/useBackendData';
 import { testimonialsAPI } from '../services/api';
-import { loadData as loadLocalData } from '../data/dataStore';
+
+const safeStr = (v, fallback = '') => (v != null && typeof v !== 'object') ? String(v) : fallback;
 
 // Backend testimonial: { id, student_name, student_image, message, rating, is_active }
-// Local testimonial may still have { name, role, company, quote, image, color, score, outcome }.
 const adapt = (t) => ({
   id: t.id,
-  name: t.student_name || t.name || 'Anonymous',
-  role: t.role || 'Graduate',
-  company: t.company || '',
-  quote: t.message || t.quote || t.text || '',
-  image: t.student_image || t.image || t.avatar || 'https://i.pravatar.cc/600?img=1',
-  score: t.rating || t.score || 5,
-  outcome: t.outcome || 'Verified graduate',
+  name: safeStr(t.student_name, 'Anonymous'),
+  role: safeStr(t.role, 'Graduate'),
+  company: safeStr(t.company),
+  quote: safeStr(t.message),
+  image: t.student_image || '',
+  score: t.rating || 5,
+  outcome: safeStr(t.outcome, 'Verified graduate'),
   color: t.color || '#EE8433',
   is_active: t.is_active !== false
 });
 
-const highlights = [
-  '24,000+ learners supported',
-  '1:1 project feedback',
-  'Portfolio-first learning',
-  'Career-ready outcomes'
-];
-
 export default function Testimonals() {
-  const fallback = (loadLocalData('testimonials') || []).map(adapt);
   const { data: fetched, loading, source } = useBackendData(
     () => testimonialsAPI.active(),
-    fallback
+    []
   );
 
-  const testimonials = (fetched.length ? fetched : fallback).filter((t) => t.is_active !== false).map(adapt);
+  const testimonials = (fetched || []).filter((t) => t.is_active !== false).map(adapt);
 
   if (testimonials.length === 0 && !loading) return null;
 
@@ -67,13 +59,6 @@ export default function Testimonals() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 text-xs font-bold uppercase tracking-[0.2em] text-white/60">
-            {highlights.map((item) => (
-              <div key={item} className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
-                {item}
-              </div>
-            ))}
-          </div>
         </motion.div>
 
         {loading && testimonials.length === 0 ? (

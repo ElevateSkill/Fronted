@@ -5,7 +5,12 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    react(),
+    react({
+      jsxImportSource: 'react',
+      useAtYourOwnRisk_mutateSwcOptions: (opts) => {
+        opts.jsc.transform.react.runtime = 'automatic'
+      },
+    }),
   ],
     server: {
     host: '0.0.0.0', // This exposes the server to your network

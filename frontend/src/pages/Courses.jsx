@@ -1,10 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Code2, Palette, BrainCircuit, Rocket, Users, Clock, Star, ArrowRight, ChevronRight, Loader2, GraduationCap, Zap } from 'lucide-react';
+import { BookOpen, Code2, Palette, BrainCircuit, Rocket, Clock, User, ArrowRight, Loader2, GraduationCap, Zap, SearchX } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useBackendData from '../hooks/useBackendData';
-import { coursesAPI } from '../services/api';
-import { loadData as loadLocalData } from '../data/dataStore';
+import { coursesAPI, getMediaUrl } from '../services/api';
 
 const iconMap = { Code2, Palette, BrainCircuit, Rocket };
 const IconComp = (name) => {
@@ -12,33 +11,43 @@ const IconComp = (name) => {
   return C ? <C size={28} /> : <BookOpen size={28} />;
 };
 
-// Backend course: { id, title, short_description, description, category: {name, slug},
-//                    price, duration, lessons, instructor, thumbnail, is_active, is_published }
-const adapt = (c) => ({
-  id: c.id,
-  title: c.title,
-  desc: c.short_description || c.description || c.desc || '',
-  description: c.description || c.short_description || c.desc || '',
-  category: typeof c.category === 'object' ? c.category?.name : (c.category || 'General'),
-  image: c.thumbnail || c.image || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
-  students: c.students || 0,
-  duration: c.duration || 'Self-paced',
-  lessons: c.lessons || 0,
-  level: c.level || c.instructor || 'All Levels',
-  color: c.color || '#EE8433',
-  price: typeof c.price === 'string' ? c.price : (c.price ? `${c.price} ETB` : 'Free'),
-  icon: c.icon || 'Code2'
-});
+// Category → icon + color mapping
+const categoryMeta = {
+  'Web Development': { icon: 'Code2', color: '#3A3992' },
+  'UI/UX Design':    { icon: 'Palette', color: '#D95C4A' },
+  'AI & Machine Learning': { icon: 'BrainCircuit', color: '#5A2DA8' },
+  'Cloud & DevOps':  { icon: 'Rocket', color: '#EE8433' },
+};
+
+const safeStr = (v, fallback = '') => (v != null && typeof v !== 'object') ? String(v) : fallback;
+
+const adapt = (c) => {
+  const catName = safeStr(typeof c.category === 'object' ? c.category?.name : c.category, 'General');
+  const meta = categoryMeta[catName] || {};
+  return {
+    id: c.id,
+    title: safeStr(c.title),
+    desc: safeStr(c.short_description || c.description),
+    description: safeStr(c.description || c.short_description),
+    category: catName,
+    image: getMediaUrl(c.thumbnail) || '',
+    instructor: safeStr(c.instructor, 'Staff'),
+    duration: safeStr(c.duration, 'Self-paced'),
+    lessons: c.lessons || 0,
+    color: meta.color || '#EE8433',
+    price: typeof c.price === 'string' ? c.price : (c.price ? `${c.price} ETB` : 'Free'),
+    icon: meta.icon || 'Code2',
+  };
+};
 
 export default function Courses() {
   const navigate = useNavigate();
-  const fallback = (loadLocalData('courses') || []).map(adapt);
   const { data: courses, loading, source } = useBackendData(
     () => coursesAPI.list(),
-    fallback
+    []
   );
 
-  const list = courses.length ? courses.map(adapt) : fallback;
+  const list = (courses || []).map(adapt);
 
   const handleEnroll = (courseId) => {
     navigate(`/register?courseId=${courseId}`);
@@ -90,8 +99,17 @@ export default function Courses() {
         </div>
 
         {loading && list.length === 0 ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 size={32} className="text-[#EE8433] animate-spin" />
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <Loader2 size={36} className="text-[#EE8433] animate-spin" />
+            <p className="text-white/50 text-sm font-medium">Loading courses...</p>
+          </div>
+        ) : list.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 gap-4">
+            <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm">
+              <SearchX size={40} className="text-white/30" />
+            </div>
+            <p className="text-white/60 text-sm font-bold">No courses available yet.</p>
+            <p className="text-white/40 text-xs max-w-sm text-center">Courses are being prepared. Check back soon or contact us for more information.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -121,16 +139,13 @@ export default function Courses() {
                   <p className="text-xs text-white/50  mb-4 leading-relaxed line-clamp-2">{course.desc || course.description}</p>
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
-                      <Users size={12} className="text-[#3A3992]" /> {(course.students || 0).toLocaleString()} students
+                      <User size={12} className="text-[#3A3992]" /> {course.instructor}
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
                       <Clock size={12} className="text-[#3A3992]" /> {course.duration}
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
                       <BookOpen size={12} className="text-[#5A2DA8]" /> {course.lessons} lessons
-                    </div>
-                    <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
-                      <Star size={12} className="text-yellow-400" /> {course.level}
                     </div>
                   </div>
                   <div className="flex items-center justify-between pt-4 border-t border-white/10">

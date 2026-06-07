@@ -1,31 +1,30 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, User, ArrowRight, ChevronRight, Loader2 } from 'lucide-react';
+import { Calendar, User, ArrowRight, ChevronRight, Loader2, FileText } from 'lucide-react';
 import useBackendData from '../hooks/useBackendData';
-import { newsAPI } from '../services/api';
-import { loadData as loadLocalData } from '../data/dataStore';
+import { newsAPI, getMediaUrl } from '../services/api';
+
+const safeStr = (v, fallback = '') => (v != null && typeof v !== 'object') ? String(v) : fallback;
 
 // Backend news: { id, title, excerpt, content, image, author: {full_name}, status, ... }
-// Local posts:  { id, title, author (string), excerpt, content, image, status, date }
 const adapt = (n) => ({
   id: n.id,
-  title: n.title,
-  excerpt: n.excerpt || '',
-  content: n.content || '',
-  image: n.image || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
-  author: typeof n.author === 'object' ? n.author?.full_name : (n.author || 'Admin'),
+  title: safeStr(n.title),
+  excerpt: safeStr(n.excerpt || n.content),
+  content: safeStr(n.content || n.excerpt),
+  image: getMediaUrl(n.image) || '',
+  author: safeStr(typeof n.author === 'object' ? n.author?.full_name : n.author, 'Admin'),
   date: n.created_at || n.date,
-  status: n.status || 'published'
+  status: safeStr(n.status, 'published')
 });
 
 export default function Blog() {
-  const fallback = (loadLocalData('posts') || []).filter((p) => p.status === 'published' || p.status === 'Published').map(adapt);
   const { data: fetched, loading, source } = useBackendData(
     () => newsAPI.list(),
-    fallback
+    []
   );
 
-  const posts = (fetched.length ? fetched : fallback)
+  const posts = (fetched || [])
     .map(adapt)
     .filter((p) => p.status === 'published' || p.status === 'Published')
     .slice(0, 3);

@@ -1,62 +1,29 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useBackendData from '../hooks/useBackendData';
-import { homepageAPI } from '../services/api';
-import { loadData as loadLocalData } from '../data/dataStore';
-import heroImg1 from '../assets/elevat.jpg';
-import heroImg2 from '../assets/grad2.jpg';
-import heroImg3 from '../assets/photo1.jpg';
-import heroImg4 from '../assets/photo2.jpg';
-import heroImg5 from '../assets/photo3.jpg';
-import heroImg6 from '../assets/photo4.jpg';
-import heroImg7 from '../assets/photo5.jpg';
-import heroImg8 from '../assets/photo_2026-06-04_14-52-56.jpg';
-import heroImg9 from '../assets/photo_2026-06-07_22-56-48.jpg';
+import { homepageAPI, getMediaUrl } from '../services/api';
 
-const localHeroImages = [heroImg1, heroImg2, heroImg3, heroImg4, heroImg5, heroImg6, heroImg7, heroImg8, heroImg9];
-
-const defaultHero = {
-  title: 'Elevate',
-  highlight: 'Skill',
-  subtitle: 'Project-based learning platform designed for the modern engineer.',
-  cta_text: 'GET STARTED',
-  cta_link: '/register'
-};
-
-const adaptHero = (hero, index = 0) => ({
+const adaptHero = (hero) => ({
   id: 'hero',
-  image: hero?.background_image || localHeroImages[index % localHeroImages.length],
-  title: hero?.title?.split(' ')[0]?.toUpperCase() || defaultHero.title.toUpperCase(),
-  highlight: hero?.title?.split(' ').slice(1).join(' ')?.toUpperCase() || defaultHero.highlight.toUpperCase(),
-  subtitle: hero?.subtitle || defaultHero.subtitle,
-  cta: hero?.cta_text || defaultHero.cta_text,
+  image: getMediaUrl(hero?.background_image) || '',
+  title: hero?.title?.split(' ')[0]?.toUpperCase() || '',
+  highlight: hero?.title?.split(' ').slice(1).join(' ')?.toUpperCase() || '',
+  subtitle: hero?.subtitle || '',
+  cta: hero?.cta_text || '',
+  ctaLink: hero?.cta_link || '/register',
   color: '#EE8433',
   active: true
 });
 
 export default function Landing() {
-  const fallback = useMemo(() => {
-    const local = loadLocalData('heroSlides');
-    if (local && local.length) {
-      return local.map((s, i) => ({
-        ...adaptHero(s, i),
-        image: s.image || localHeroImages[i % localHeroImages.length],
-      }));
-    }
-    return localHeroImages.map((img, i) => ({
-      ...adaptHero(defaultHero, i),
-      image: img,
-    }));
-  }, []);
-
-  const { data, loading, source } = useBackendData(
+  const { data, loading } = useBackendData(
     () => homepageAPI.get().then((r) => [adaptHero(r.hero)]),
-    fallback
+    []
   );
 
-  const slides = (data.length ? data : fallback).filter((s) => s.active !== false);
+  const slides = data.filter((s) => s.active !== false);
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -75,16 +42,18 @@ export default function Landing() {
     );
   }
 
-  const slide = slides[current] || slides[0] || adaptHero(defaultHero);
+  if (slides.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <p className="text-white/60 text-sm font-medium">Loading...</p>
+      </div>
+    );
+  }
+
+  const slide = slides[current] || slides[0];
 
   return (
     <div id="home" className="relative min-h-screen w-full overflow-hidden bg-black">
-      {source === 'api' && (
-        <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/20 backdrop-blur-md border border-emerald-400/40 rounded-full">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-300">Live</span>
-        </div>
-      )}
 
       {/* Ambient brand glow orbs */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
@@ -199,11 +168,11 @@ export default function Landing() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link
-              to="/register"
+              to={slide.ctaLink || '/register'}
               className="flex items-center gap-3 text-white font-black text-sm tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group bg-gradient-to-r from-[#3A3992] to-[#D95C4A] px-8 py-4 rounded-full shadow-2xl shadow-[#3A3992]/40"
             >
               <GraduationCap size={22} className="text-white group-hover:scale-110 transition-transform" />
-              Enroll Now
+              {slide.cta || 'Enroll Now'}
             </Link>
             <Link
               to="/about"
@@ -227,7 +196,7 @@ export default function Landing() {
               transition={{ delay: 1.4 }}
               className="flex items-center gap-2 drop-shadow-md"
             >
-              <span className="w-2 h-2 rounded-full bg-[#3A3992]" /> 24,000+ Learners
+              <span className="w-2 h-2 rounded-full bg-[#3A3992]" /> Practical Learning
             </motion.span>
             <motion.span
               initial={{ opacity: 0, y: 20 }}
@@ -235,7 +204,7 @@ export default function Landing() {
               transition={{ delay: 1.6 }}
               className="flex items-center gap-2 drop-shadow-md"
             >
-              <span className="w-2 h-2 rounded-full bg-[#5A2DA8]" /> 450+ Mentors
+              <span className="w-2 h-2 rounded-full bg-[#5A2DA8]" /> Expert Mentors
             </motion.span>
             <motion.span
               initial={{ opacity: 0, y: 20 }}
@@ -243,7 +212,7 @@ export default function Landing() {
               transition={{ delay: 1.8 }}
               className="flex items-center gap-2 drop-shadow-md"
             >
-              <span className="w-2 h-2 rounded-full bg-[#D95C4A]" /> 100% Practical
+              <span className="w-2 h-2 rounded-full bg-[#D95C4A]" /> Career Ready
             </motion.span>
           </motion.div>
         </div>

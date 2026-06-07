@@ -60,7 +60,11 @@ export const coursesAPI = {
 // ===================== CATEGORIES =====================
 export const categoriesAPI = {
   list: () => api.get('/categories/').then((r) => r.data),
-  get: (id) => api.get(`/categories/${id}/`).then((r) => r.data)
+  get: (id) => api.get(`/categories/${id}/`).then((r) => r.data),
+  adminList: (params = {}) => api.get('/admin/categories/', { params }).then((r) => r.data),
+  adminCreate: (data) => api.post('/admin/categories/', data).then((r) => r.data),
+  adminUpdate: (id, data) => api.patch(`/admin/categories/${id}/`, data).then((r) => r.data),
+  adminDelete: (id) => api.delete(`/admin/categories/${id}/`).then((r) => r.data)
 };
 
 // ===================== TESTIMONIALS =====================
