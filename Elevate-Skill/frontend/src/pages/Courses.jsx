@@ -141,13 +141,13 @@ export default function Courses() {
                 <p className="text-xs text-gray-500 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">{course.desc}</p>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-1 mb-4">
                   <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
-                    <Users size={13} className="text-[#15c8fb] shrink-0" /> {course.students.toLocaleString()}
+                    <Users size={13} className="text-[#fea305] shrink-0" /> {course.students.toLocaleString()}
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
                     <Clock size={13} className="text-[#f89f29] shrink-0" /> {course.duration}
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
-                    <BookOpen size={13} className="text-[#15c8fb] shrink-0" /> {course.lessons} lessons
+                    <BookOpen size={13} className="text-[#fea305] shrink-0" /> {course.lessons} lessons
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
                     <Award size={13} className="text-[#f89f29] shrink-0" /> {course.level}
