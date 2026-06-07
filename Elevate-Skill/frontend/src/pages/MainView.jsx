@@ -1,5 +1,6 @@
 import Landing from "./Landing";
 import Services from "./Service";
+import Testimonals from "./Testimonals";
 import FAQ from "./FAQ";
 import Contact from "./Contact";
 import Courses from "./Courses";
@@ -12,7 +13,7 @@ export default function MainView() {
   return (
     <>
       {announcements.length > 0 && (
-        <div className="relative z-50 bg-gradient-to-r from-[#f89f29] via-[#15c8fb] to-[#f89f29] overflow-hidden">
+        <div className="relative z-50 bg-linear-to-r from-[#f89f29] via-sky-400 to-[#f89f29] overflow-hidden">
           <div className="animate-announcement flex whitespace-nowrap py-2.5">
             {[...announcements, ...announcements].map((a, i) => (
               <span key={i} className="inline-flex items-center gap-6 mx-8 text-white font-bold text-xs uppercase tracking-wider">
@@ -26,6 +27,7 @@ export default function MainView() {
       <section id="home"><Landing /></section>
       <section id="services"><Services /></section>
       <section id="courses"><Courses /></section>
+      <Testimonals />
       <section id="blog"><Blog /></section>
       <section id="faq"><FAQ /></section>
       <section id="contact"><Contact /></section>
