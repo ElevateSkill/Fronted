@@ -95,11 +95,11 @@ export default function Testimonals() {
 									Verified result
 								</div> */}
 								<div className="absolute bottom-5 left-5 right-5">
-									<div className="mb-3 flex items-center gap-1">
+									{/* <div className="mb-3 flex items-center gap-1">
 										{[...Array(testimonials[0].score)].map((_, index) => (
 											<Star key={index} size={14} className="fill-[#f89f29] text-[#f89f29]" />
 										))}
-									</div>
+									</div> */}
 									<p className="text-lg font-black tracking-tight">{testimonials[0].name}</p>
 									<p className="text-sm text-white/70">{testimonials[0].role} · {testimonials[0].company}</p>
 									{/* <div className="mt-3 inline-flex rounded-full border border-[#15c8fb]/30 bg-[#15c8fb]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#15c8fb]">
@@ -130,11 +130,11 @@ export default function Testimonals() {
 													<p className="text-xs text-white/60">{item.role}</p>
 												</div>
 											</div>
-											<div className="mt-3 flex items-center gap-1">
+											{/* <div className="mt-3 flex items-center gap-1">
 												{[...Array(item.score)].map((_, index) => (
 													<Star key={index} size={12} className="fill-[#f89f29] text-[#f89f29]" />
 												))}
-											</div>
+											</div> */}
 											<p className="mt-3 text-sm leading-relaxed text-white/70">{item.quote}</p>
 										</div>
 									))}
@@ -177,11 +177,11 @@ export default function Testimonals() {
 									</div>
 								</div>
 
-								<div className="mt-4 flex items-center gap-1">
+								{/* <div className="mt-4 flex items-center gap-1">
 									{[...Array(item.score)].map((_, starIndex) => (
 										<Star key={starIndex} size={12} className="fill-[#f89f29] text-[#f89f29]" />
 									))}
-								</div>
+								</div> */}
 
 								<p className="mt-4 text-sm leading-relaxed text-white/75">
 									{item.quote}
@@ -195,7 +195,7 @@ export default function Testimonals() {
 									<p className="text-xs font-bold uppercase tracking-[0.28em] text-[#f89f29]">Next step</p>
 									<h3 className="mt-2 text-2xl font-black tracking-tight text-white">Replace mock images with real learner photos later.</h3>
 								</div>
-								<button className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[red] to-[red] px-5 py-3 text-sm font-black text-white shadow-lg shadow-[#15c8fb]/20 transition-transform hover:scale-[1.02]">
+								<button className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[red] to-[#ff9d00] px-5 py-3 text-sm font-black text-white shadow-lg shadow-[#15c8fb]/20 transition-transform hover:scale-[1.02]">
 									Add real media
 									<ArrowRight size={16} />
 								</button>
