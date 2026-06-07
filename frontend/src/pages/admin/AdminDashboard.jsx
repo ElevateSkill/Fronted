@@ -144,8 +144,9 @@ export default function AdminDashboard() {
   const [heroSlides, setHeroSlides] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState(null);
 
-  // Fetch live data from backend API on mount (falls back to localStorage)
+  // Fetch live data from backend API on mount
   useEffect(() => {
     const syncFromAPI = async () => {
       try {
@@ -199,25 +200,58 @@ export default function AdminDashboard() {
           }));
           setFaqs(prev => adapted.length ? adapted : prev);
         }
-        if (statsRes.status === 'fulfilled' && statsRes.value) {
-          const s = statsRes.value;
-          if (s.total_registrations !== undefined || s.total_users !== undefined) return;
-        }
         if (categoriesRes.status === 'fulfilled' && categoriesRes.value?.results) {
           setCategories(categoriesRes.value.results);
         }
+        if (statsRes.status === 'fulfilled' && statsRes.value) {
+          const s = statsRes.value;
+          setDashboardStats({
+            totalStudents: s.total_students || 0,
+            activeCourses: s.active_courses || 0,
+            totalEnrollments: s.total_enrollments || 0,
+            sysTotalCourses: s.total_courses || courses.length,
+            pendingPayments: s.payments?.pending || 0,
+            approvedPayments: s.payments?.approved || 0,
+            rejectedPayments: s.payments?.rejected || 0,
+          });
+          if (s.recent_enrollments?.length) {
+            const mapped = s.recent_enrollments.map(e => ({
+              id: e.id,
+              name: e.student_full_name || e.student_username || 'Student',
+              email: '',
+              phone: '',
+              course: e.course_title || '',
+              status: e.status === 'active' ? 'Approved' : e.status === 'pending' ? 'Pending' : e.status === 'completed' ? 'Completed' : e.status === 'cancelled' ? 'Cancelled' : e.status || 'Pending',
+              date: e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString() : '',
+              payment: '—',
+            }));
+            setRegistrations(mapped);
+          }
+        }
       } catch (e) {
-        // API unavailable — keep localStorage data
+        // API unavailable
       }
       setApiSynced(true);
     };
     syncFromAPI();
-    // Fetch payments
+    // Fetch payments (merges enrollment + payment context)
     const fetchPayments = async () => {
       setPaymentLoading(true);
       try {
         const res = await paymentsAPI.adminList({ page_size: 200 });
-        setPaymentList(Array.isArray(res) ? res : res.results || []);
+        const list = Array.isArray(res) ? res : res.results || [];
+        setPaymentList(list);
+        // Enrich registrations with payment status
+        if (list.length) {
+          setRegistrations(prev => prev.map(r => {
+            const match = list.find(p =>
+              p.course_title === r.course &&
+              (p.full_name?.toLowerCase().includes(r.name?.toLowerCase().split(' ')[0] || '') ||
+               r.name?.toLowerCase().includes((p.full_name || '').toLowerCase().split(' ')[0] || ''))
+            );
+            return { ...r, phone: r.phone || match?.phone || '', email: r.email || match?.email || '', payment: match ? (match.status === 'approved' ? 'Paid' : match.status === 'pending' ? 'Pending' : 'Rejected') : '—' };
+          }));
+        }
       } catch (e) {
         // keep empty
       }
@@ -234,25 +268,25 @@ export default function AdminDashboard() {
   const [selectedPayment, setSelectedPayment] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
 
- const stats = {
- total: registrations.length,
- pending: registrations.filter(r => r.status === 'Pending').length,
- approved: registrations.filter(r => r.status === 'Approved').length,
- rejected: registrations.filter(r => r.status === 'Rejected').length,
- activeUsers: users.filter(u => u.status === 'Active').length,
- totalCourses: courses.length,
- totalPosts: posts.length,
- totalPhotos: photos.length,
- };
+  const stats = {
+    total: dashboardStats?.totalEnrollments || registrations.length,
+    pending: registrations.filter(r => r.status === 'Pending').length,
+    approved: registrations.filter(r => r.status === 'Approved' || r.status === 'Paid').length,
+    rejected: registrations.filter(r => r.status === 'Rejected').length,
+    activeUsers: dashboardStats?.totalStudents || users.filter(u => u.status === 'Active').length,
+    totalCourses: courses.length || dashboardStats?.sysTotalCourses || 0,
+    totalPosts: posts.length,
+    pendingPayments: dashboardStats?.pendingPayments || paymentList.filter(p => (p.status || '').toLowerCase() === 'pending').length,
+  };
 
- const statCards = [
- { label: 'Total Registrations', value: stats.total, icon: <UserPlus size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
- { label: 'Pending Review', value: stats.pending, icon: <Clock size={24} />, color: 'from-[#3A3992] to-[#3A3992]' },
- { label: 'Approved', value: stats.approved, icon: <CheckCircle size={24} />, color: 'from-green-500 to-green-600' },
- { label: 'Active Users', value: stats.activeUsers, icon: <Users size={24} />, color: 'from-[#7A3FB5] to-[#7A3FB5]' },
- { label: 'Courses', value: stats.totalCourses, icon: <BookOpen size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
- { label: 'Published Posts', value: stats.totalPosts, icon: <Newspaper size={24} />, color: 'from-pink-500 to-pink-600' },
- ];
+  const statCards = [
+    { label: 'Total Enrollments', value: stats.total, icon: <UserPlus size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
+    { label: 'Pending Review', value: stats.pending, icon: <Clock size={24} />, color: 'from-[#3A3992] to-[#3A3992]' },
+    { label: 'Approved', value: stats.approved, icon: <CheckCircle size={24} />, color: 'from-green-500 to-green-600' },
+    { label: 'Active Students', value: stats.activeUsers, icon: <Users size={24} />, color: 'from-[#7A3FB5] to-[#7A3FB5]' },
+    { label: 'Courses', value: stats.totalCourses, icon: <BookOpen size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
+    { label: 'Pending Payments', value: stats.pendingPayments, icon: <CreditCard size={24} />, color: 'from-amber-500 to-amber-600' },
+  ];
 
  const handleSidebarClick = (id) => {
  if (id === 'media') { setMediaOpen(!mediaOpen); if (!mediaOpen) setActiveTab('posts'); }
@@ -270,7 +304,7 @@ export default function AdminDashboard() {
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
  {statCards.map((card, i) => (
- <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 p-4 group hover:border-gray-300 transition-all cursor-pointer" onClick={() => { const map = { 'Total Registrations': 'registrations', 'Pending Review': 'registrations', 'Approved': 'registrations', 'Active Users': 'users', 'Courses': 'courses', 'Published Posts': 'posts' }; setActiveTab(map[card.label]); }}>
+ <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 p-4 group hover:border-gray-300 transition-all cursor-pointer"             onClick={() => { const map = { 'Total Enrollments': 'registrations', 'Pending Review': 'registrations', 'Approved': 'registrations', 'Active Students': 'users', 'Courses': 'courses', 'Pending Payments': 'payments' }; setActiveTab(map[card.label]); }}>
  <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br ${card.color}`} />
  <div className="flex items-center justify-between mb-3">
  <div className="p-2.5 rounded-xl bg-gray-200 text-gray-600 ">{card.icon}</div>
@@ -342,7 +376,7 @@ export default function AdminDashboard() {
  <table className="w-full text-sm">
  <thead>
  <tr className="border-b border-gray-200 bg-gray-50 ">
- {['Full Name', 'Email', 'Phone', 'Course', 'Status', 'Actions'].map(h => <th key={h} className={`text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-wider ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>)}
+          {['Full Name', 'Email', 'Phone', 'Course', 'Payment', 'Status', 'Actions'].map(h => <th key={h} className={`text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-wider ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>)}
  </tr>
  </thead>
  <tbody>
@@ -355,8 +389,9 @@ export default function AdminDashboard() {
  <td className="p-3"><span className="font-semibold text-gray-900 text-sm">{r.name}</span></td>
  <td className="p-3 text-gray-500 text-xs">{r.email}</td>
  <td className="p-3 text-gray-500 text-xs">{r.phone}</td>
- <td className="p-3 text-gray-500 text-xs">{r.course}</td>
- <td className="p-3"><StatusBadge status={r.status} /></td>
+          <td className="p-3 text-gray-500 text-xs">{r.course}</td>
+          <td className="p-3"><span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider inline-block ${r.payment === 'Paid' ? 'bg-green-100 text-green-700' : r.payment === 'Pending' ? 'bg-amber-100 text-amber-700' : r.payment === 'Rejected' ? 'bg-[#FDE0DC] text-red-700' : 'bg-gray-100 text-gray-400'}`}>{r.payment}</span></td>
+          <td className="p-3"><StatusBadge status={r.status} /></td>
  <td className="p-3">
  <div className="flex items-center justify-end gap-2">
  <button onClick={() => { const updated = registrations.map(x => x.id === r.id ? { ...x, status: 'Approved' } : x); setRegistrations(updated); showToast(`${r.name} approved`); }} disabled={r.status === 'Approved'} className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all" title="Approve"><CheckCircle size={16} /></button>
@@ -1013,13 +1048,14 @@ export default function AdminDashboard() {
  </div>
  <div className="ml-auto"><StatusBadge status={selectedItem.data.status} /></div>
  </div>
- <div className="grid grid-cols-2 gap-4 text-sm">
- {[
- { icon: <Phone size={16} />, label: 'Phone', value: selectedItem.data.phone },
- { icon: <Mail size={16} />, label: 'Email', value: selectedItem.data.email },
- { icon: <BookOpen size={16} />, label: 'Course', value: selectedItem.data.course },
- { icon: <Calendar size={16} />, label: 'Registered', value: selectedItem.data.date },
- ].map((item, i) => (
+  <div className="grid grid-cols-2 gap-4 text-sm">
+              {[
+              { icon: <Phone size={16} />, label: 'Phone', value: selectedItem.data.phone },
+              { icon: <Mail size={16} />, label: 'Email', value: selectedItem.data.email },
+              { icon: <BookOpen size={16} />, label: 'Course', value: selectedItem.data.course },
+              { icon: <CreditCard size={16} />, label: 'Payment', value: selectedItem.data.payment },
+              { icon: <Calendar size={16} />, label: 'Enrolled', value: selectedItem.data.date },
+              ].map((item, i) => (
  <div key={i} className="p-3 rounded-xl bg-gray-50 border border-gray-200 ">
  <div className="flex items-center gap-2 text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{item.icon} {item.label}</div>
  <p className="text-gray-900 font-semibold">{item.value}</p>
