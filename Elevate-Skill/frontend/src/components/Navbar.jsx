@@ -145,7 +145,7 @@ export default function Navbar() {
                 {/* <Link to="/login" className="px-5 py-2 border border-[#15c8fb]/30 text-[#15c8fb] font-black text-[10px] tracking-widest rounded-md hover:bg-[#15c8fb]/10 transition-all uppercase">
                   Login
                 </Link> */}
-                <Link to="/register" className="px-5 py-2 bg-[#f89f29] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase">
+                <Link to="/register" className="px-5 py-2 bg-[#643fca] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase">
                   Portal
                 </Link>
               </>
@@ -231,7 +231,7 @@ export default function Navbar() {
                   <Link 
                     to="/register" 
                     onClick={() => setMobileMenu(false)}
-                    className="w-full py-4 bg-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
+                    className="w-full py-4 bg-[#4a2ba0] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
                   >
                     Portal
                   </Link>
