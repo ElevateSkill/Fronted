@@ -23,131 +23,72 @@ export default function Footer() {
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   return (
-    <footer className="w-full bg-[#0f0f0f] text-[#a1a1a1] font-sans pt-20 pb-10 relative">
-      {/* Top gradient accent */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#15c8fb]/50 to-transparent" />
-
+    <footer className="w-full bg-[#08070b] text-[#c7c7c7] font-sans py-10 relative">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-16">
-          
-          {/* Brand Section */}
-          <div className="lg:col-span-4 space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-8 items-start">
+
+          {/* Brand */}
+          <div className="lg:col-span-4 flex flex-col gap-3">
             <div className="flex items-center gap-3">
-              <div className="relative">
-                <img 
-                  src={logoJpg} 
-                  alt="Elevate Skill" 
-                  className="h-12 w-12 rounded-xl object-cover shadow-lg shadow-black/20" 
-                />
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-[#f89f29] rounded-full border-2 border-[#0f0f0f]" />
-              </div>
+              <img src={logoJpg} alt="logo" className="h-10 w-10 rounded-lg object-cover shadow-sm" />
               <div>
-                <span className="text-xl font-black tracking-tight text-white">Elevate</span>
-                <span className="text-xl font-black tracking-tight text-[#15c8fb]">Skill</span>
+                <div className="text-lg font-black text-white leading-none">Elevate <span className="text-cyan-primary">Skill</span></div>
+                <div className="text-[11px] text-white/60">Project-based learning for modern engineers</div>
               </div>
             </div>
-            <p className="text-sm leading-relaxed max-w-xs text-white/70">
-              Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.
-            </p>
-            <div className="flex gap-3">
+            <p className="text-xs text-white/60 max-w-xs">Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.</p>
+            <div className="flex items-center gap-2 mt-2">
               {[Github, Twitter, Instagram, Linkedin].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="w-10 h-10 flex items-center justify-center rounded-full border border-white/10 text-white/70 hover:border-[#15c8fb]/50 hover:text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all duration-300"
-                >
-                  <Icon size={16} />
+                <a key={i} href="#" className="p-2 rounded-md bg-white/3 hover:bg-cyan-primary/10 transition-colors text-white/70">
+                  <Icon size={14} />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Navigation Links */}
-          {footerSections.map((section) => (
-            <div key={section.title} className="lg:col-span-2 space-y-5">
-              <h5 className="text-white font-bold uppercase tracking-widest text-[10px]">
-                {section.title}
-              </h5>
-              <ul className="space-y-3">
-                {section.links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-sm text-white/70 hover:text-[#15c8fb] transition-colors duration-200">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-
-          {/* Contact Section */}
-          <div className="lg:col-span-2 space-y-5">
-            <h5 className="text-white font-bold uppercase tracking-widest text-[10px]">
-              Contact
-            </h5>
-            <div className="space-y-5">
-              <div className="group cursor-pointer">
-                <div className="flex items-center gap-2 mb-1">
-                  <Phone size={13} className="text-[#15c8fb]" />
-                  <span className="text-[10px] uppercase font-bold text-white/60 tracking-wider">Call us</span>
-                </div>
-                <p className="text-sm font-bold text-white/80 group-hover:text-[#15c8fb] transition-colors">
-                  (+02) 0100-556-345
-                </p>
+          {/* Links */}
+          <div className="lg:col-span-5 grid grid-cols-2 gap-4 sm:gap-6">
+            {footerSections.map(section => (
+              <div key={section.title}>
+                <h6 className="text-xs font-bold uppercase text-white/80 tracking-wider mb-3">{section.title}</h6>
+                <ul className="space-y-2">
+                  {section.links.map(link => (
+                    <li key={link}><a href="#" className="text-sm text-white/60 hover:text-white transition-colors">{link}</a></li>
+                  ))}
+                </ul>
               </div>
-              <div className="group cursor-pointer">
-                <div className="flex items-center gap-2 mb-1">
-                  <Mail size={13} className="text-[#f89f29]" />
-                  <span className="text-[10px] uppercase font-bold text-white/60 tracking-wider">Email</span>
-                </div>
-                <p className="text-sm font-semibold text-white/80 group-hover:text-[#f89f29] transition-colors">
-                  help@elevate-skill.com
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Newsletter */}
-          <div className="lg:col-span-2 space-y-5">
-            <h5 className="text-white font-bold uppercase tracking-widest text-[10px]">
-              Newsletter
-            </h5>
-            <p className="text-xs text-white/70 leading-relaxed">
-              Follow the latest news and updates from us.
-            </p>
-            <div className="relative">
-              <input 
-                type="email" 
-                placeholder="your@email.com"
-                className="w-full bg-white/5 border border-white/10 py-3 pl-4 pr-28 rounded-xl text-sm text-white focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/40"
-              />
-              <button className="absolute right-1 top-1 bottom-1 px-4 bg-gradient-to-r from-[#15c8fb] to-[#f89f29] hover:brightness-110 text-white text-[10px] font-black rounded-lg transition-all uppercase tracking-wider">
-                Subscribe
-              </button>
+          {/* Contact & Newsletter compact */}
+          <div className="lg:col-span-3 flex flex-col gap-3">
+            <div>
+              <h6 className="text-xs font-bold uppercase text-white/80 tracking-wider mb-2">Contact</h6>
+              <div className="text-sm text-white/70">(+02) 0100-556-345</div>
+              <a href="mailto:help@elevate-skill.com" className="block text-sm text-white/70 hover:text-white mt-1">help@elevate-skill.com</a>
+            </div>
+
+            <div className="mt-2">
+              <h6 className="text-xs font-bold uppercase text-white/80 tracking-wider mb-2">Newsletter</h6>
+              <div className="flex w-full rounded-lg overflow-hidden bg-white/5 border border-white/6">
+                <input type="email" placeholder="Your email" className="flex-1 bg-transparent px-3 py-2 text-sm text-white/70 placeholder:text-white/40 focus:outline-none" />
+                <button className="px-3 bg-linear-to-r from-cyan-primary to-[#f89f29] text-white text-sm font-bold">Join</button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-[12px] text-white/60">
-            Copyright © {currentYear} <span className="text-white font-medium">Elevate Skill</span>. 
-            Designed & Developed by <span className="text-white/60">Lide-X</span>
-          </p>
-          <div className="flex gap-6 text-[12px]">
-            <a href="#" className="text-white/60 hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="text-white/60 hover:text-white transition-colors">Terms of Use</a>
+        <div className="mt-6 pt-6 border-t border-white/6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-white/60">
+          <div>© {currentYear} <span className="text-white font-medium">Elevate Skill</span>. Designed by <span className="text-white/80">Lide-X</span></div>
+          <div className="flex items-center gap-4">
+            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms</a>
           </div>
         </div>
       </div>
 
-      {/* Scroll to Top */}
-      <motion.button 
-        onClick={scrollToTop}
-        whileHover={{ y: -3 }}
-        className="fixed bottom-8 right-8 w-11 h-11 bg-gradient-to-br from-[#15c8fb]/20 to-[#f89f29]/20 border border-[#15c8fb]/30 rounded-xl flex items-center justify-center text-[#15c8fb] hover:bg-[#15c8fb] hover:text-white transition-all shadow-lg shadow-[#15c8fb]/10 backdrop-blur"
-      >
-        <ArrowUp size={18} />
+      <motion.button onClick={scrollToTop} whileHover={{ y: -3 }} className="fixed bottom-6 right-6 w-10 h-10 rounded-lg bg-white/6 flex items-center justify-center text-cyan-primary hover:bg-cyan-primary hover:text-white transition-colors shadow-md">
+        <ArrowUp size={16} />
       </motion.button>
     </footer>
   );
