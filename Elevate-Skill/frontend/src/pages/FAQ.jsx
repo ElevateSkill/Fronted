@@ -59,9 +59,9 @@ export default function FAQ() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`group overflow-hidden rounded-2xl border transition-all duration-300 ${
+              className={`group overflow-hidden border transition-all duration-300 ${
                 activeIndex === index 
-                ? 'bg-gray-100 dark:bg-white/5 border-[#15c8fb] shadow-xl shadow-[#15c8fb]/10' 
+                ? 'bg-gray-100 dark:bg-white/5 border-[#fea305] shadow-xl shadow-[#15c8fb]/10' 
                 : 'bg-gray-100 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
               }`}
             >
@@ -71,7 +71,7 @@ export default function FAQ() {
               >
                 <div className="flex items-center gap-4">
                   <span className={`text-xs font-black px-3 py-1 rounded-lg transition-colors ${
-                    activeIndex === index ? 'bg-[#15c8fb] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/70'
+                    activeIndex === index ? 'bg-[#fea305] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/70'
                   }`}>
                     0{index + 1}
                   </span>
@@ -80,7 +80,7 @@ export default function FAQ() {
                   </span>
                 </div>
                 <div className={`p-1.5 rounded-lg transition-all duration-300 ${
-                  activeIndex === index ? 'rotate-180 bg-[#15c8fb] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/70'
+                  activeIndex === index ? 'rotate-180 bg-[#fea305] text-white shadow-lg' : 'bg-gray-200 dark:bg-white/10 text-gray-500 dark:text-white/70'
                 }`}>
                   {activeIndex === index ? <Minus size={18} /> : <Plus size={18} />}
                 </div>
