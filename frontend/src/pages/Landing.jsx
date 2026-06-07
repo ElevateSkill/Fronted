@@ -9,12 +9,11 @@ import heroImg1 from '../assets/elevat.jpg';
 import heroImg2 from '../assets/grad2.jpg';
 import heroImg3 from '../assets/photo1.jpg';
 import heroImg4 from '../assets/photo2.jpg';
+import heroImg5 from '../assets/photo3.jpg';
+import heroImg6 from '../assets/photo4.jpg';
+import heroImg7 from '../assets/photo5.jpg';
 
-const localHeroImages = [
-  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&q=80',
-  'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&q=80',
-  'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1920&q=80',
-];
+const localHeroImages = [heroImg1, heroImg2, heroImg3, heroImg4, heroImg5, heroImg6, heroImg7];
 
 const defaultHero = {
   title: 'Elevate',
