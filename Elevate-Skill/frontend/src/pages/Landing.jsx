@@ -105,7 +105,7 @@ export default function Landing() {
       transition={{ delay: 0.6 }}
       className="flex justify-center"
     >
-      <button className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group bg-[#3C83F6] px-8 py-4 rounded-full shadow-2xl shadow-blue-500/20">
+      <button className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 hover:bg-[#ef430f] active:scale-95 transition-all group bg-[#f9a215] px-8 py-4 rounded-full shadow-2xl shadow-blue-500/20">
         <PlayCircle size={24} className="text-white group-hover:rotate-12 transition-transform" />
         WATCH NOW
       </button>
