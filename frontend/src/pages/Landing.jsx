@@ -12,8 +12,10 @@ import heroImg4 from '../assets/photo2.jpg';
 import heroImg5 from '../assets/photo3.jpg';
 import heroImg6 from '../assets/photo4.jpg';
 import heroImg7 from '../assets/photo5.jpg';
+import heroImg8 from '../assets/photo_2026-06-04_14-52-56.jpg';
+import heroImg9 from '../assets/photo_2026-06-07_22-56-48.jpg';
 
-const localHeroImages = [heroImg1, heroImg2, heroImg3, heroImg4, heroImg5, heroImg6, heroImg7];
+const localHeroImages = [heroImg1, heroImg2, heroImg3, heroImg4, heroImg5, heroImg6, heroImg7, heroImg8, heroImg9];
 
 const defaultHero = {
   title: 'Elevate',
