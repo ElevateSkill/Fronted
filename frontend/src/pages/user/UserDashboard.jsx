@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
  User, Mail, Phone, Lock,
  CheckCircle, Upload, FileText,
  GraduationCap, ShieldCheck, Sparkles, LogOut,
  Bell, Home, BookOpen, MessageCircle, Settings,
   AlertTriangle, Clock, Play,
- ChevronDown, Send, Headphones, HelpCircle,
+  Send, Headphones,
  Save, CreditCard, TrendingUp, BarChart3, ArrowRight,
   Eye, X, Download
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { enrollmentsAPI, paymentsAPI, authAPI, getMediaUrl } from '../../services/api';
-
-const genId = () => Date.now() + Math.random();
 
 const sidebarItems = [
  { id: 'home', label: 'Home', icon: <Home size={18} /> },
@@ -23,25 +21,14 @@ const sidebarItems = [
  { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
 ];
 
-const initialEnrolledCourses = [
-  { id: genId(), title: 'Full-Stack Web Development', progress: 65, instructor: 'Lidetu Tesfaye', lessons: 48, completed: 31, nextLesson: 'API Integration with Node.js', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400' },
-  { id: genId(), title: 'UI/UX Design Mastery', progress: 30, instructor: 'Meron Tadesse', lessons: 36, completed: 11, nextLesson: 'Color Theory & Typography', image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=400' },
-];
 
-const faqData = [
- { q: 'How do I reset my password?', a: 'Go to Settings and click "Change Password". Follow the instructions sent to your email.' },
- { q: 'How do I access my courses?', a: 'Your enrolled courses appear under "My Courses" in the sidebar. Click any course to continue learning.' },
- { q: 'How do I get my certificate?', a: 'Certificates are awarded upon completing all lessons and the final project in your course.' },
- { q: 'How do I contact support?', a: 'Use the Support tab to submit a ticket. Our team typically responds within 24 hours.' },
-];
 
 export default function UserDashboard() {
   const { user, logout } = useAuth();
 
   const [activeTab, setActiveTab] = useState('home');
- const [toast, setToast] = useState(null);
- const [faqOpen, setFaqOpen] = useState(null);
- const [ticketForm, setTicketForm] = useState({ subject: '', message: '', priority: 'Normal' });
+  const [toast, setToast] = useState(null);
+  const [ticketForm, setTicketForm] = useState({ subject: '', message: '', priority: 'Normal' });
  const [showTicketSuccess, setShowTicketSuccess] = useState(false);
 
  const [profile, setProfile] = useState(() => ({
@@ -60,7 +47,7 @@ export default function UserDashboard() {
   const [viewingPayment, setViewingPayment] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
 
-  const [enrolledCourses, setEnrolledCourses] = useState(initialEnrolledCourses);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
 
   const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
@@ -79,7 +66,7 @@ export default function UserDashboard() {
             progress: e.progress || 0, instructor: e.course?.instructor || 'Instructor',
             lessons: e.course?.lessons || 0, completed: e.completed_lessons || 0,
             nextLesson: e.next_lesson || 'Continue learning',
-            image: e.course?.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400',
+            image: e.course?.thumbnail || '',
           }));
           setEnrolledCourses(adapted);
         }
@@ -420,26 +407,7 @@ export default function UserDashboard() {
  </div>
  )}
 
- <div className="rounded-2xl border border-gray-200 bg-gray-100 p-5 shadow-sm">
- <h3 className="text-xs font-bold text-gray-900 mb-3 flex items-center gap-1.5 uppercase tracking-wider"><HelpCircle size={13} className="text-[#3A3992]" /> FAQ</h3>
- <div className="space-y-1.5">
- {faqData.map((faq, i) => (
- <div key={i} className="rounded-lg border border-gray-200 overflow-hidden">
- <button onClick={() => setFaqOpen(faqOpen === i ? null : i)} className="w-full flex items-center justify-between p-3 text-left bg-gray-50 hover:bg-gray-100 transition-all">
- <span className="text-xs font-semibold text-gray-900 ">{faq.q}</span>
- <ChevronDown size={12} className={`text-gray-400 transition-transform shrink-0 ${faqOpen === i ? 'rotate-180' : ''}`} />
- </button>
- <AnimatePresence>
- {faqOpen === i && (
- <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
- <p className="px-3 pb-3 text-xs text-gray-500 ">{faq.a}</p>
- </motion.div>
- )}
- </AnimatePresence>
- </div>
- ))}
- </div>
- </div>
+
  </div>
  )}
 

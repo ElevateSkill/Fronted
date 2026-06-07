@@ -135,26 +135,15 @@ export default function AdminDashboard() {
   return stored.length ? stored : [];
   });
   const [userLoading, setUserLoading] = useState(false);
-  const [courses, setCourses] = useState(() => loadData('courses'));
-  const [posts, setPosts] = useState(() => loadData('posts'));
-  const [testimonials, setTestimonials] = useState(() => loadData('testimonials'));
+  const [courses, setCourses] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [galleryAlbums, setGalleryAlbums] = useState([]);
-  const [announcements, setAnnouncements] = useState(() => loadData('announcements'));
-  const [heroSlides, setHeroSlides] = useState(() => loadData('heroSlides').length ? loadData('heroSlides') : []);
-  const [faqs, setFaqs] = useState(() => loadData('faqs'));
+  const [announcements, setAnnouncements] = useState([]);
+  const [heroSlides, setHeroSlides] = useState([]);
+  const [faqs, setFaqs] = useState([]);
   const [categories, setCategories] = useState([]);
-
-  // Auto-persist all data to localStorage
-  useEffect(() => {
-  saveData('heroSlides', heroSlides);
-  saveData('courses', courses);
-  saveData('testimonials', testimonials);
-  saveData('posts', posts);
-  saveData('announcements', announcements);
-  saveData('faqs', faqs);
-  saveData('users', users);
-  }, [heroSlides, courses, testimonials, posts, announcements, faqs, users]);
 
   // Fetch live data from backend API on mount (falls back to localStorage)
   useEffect(() => {
@@ -175,6 +164,7 @@ export default function AdminDashboard() {
             id: c.id, title: c.title || '', category: c.category?.name || c.category || '', students: c.students || 0,
             lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price || '',
             desc: c.short_description || '', description: c.description || '',
+            is_published: c.is_published ?? false,
           }));
           setCourses(prev => adapted.length ? adapted : prev);
         }
@@ -238,7 +228,7 @@ export default function AdminDashboard() {
 
   const [apiSynced, setApiSynced] = useState(false);
   const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
-  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', description: '', price: '', status: 'Active' });
+  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', description: '', price: '', status: 'Active', is_published: true });
   const [paymentList, setPaymentList] = useState([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
@@ -438,7 +428,7 @@ export default function AdminDashboard() {
  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Courses</h2>
  <p className="text-gray-500 text-sm font-medium">{courses.length} courses available</p>
  </div>
-  <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', description: '', price: '', status: 'Active' }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
+  <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', description: '', price: '', status: 'Active', is_published: true }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {courses.map((course, i) => (
@@ -793,13 +783,17 @@ export default function AdminDashboard() {
  <Select label="Status" value={editItem?.status || newCourse.status} onChange={e => editItem ? setEditItem(p => ({ ...p, status: e.target.value })) : setNewCourse(p => ({ ...p, status: e.target.value }))} options={['Active', 'Inactive']} />
   <TextArea label="Short Description" rows={2} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Brief summary..." />
   <TextArea label="Full Description" rows={4} value={editItem?.description || newCourse.description} onChange={e => editItem ? setEditItem(p => ({ ...p, description: e.target.value })) : setNewCourse(p => ({ ...p, description: e.target.value }))} placeholder="Detailed course content..." />
- <div className="flex justify-end gap-3 pt-2">
- <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
-  <button onClick={async () => {
+  <label className="flex items-center gap-3 text-sm font-bold text-gray-600">
+  <input type="checkbox" checked={editItem?.is_published ?? newCourse.is_published} onChange={e => editItem ? setEditItem(p => ({ ...p, is_published: e.target.checked })) : setNewCourse(p => ({ ...p, is_published: e.target.checked }))} className="w-5 h-5 rounded border-gray-300 text-[#3A3992] focus:ring-[#3A3992]" />
+  Published (visible on public site)
+  </label>
+  <div className="flex justify-end gap-3 pt-2">
+  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
+   <button onClick={async () => {
   try {
     const parsePrice = (v) => String(v).replace(/[^0-9.]/g, '');
     const payload = (item) => {
-      const p = { title: item.title, short_description: item.desc, description: item.description || item.desc, price: parsePrice(item.price) };
+      const p = { title: item.title, short_description: item.desc, description: item.description || item.desc, price: parsePrice(item.price), is_published: item.is_published ?? true, is_active: item.status === 'Active' };
       if (item.category_id) p.category_id = item.category_id;
       return p;
     };
