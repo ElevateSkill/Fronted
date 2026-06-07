@@ -153,7 +153,7 @@ export default function Services() {
                 </div>
               </div>
             </div>
-            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#f85104] to-[#f15805] hover:brightness-110 text-white font-bold shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
+            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#f9a215] to-[#f15805] hover:brightness-110 text-white font-bold shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
               <span className="relative z-10">JOIN PLATFORM</span>
               <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform relative z-10" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -231,7 +231,7 @@ export default function Services() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#161d53] to-transparent rounded-[3rem]"
+          className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#f44c04] to-transparent rounded-[3rem]"
         >
           <div className="bg-white dark:bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20 rounded-[2.9rem]">
             <div className="text-center lg:text-left">
@@ -239,7 +239,9 @@ export default function Services() {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
-              <button className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#a97703] to-[white] text-black rounded-2xl font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
+              <button  
+              // onClick={}
+              className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#f9a215] to-[#f15805] text-[white] font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
                 GET STARTED NOW
                 <ArrowRight className="group-hover:rotate-[-45deg] transition-transform" />
               </button>
