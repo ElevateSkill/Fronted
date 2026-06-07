@@ -1,0 +1,182 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Play, Volume2, Maximize, Settings, 
+  CheckCircle2, Star, Quote, ExternalLink 
+} from 'lucide-react';
+import { loadData } from '../data/dataStore';
+
+const defaultTestimonials = [
+  {
+    id: "1", name: "DAWIT MEKONNEN", role: "Senior Fullstack Engineer",
+    company: "Addis Tech Hub", video: "https://www.youtube.com/embed/aqz-KE-bpKQ",
+    story: "The transition from finance to tech seemed impossible until I joined. The project-based approach taught me how to architect complex systems. I doubled my salary in six months.",
+    color: "#EE8433"
+  },
+  {
+    id: "2", name: "SELAWAWIT BEKELE", role: "UI/UX Lead",
+    company: "Creative Flow Agency", video: "https://www.youtube.com/embed/c9Wg6A_9f4U",
+    story: "Most courses focus on tools, but here I learned the psychology of design. The feedback from world-class mentors helped me build a portfolio that landed me a lead role.",
+    color: "#3A3992"
+  },
+  {
+    id: "3", name: "ABENEZER LEMMA", role: "AI Researcher",
+    company: "Neural Systems", video: "https://www.youtube.com/embed/aircAruvnKk",
+    story: "While others were talking about AI, we were building LLM integrations. The curriculum is consistently six months ahead of the industry standards.",
+    color: "#EE8433"
+  }
+];
+
+const adaptStories = (stored) => {
+  if (!stored || stored.length === 0) return defaultTestimonials;
+  return stored.map(t => ({
+    id: t.id || String(Math.random()),
+    name: (t.name || '').toUpperCase(),
+    role: t.role || '',
+    company: t.company || '',
+    video: t.video || 'https://www.youtube.com/embed/aqz-KE-bpKQ',
+    story: t.text || t.story || t.message || '',
+    color: t.color || '#EE8433'
+  }));
+};
+
+export default function VideoSuccessStories() {
+  const [testimonials, setTestimonials] = useState(() =>
+    adaptStories(loadData('testimonials'))
+  );
+
+  useEffect(() => {
+    const handler = () => setTestimonials(adaptStories(loadData('testimonials')));
+    window.addEventListener('storage', handler);
+    return () => window.removeEventListener('storage', handler);
+  }, []);
+  return (
+    <div className="relative bg-gray-50  py-16 md:py-24 px-6 overflow-hidden">
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#EE8433]/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#3A3992]/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        
+        {/* --- SECTION HEADER --- */}
+        <div className="text-center mb-16">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-center gap-3 mb-4"
+          >
+            <span className="h-[2px] w-12 bg-[#3A3992]" />
+            <span className="text-[#3A3992] font-black uppercase tracking-[0.3em] text-xs">Success Stories</span>
+            <span className="h-[2px] w-12 bg-[#3A3992]" />
+          </motion.div>
+          <h2 className="text-4xl sm:text-5xl font-black  text-gray-900 tracking-tight">
+            Trusted by{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3A3992] to-[#EE8433]">Thousands</span>
+          </h2>
+          <p className="text-gray-500  text-sm mt-3 max-w-xl mx-auto">
+            Hear from our community of engineers and designers who transformed their careers.
+          </p>
+        </div>
+
+        {/* --- ZIG-ZAG LIST --- */}
+        <div className="space-y-24 md:space-y-32">
+          {testimonials.map((item, index) => (
+            <motion.div 
+              key={item.id}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              className={`flex flex-col ${index % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-10 lg:gap-20`}
+            >
+              
+              {/* --- VIDEO PART --- */}
+              <div className="w-full lg:w-1/2 relative group">
+                {/* Decorative Background Glow */}
+                <div 
+                  className="absolute -inset-4 blur-3xl opacity-20 rounded-full transition-all group-hover:opacity-40" 
+                  style={{ backgroundColor: item.color }}
+                />
+                
+                {/* Video Frame */}
+                <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-gray-200  bg-gray-100  shadow-2xl">
+                  <iframe 
+                    className="w-full h-full"
+                    src={item.video}
+                    title="YouTube video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+
+                  {/* Custom Interface Overlay (Visual Only) */}
+                  <div className="absolute inset-0 pointer-events-none flex flex-col justify-between p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-between items-start">
+                      <div className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-lg text-[10px] text-white font-bold border border-white/10">
+                         {item.company}
+                      </div>
+                      <Settings size={18} className="text-white/70" />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-white/80">
+                        <Volume2 size={18} />
+                        <div className="h-1 w-24 bg-white/20 rounded-full overflow-hidden">
+                           <div className="h-full w-2/3 bg-[#EE8433]" />
+                        </div>
+                      </div>
+                      <Maximize size={18} className="text-white/80" />
+                    </div>
+                  </div>
+                </div>
+                
+              </div>
+
+              {/* --- DESCRIPTION PART --- */}
+              <div className="w-full lg:w-1/2 space-y-6">
+                <div className="space-y-3">
+                  <h3 className="text-3xl md:text-4xl font-black  text-gray-900 leading-tight">
+                    {item.name}
+                  </h3>
+                  <p className="text-[#3A3992] font-bold tracking-[0.2em] text-xs uppercase">
+                    {item.role} · {item.company}
+                  </p>
+                </div>
+                <p className="text-base md:text-lg text-gray-600  leading-relaxed italic">
+                  "{item.story}"
+                </p>
+
+                <div className="flex items-center gap-2 pt-4">
+                  <button 
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-xs tracking-widest text-white transition-all hover:brightness-110 shadow-xl"
+                    style={{ backgroundColor: item.color }}
+                  >
+                    FULL CASE STUDY <ExternalLink size={14} />
+                  </button>
+                  <div className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-gray-200  text-gray-500  font-bold text-[10px] uppercase tracking-wider border border-gray-200 ">
+                    VERIFIED
+                  </div>
+                </div>
+              </div>
+
+            </motion.div>
+          ))}
+        </div>
+
+        {/* --- BOTTOM CTA --- */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-24 p-10 md:p-14 bg-gray-100  border border-gray-200  rounded-3xl text-center shadow-2xl shadow-black/5 "
+        >
+          <h4 className="text-2xl md:text-4xl font-black  text-gray-900 mb-3">Want to be our next story?</h4>
+          <p className="text-gray-500  text-sm mb-8 max-w-xl mx-auto">
+            Join 24,000+ engineers and designers who have already transformed their careers.
+          </p>
+          <button className="px-10 py-4 bg-gradient-to-r from-[#3A3992] to-[#EE8433] text-white font-black text-xs rounded-2xl hover:brightness-110 transition-all uppercase tracking-wider shadow-2xl">
+            Start Your Journey Now
+          </button>
+        </motion.div>
+
+      </div>
+    </div>
+  );
+}

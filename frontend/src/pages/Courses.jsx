@@ -1,0 +1,187 @@
+import React from 'react';
+import { motion } from 'framer-motion';
+import { BookOpen, Code2, Palette, BrainCircuit, Rocket, Users, Clock, Star, ArrowRight, ChevronRight, Loader2, GraduationCap, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import useBackendData from '../hooks/useBackendData';
+import { coursesAPI } from '../services/api';
+import { loadData as loadLocalData } from '../data/dataStore';
+
+const iconMap = { Code2, Palette, BrainCircuit, Rocket };
+const IconComp = (name) => {
+  const C = iconMap[name];
+  return C ? <C size={28} /> : <BookOpen size={28} />;
+};
+
+// Backend course: { id, title, short_description, description, category: {name, slug},
+//                    price, duration, lessons, instructor, thumbnail, is_active, is_published }
+const adapt = (c) => ({
+  id: c.id,
+  title: c.title,
+  desc: c.short_description || c.description || c.desc || '',
+  description: c.description || c.short_description || c.desc || '',
+  category: typeof c.category === 'object' ? c.category?.name : (c.category || 'General'),
+  image: c.thumbnail || c.image || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
+  students: c.students || 0,
+  duration: c.duration || 'Self-paced',
+  lessons: c.lessons || 0,
+  level: c.level || c.instructor || 'All Levels',
+  color: c.color || '#EE8433',
+  price: typeof c.price === 'string' ? c.price : (c.price ? `${c.price} ETB` : 'Free'),
+  icon: c.icon || 'Code2'
+});
+
+export default function Courses() {
+  const navigate = useNavigate();
+  const fallback = (loadLocalData('courses') || []).map(adapt);
+  const { data: courses, loading, source } = useBackendData(
+    () => coursesAPI.list(),
+    fallback
+  );
+
+  const list = courses.length ? courses.map(adapt) : fallback;
+
+  const handleEnroll = (courseId) => {
+    navigate(`/register?courseId=${courseId}`);
+  };
+
+  return (
+    <div id="courses" className="relative w-full bg-gradient-to-br from-[#1a1150] via-[#0f0a3a] to-[#0a0625]    py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
+      <div className="absolute top-1/3 right-0 w-[500px] h-[500px] bg-[#EE8433]/30 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-[#3A3992]/25 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-[#5A2DA8]/20 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex items-center justify-center gap-3 mb-4"
+          >
+            <span className="h-[2px] w-12 bg-[#3A3992]" />
+            <span className="text-[#3A3992] font-black uppercase tracking-[0.3em] text-xs">Our Programs</span>
+            <span className="h-[2px] w-12 bg-[#3A3992]" />
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl sm:text-5xl font-black text-gray-900  tracking-tight"
+          >
+            Choose Your{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3A3992] to-[#EE8433]">Path</span>
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-white/60  text-sm mt-3 max-w-xl mx-auto"
+          >
+            Industry-driven curriculum designed to take you from beginner to job-ready professional.
+          </motion.p>
+          {source === 'api' && (
+            <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 ">Live from /courses/</span>
+            </div>
+          )}
+        </div>
+
+        {loading && list.length === 0 ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 size={32} className="text-[#EE8433] animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+            {list.map((course, i) => (
+              <motion.div
+                key={course.id || course.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ delay: i * 0.1 }}
+                className="group rounded-2xl bg-white/[0.08] .06] border border-white/[0.15] .12] overflow-hidden hover:border-[#3A3992]/60 :border-[#3A3992]/60 transition-all duration-300 hover:shadow-2xl hover:shadow-[#3A3992]/20 :shadow-[#3A3992]/10 backdrop-blur-sm"
+              >
+                <div className="h-48 overflow-hidden relative">
+                  <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#1a1150]/90 via-[#1a1150]/30 to-transparent" />
+                  <div className="absolute top-4 left-4 px-3 py-1.5 bg-gradient-to-r from-[#3A3992] to-[#D95C4A] backdrop-blur rounded-lg text-[10px] font-black text-white shadow-lg shadow-[#3A3992]/30 uppercase tracking-wider">{course.category}</div>
+                  {course.icon && (
+                    <div className="absolute top-4 right-4 p-2.5 bg-white/20 backdrop-blur-xl rounded-xl shadow-lg border border-white/20" style={{ color: course.color || '#3A3992' }}>
+                      {IconComp(course.icon)}
+                    </div>
+                  )}
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h3 className="text-lg font-black text-white mb-1 line-clamp-1 drop-shadow-lg">{course.title}</h3>
+                  </div>
+                </div>
+                <div className="p-5">
+                  <p className="text-xs text-white/50  mb-4 leading-relaxed line-clamp-2">{course.desc || course.description}</p>
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
+                      <Users size={12} className="text-[#3A3992]" /> {(course.students || 0).toLocaleString()} students
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
+                      <Clock size={12} className="text-[#3A3992]" /> {course.duration}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
+                      <BookOpen size={12} className="text-[#5A2DA8]" /> {course.lessons} lessons
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
+                      <Star size={12} className="text-yellow-400" /> {course.level}
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <span className="text-xl font-black text-[#3A3992] drop-shadow-lg">{course.price}</span>
+                    <button
+                      onClick={() => handleEnroll(course.id)}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#3A3992] to-[#D95C4A] text-white font-black text-[11px] rounded-xl hover:from-[#D95C4A] hover:to-[#3A3992] transition-all uppercase tracking-wider shadow-lg shadow-[#3A3992]/40 hover:shadow-[#3A3992]/60 hover:scale-105 active:scale-95"
+                    >
+                      <GraduationCap size={14} />
+                      Enroll Now
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Bold Enrollment CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-16"
+        >
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#3A3992] via-[#D95C4A] to-[#5A2DA8] p-10 md:p-14 text-center shadow-2xl shadow-[#3A3992]/30">
+            <div className="absolute inset-0 bg-[radial-gradient(#ffffff15_1px,transparent_1px)] bg-[length:8px_8px]" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px]" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#5A2DA8]/30 rounded-full blur-[60px]" />
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 border border-white/30">
+                <Zap size={16} className="text-white" />
+                <span className="text-white text-xs font-black uppercase tracking-widest">Limited Spots Available</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-black text-white mb-4 drop-shadow-lg">
+                Ready to Start Your Journey?
+              </h3>
+              <p className="text-white/80 text-sm max-w-lg mx-auto mb-8">
+                Join thousands of learners building real-world skills. Enroll today and transform your career.
+              </p>
+              <button
+                onClick={() => handleEnroll(list[0]?.id || '')}
+                className="px-10 py-4 bg-white text-[#3A3992] font-black text-sm rounded-2xl hover:bg-white/90 transition-all uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl hover:scale-105 active:scale-95"
+              >
+                <GraduationCap size={18} />
+                Enroll Now <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+}

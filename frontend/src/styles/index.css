@@ -1,0 +1,416 @@
+@import "tailwindcss";
+
+@theme {
+  /* Elevate Skill Brand Palette — Enterprise SaaS Design System */
+  --color-brand-primary: #3A3992;
+  --color-brand-secondary: #3A3992;
+  --color-brand-purple: #5A2DA8;
+  --color-brand-deep-purple: #7A3FB5;
+  --color-brand-orange: #EE8433;
+  --color-brand-accent-orange: #D95C4A;
+  --color-brand-bg: #F8FAFC;
+  --color-brand-surface: #F1F5F9;
+  --color-brand-text: #1E1B4B;
+  --color-brand-text-secondary: #4338CA;
+  --color-brand-border: rgba(58, 57, 146, 0.12);
+  --color-brand-card: #FFFFFF;
+  --color-brand-muted: #6366F1;
+  --color-brand-red: #D95C4A;
+  --color-brand-violet: #7A3FB5;
+  --color-brand-success: #059669;
+  --color-brand-warning: #EE8433;
+  --color-brand-danger: #D95C4A;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-brand-bg text-brand-text antialiased;
+    font-family: 'Inter', 'Noto Sans Ethiopic', -apple-system, BlinkMacSystemFont,
+      'Segoe UI', Roboto, sans-serif;
+  }
+
+  p {
+    @apply font-normal text-[15px] leading-[1.8] mb-5;
+    letter-spacing: 0.01em;
+  }
+
+  span {
+    @apply font-light;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    @apply font-medium tracking-wide;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(58, 57, 146, 0.2);
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(58, 57, 146, 0.35);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-purple);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: rgba(90, 45, 168, 0.2);
+    color: inherit;
+  }
+}
+
+body,
+html,
+#root {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Noto Sans Ethiopic', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--color-brand-text);
+}
+
+/* ═══════════════════════════════════════════
+   ENTERPRISE SaaS DESIGN SYSTEM — BRAND TOKENS
+   ═══════════════════════════════════════════ */
+
+/* Brand Background Colors */
+.bg-brand-primary { background-color: #3A3992; }
+.bg-brand-secondary { background-color: #3A3992; }
+.bg-brand-purple { background-color: #5A2DA8; }
+.bg-brand-orange { background-color: #EE8433; }
+.bg-brand-red { background-color: #D95C4A; }
+.bg-brand-violet { background-color: #7A3FB5; }
+
+/* Brand Text Colors */
+.text-brand-primary { color: #3A3992; }
+.text-brand-secondary { color: #3A3992; }
+.text-brand-purple { color: #5A2DA8; }
+.text-brand-orange { color: #EE8433; }
+.text-brand-red { color: #D95C4A; }
+.text-brand-violet { color: #7A3FB5; }
+
+/* Brand Gradient Classes */
+.gradient-brand-primary {
+  background: linear-gradient(135deg, #3A3992 0%, #5A2DA8 100%);
+}
+.gradient-brand-orange {
+  background: linear-gradient(135deg, #EE8433 0%, #D95C4A 100%);
+}
+.gradient-brand-vivid {
+  background: linear-gradient(135deg, #EE8433 0%, #D95C4A 50%, #5A2DA8 100%);
+}
+.gradient-brand-hero {
+  background: linear-gradient(135deg, #1a1150 0%, #0f0a3a 50%, #0a0625 100%);
+}
+.gradient-brand-sidebar {
+  background: linear-gradient(180deg, #1E1B4B 0%, #0F0A3A 100%);
+}
+
+/* Brand Shadow Classes */
+.shadow-brand-primary { box-shadow: 0 4px 24px rgba(58, 57, 146, 0.25); }
+.shadow-brand-secondary { box-shadow: 0 4px 24px rgba(58, 57, 146, 0.25); }
+.shadow-brand-orange { box-shadow: 0 4px 24px rgba(238, 132, 51, 0.3); }
+.shadow-brand-purple { box-shadow: 0 4px 24px rgba(90, 45, 168, 0.25); }
+.shadow-brand-vivid { box-shadow: 0 8px 32px rgba(238, 132, 51, 0.3); }
+
+/* ═══════════════════════════════════════════
+   DASHBOARD LAYOUT
+   ═══════════════════════════════════════════ */
+
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 40;
+}
+
+.dashboard-main {
+  margin-left: 280px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  flex-shrink: 0;
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.main-scroll {
+  margin-left: 280px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════ */
+
+@keyframes announcement-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-announcement {
+  animation: announcement-scroll 30s linear infinite;
+  will-change: transform;
+}
+.animate-announcement:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-33.3333%); }
+}
+.ticker-track {
+  animation: ticker-scroll 40s linear infinite;
+  will-change: transform;
+  display: inline-flex;
+  min-width: 200%;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 25px) scale(0.97); }
+}
+.animate-float-slow {
+  animation: float-slow 14s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    #3A3992 0%,
+    #ffffff 25%,
+    #EE8433 50%,
+    #ffffff 75%,
+    #3A3992 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 5s linear infinite;
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(238, 132, 51, 0.35),
+      0 0 50px rgba(90, 45, 168, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 40px rgba(238, 132, 51, 0.6),
+      0 0 90px rgba(90, 45, 168, 0.45);
+  }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.animate-ring-rotate {
+  animation: ring-rotate 30s linear infinite;
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out both;
+}
+
+@keyframes loop-partners {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-loop-partners {
+  animation: loop-partners 20s linear infinite;
+  will-change: transform;
+}
+.animate-loop-partners:hover {
+  animation-play-state: paused;
+}
+
+.mask-image-gradient {
+  -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+}
+
+.text-gradient-brand {
+  background: linear-gradient(90deg, #3A3992 0%, #5A2DA8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ═══════════════════════════════════════════
+   BRAND BUTTON SYSTEM
+   ═══════════════════════════════════════════ */
+
+.btn-brand-primary {
+  @apply px-5 py-2.5 bg-brand-primary text-white font-black text-xs rounded-xl
+    hover:brightness-110 transition-all uppercase tracking-wider cursor-pointer;
+}
+
+.btn-brand-orange {
+  @apply px-5 py-2.5 bg-brand-orange text-white font-black text-xs rounded-xl
+    hover:brightness-110 transition-all uppercase tracking-wider cursor-pointer;
+}
+
+.btn-brand-gradient {
+  @apply px-5 py-2.5 bg-gradient-to-r from-brand-orange to-brand-purple text-white
+    font-black text-xs rounded-xl hover:brightness-110 transition-all
+    uppercase tracking-wider cursor-pointer;
+}
+
+.btn-brand-outline {
+  @apply px-5 py-2.5 border border-brand-primary text-brand-primary font-bold text-xs
+    rounded-xl hover:bg-brand-primary hover:text-white transition-all cursor-pointer;
+}
+
+.btn-brand-ghost {
+  @apply px-4 py-2 text-brand-primary font-bold text-xs rounded-lg
+    hover:bg-brand-primary/10 transition-all cursor-pointer;
+}
+
+/* ═══════════════════════════════════════════
+   BRAND CARD SYSTEM
+   ═══════════════════════════════════════════ */
+
+.card-brand {
+  @apply rounded-2xl bg-brand-card border border-brand-border p-5
+    hover:border-brand-primary/20 hover:shadow-lg transition-all;
+}
+
+.card-brand-elevated {
+  @apply rounded-2xl bg-brand-card border border-brand-border p-5
+    hover:shadow-xl transition-all;
+}
+
+/* ═══════════════════════════════════════════
+   BRAND INPUT SYSTEM
+   ═══════════════════════════════════════════ */
+
+.input-brand {
+  @apply w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-xl
+    text-brand-text text-sm focus:outline-none transition-all;
+}
+
+.input-brand-dark {
+  @apply w-full px-4 py-3 bg-brand-bg border border-brand-border rounded-xl
+    text-brand-text text-sm focus:outline-none transition-all;
+}
+
+/* ═══════════════════════════════════════════
+   BRAND TABLE SYSTEM
+   ═══════════════════════════════════════════ */
+
+.table-brand thead tr {
+  background-color: rgba(248, 250, 252, 0.8);
+}
+
+.table-brand thead th {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 12px;
+  text-align: left;
+}
+
+.table-brand tbody tr {
+  border-bottom: 1px solid rgba(58, 57, 146, 0.12);
+  transition: background-color 0.15s;
+}
+
+.table-brand tbody tr:hover {
+  background-color: rgba(248, 250, 252, 0.5);
+}
+
+.table-brand tbody td {
+  padding: 12px;
+  font-size: 14px;
+}
