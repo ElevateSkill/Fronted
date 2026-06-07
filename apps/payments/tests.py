@@ -253,3 +253,60 @@ class PaymentsTests(APITestCase):
 
         with self.assertRaisesMessage(ValidationError, "Only pending payments can be approved."):
             PaymentService.approve_payment(payment.id)
+
+    def test_e2e_flow_register_enroll_pay_approve(self):
+        """
+        End-to-end flow test: register -> enroll -> submit payment -> admin approves.
+        """
+        # 1. Register a new student
+        register_url = reverse("register")
+        student_data = {
+            "username": "e2estudent",
+            "email": "e2estudent@test.com",
+            "password": "password123",
+            "full_name": "E2E Student",
+            "phone_number": "1234567890",
+        }
+        resp_register = self.client.post(register_url, student_data)
+        self.assertEqual(resp_register.status_code, status.HTTP_201_CREATED)
+        self.assertIn("access", resp_register.data)
+        student_access_token = resp_register.data["access"]
+        
+        # 2. Authenticate the client as the registered student
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {student_access_token}")
+        
+        # 3. Enroll in the course
+        enroll_url = reverse("enrollment-create")
+        enroll_payload = {"course": self.course.id}
+        resp_enroll = self.client.post(enroll_url, enroll_payload)
+        self.assertEqual(resp_enroll.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp_enroll.data["status"], Enrollment.PENDING)
+        enrollment_id = resp_enroll.data["id"]
+        
+        # 4. Submit payment proof
+        pay_url = reverse("student-payments")
+        pay_payload = {
+            "enrollment_id": enrollment_id,
+            "full_name": "E2E Student",
+            "email": "e2estudent@test.com",
+            "phone": "1234567890",
+            "proof_file": self.build_proof_file(name="e2eproof.pdf"),
+        }
+        resp_pay = self.client.post(pay_url, pay_payload, format="multipart")
+        self.assertEqual(resp_pay.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(resp_pay.data["status"], Payment.STATUS_PENDING)
+        payment_id = resp_pay.data["id"]
+        
+        # 5. Authenticate the client as the admin
+        self.auth_as(self.admin)
+        
+        # 6. Admin approves the payment
+        approve_url = reverse("admin-payment-approve", kwargs={"pk": payment_id})
+        resp_approve = self.client.put(approve_url)
+        self.assertEqual(resp_approve.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp_approve.data["status"], Payment.STATUS_APPROVED)
+        
+        # 7. Verify enrollment is active
+        enrollment = Enrollment.objects.get(id=enrollment_id)
+        self.assertEqual(enrollment.status, Enrollment.ACTIVE)
+

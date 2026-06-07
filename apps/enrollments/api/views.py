@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema
 
 from utils.ratelimit import api_ratelimit
+from apps.accounts.permissions import IsStudent
 
 from apps.enrollments.api.serializers import (
     EnrollmentSerializer,
@@ -16,7 +17,7 @@ class EnrollmentCreateView(generics.CreateAPIView):
     """
     Enroll the authenticated student in a course.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
     serializer_class = EnrollmentCreateSerializer
 
     @api_ratelimit(key='user', rate='30/h')
@@ -49,7 +50,7 @@ class MyEnrollmentListView(generics.ListAPIView):
     """
     Retrieve all enrollments for the authenticated student.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
     serializer_class = EnrollmentSerializer
 
     def get_queryset(self):

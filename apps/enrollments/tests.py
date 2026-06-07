@@ -178,6 +178,25 @@ class EnrollmentsTests(APITestCase):
         resp_list = self.client.get(self.my_list_url)
         self.assertEqual(resp_list.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_admin_access_blocked(self):
+        """Test that admin requests receive 403 Forbidden for student endpoints."""
+        admin_user = User.objects.create_user(
+            username="admin_test",
+            email="admin_test@test.com",
+            password="password123",
+            full_name="Admin User",
+            role=User.ADMIN,
+        )
+        self.auth_as(admin_user)
+        
+        # Try to enroll
+        resp_create = self.client.post(self.create_url, {"course": self.published_course.id})
+        self.assertEqual(resp_create.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Try to list
+        resp_list = self.client.get(self.my_list_url)
+        self.assertEqual(resp_list.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_enrollment_service_status_update(self):
         """Test service method update_status transitions enrollment statuses correctly."""
         enrollment = Enrollment.objects.create(

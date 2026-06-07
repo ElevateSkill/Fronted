@@ -4,6 +4,59 @@ Base path: `/api/v1/`
 
 Authentication: JWT Bearer (`Authorization: Bearer <access_token>`). Public endpoints allow anonymous access.
 
+## Role-based Access Control (Permissions)
+
+The API enforces role-based access control (RBAC) across endpoints:
+
+- **Public**: No authentication required.
+- **Student**: Requires a valid JWT token where the user's role is `student`.
+- **Admin**: Requires a valid JWT token where the user's role is `admin` (or the user is staff/superuser).
+- **Authenticated (Any)**: Requires a valid JWT token regardless of user role.
+
+### Admin Endpoints (requires JWT + `IsAdmin` permission)
+- `GET /api/v1/admin/dashboard/` — Platform metrics
+- `GET|POST /api/v1/admin/courses/` — List/create courses
+- `GET|PUT|PATCH|DELETE /api/v1/admin/courses/{id}/` — Course detail management
+- `GET|POST /api/v1/admin/categories/` — List/create categories
+- `GET|PUT|PATCH|DELETE /api/v1/admin/categories/{id}/` — Category detail management
+- `GET|POST /api/v1/admin/announcements/` — List/create announcements
+- `GET|PUT|PATCH|DELETE /api/v1/admin/announcements/{id}/` — Announcement management
+- `GET|POST /api/v1/admin/news/` — List/create news posts
+- `GET|PUT|PATCH|DELETE /api/v1/admin/news/{id}/` — News post management
+- `GET /api/v1/admin/payments/` — Review all student payments
+- `PUT /api/v1/admin/payments/{id}/approve/` — Approve a pending payment
+- `PUT /api/v1/admin/payments/{id}/reject/` — Reject a pending payment
+- `GET|PUT /api/v1/admin/hero/` — Hero section singleton
+- `GET|PUT /api/v1/admin/about/` — About section singleton
+- `GET|PUT /api/v1/admin/site-settings/` — Site settings singleton
+- `GET|POST /api/v1/admin/testimonials/` — List/create testimonials
+- `GET|PUT|PATCH|DELETE /api/v1/admin/testimonials/{id}/` — Testimonial management
+- `GET|POST /api/v1/admin/faqs/` — List/create FAQs
+- `GET|PUT|PATCH|DELETE /api/v1/admin/faqs/{id}/` — FAQ management
+
+### Student Endpoints (requires JWT + `IsStudent` permission)
+- `POST /api/v1/enrollments/` — Enroll in a course
+- `GET /api/v1/my-enrollments/` — View own enrollments
+- `POST /api/v1/payments/` — Submit a payment proof
+- `GET /api/v1/payments/` — View own payments
+
+### Authenticated Endpoints (requires JWT only, any role)
+- `POST /api/v1/auth/logout/` — Blacklist refresh token
+- `GET|PUT /api/v1/profile/` — Retrieve/update own profile
+- `GET /api/v1/announcements/` — List published announcements (student feed)
+- `GET /api/v1/announcements/{id}/` — Retrieve published announcement detail
+
+### Public Endpoints (no authentication required)
+- `POST /api/v1/auth/register/` — Register a new student user
+- `POST /api/v1/auth/login/` — Login/obtain JWT tokens
+- `GET /api/v1/courses/` — List published/active courses
+- `GET /api/v1/courses/{id}/` — View active/published course detail
+- `GET /api/v1/categories/` — List all categories
+- `GET /api/v1/categories/{id}/` — Category detail
+- `GET /api/v1/news/` — List published news posts
+- `GET /api/v1/news/{id}/` — View published news post detail
+- `GET /api/v1/homepage/` — Public homepage CMS data
+
 ## Global Conventions
 
 ### Paginated List Responses

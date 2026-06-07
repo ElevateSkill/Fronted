@@ -62,9 +62,10 @@ Enrollment Flow:
 1. Authenticate: Student obtains JWT via `POST /api/v1/auth/login/` or registration.
 2. Enroll: Student calls `POST /api/v1/enrollments/` with `{ "course": <course_id> }` to create an enrollment.
    - Outcome: 201 Created with initial `pending` status.
-   - Guards: Checks for course active/published status and prevents duplicate enrollments.
+   - Guards: Checks for course active/published status, prevents duplicate enrollments, and enforces that only users with the `student` role are allowed (via `IsStudent` permission).
    - **Rate limit**: 30 requests / hour per user.
-3. List: Student views all their current enrollments via `GET /api/v1/my-enrollments/`. (Returns a **paginated** response).
+3. List: Student views all their current enrollments via `GET /api/v1/my-enrollments/`. (Returns a **paginated** response). Requires the user to have the `student` role (via `IsStudent` permission).
+
 
 Notes & Requirements
 
