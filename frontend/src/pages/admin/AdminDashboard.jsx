@@ -38,8 +38,9 @@ const sidebarItems = [
  { id: 'gallery', label: 'Gallery', icon: <Image size={16} /> },
  ]
  },
- { id: 'faqs', label: 'FAQs', icon: <HelpCircle size={20} /> },
- { id: 'announcements', label: 'Announcements', icon: <Megaphone size={20} /> },
+   { id: 'categories', label: 'Categories', icon: <BookOpen size={20} /> },
+   { id: 'faqs', label: 'FAQs', icon: <HelpCircle size={20} /> },
+  { id: 'announcements', label: 'Announcements', icon: <Megaphone size={20} /> },
 ];
 
 const genId = () => Date.now() + Math.random();
@@ -172,8 +173,8 @@ export default function AdminDashboard() {
         if (coursesRes.status === 'fulfilled' && coursesRes.value?.results?.length) {
           const adapted = coursesRes.value.results.map(c => ({
             id: c.id, title: c.title || '', category: c.category?.name || c.category || '', students: c.students || 0,
-            lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price ? `${c.price} ETB` : 'Free',
-            desc: c.short_description || c.description || '',
+            lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price || '',
+            desc: c.short_description || '', description: c.description || '',
           }));
           setCourses(prev => adapted.length ? adapted : prev);
         }
@@ -237,7 +238,7 @@ export default function AdminDashboard() {
 
   const [apiSynced, setApiSynced] = useState(false);
   const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
-  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', price: '', status: 'Active' });
+  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', description: '', price: '', status: 'Active' });
   const [paymentList, setPaymentList] = useState([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
@@ -437,7 +438,7 @@ export default function AdminDashboard() {
  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Courses</h2>
  <p className="text-gray-500 text-sm font-medium">{courses.length} courses available</p>
  </div>
- <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', price: '', status: 'Active' }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
+  <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', description: '', price: '', status: 'Active' }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {courses.map((course, i) => (
@@ -634,7 +635,42 @@ export default function AdminDashboard() {
  </div>
  );
 
- case 'faqs':
+  case 'categories':
+  return (
+  <div className="space-y-4">
+  <div className="flex items-center justify-between">
+  <div>
+  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Categories</h2>
+  <p className="text-gray-500 text-sm font-medium">{categories.length} categories</p>
+  </div>
+  <button onClick={() => { setEditItem({ name: '' }); setShowModal('category'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Category</button>
+  </div>
+  <div className="space-y-3">
+  {categories.length === 0 ? (
+  <div className="rounded-2xl border border-gray-200 bg-gray-100 p-12 text-center">
+  <BookOpen size={40} className="mx-auto text-gray-300 mb-4" />
+  <h3 className="text-lg font-bold text-gray-500 mb-1">No categories yet</h3>
+  <p className="text-gray-400 text-sm">Create categories to organize your courses</p>
+  </div>
+  ) : categories.map((cat, i) => (
+  <motion.div key={cat.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="rounded-2xl border border-gray-200 bg-gray-100 p-5 hover:border-[#5A2DA8]/30 transition-all">
+  <div className="flex items-start justify-between gap-4">
+  <div className="flex-1">
+  <h3 className="font-bold text-gray-900 mb-1">{cat.name}</h3>
+  <p className="text-xs text-gray-400">Slug: {cat.slug} · Created: {cat.created_at?.split('T')[0] || cat.created_at}</p>
+  </div>
+  <div className="flex items-center gap-2 shrink-0">
+  <button onClick={() => { setEditItem(cat); setShowModal('category'); }} className="p-2 rounded-lg bg-[#E0E0F0] text-[#5A2DA8] hover:bg-[#C1C1E0] transition-all"><Edit3 size={14} /></button>
+  <button onClick={async () => { if (cat.id && typeof cat.id === 'number') try { await categoriesAPI.adminDelete(cat.id); } catch(e) {} setCategories(prev => prev.filter(c => c.id !== cat.id)); showToast('Category deleted'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
+  </div>
+  </div>
+  </motion.div>
+  ))}
+  </div>
+  </div>
+  );
+ 
+  case 'faqs':
  return (
  <div className="space-y-4">
  <div className="flex items-center justify-between">
@@ -755,13 +791,15 @@ export default function AdminDashboard() {
  </div>
  <Input label="Price" value={editItem?.price || newCourse.price} onChange={e => editItem ? setEditItem(p => ({ ...p, price: e.target.value })) : setNewCourse(p => ({ ...p, price: e.target.value }))} placeholder="500 ETB" />
  <Select label="Status" value={editItem?.status || newCourse.status} onChange={e => editItem ? setEditItem(p => ({ ...p, status: e.target.value })) : setNewCourse(p => ({ ...p, status: e.target.value }))} options={['Active', 'Inactive']} />
- <TextArea label="Description" rows={3} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Course description..." />
+  <TextArea label="Short Description" rows={2} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Brief summary..." />
+  <TextArea label="Full Description" rows={4} value={editItem?.description || newCourse.description} onChange={e => editItem ? setEditItem(p => ({ ...p, description: e.target.value })) : setNewCourse(p => ({ ...p, description: e.target.value }))} placeholder="Detailed course content..." />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
   <button onClick={async () => {
   try {
+    const parsePrice = (v) => String(v).replace(/[^0-9.]/g, '');
     const payload = (item) => {
-      const p = { title: item.title, short_description: item.desc, price: item.price };
+      const p = { title: item.title, short_description: item.desc, description: item.description || item.desc, price: parsePrice(item.price) };
       if (item.category_id) p.category_id = item.category_id;
       return p;
     };
@@ -945,7 +983,32 @@ export default function AdminDashboard() {
  </Modal>
  )}
 
- {selectedItem?.type === 'registration' && (
+  {showModal === 'category' && (
+  <Modal title={editItem?.id ? 'Edit Category' : 'New Category'} onClose={() => setShowModal(null)}>
+  <div className="space-y-4">
+  <Input label="Category Name" value={editItem?.name || ''} onChange={e => setEditItem(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Development, Design, AI" />
+  <div className="flex justify-end gap-3 pt-2">
+  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
+  <button onClick={async () => {
+  try {
+    if (editItem?.id && typeof editItem.id === 'number') {
+      await categoriesAPI.adminUpdate(editItem.id, { name: editItem.name });
+      setCategories(prev => prev.map(c => c.id === editItem.id ? { ...c, name: editItem.name } : c));
+      showToast('Category updated');
+    } else {
+      const created = await categoriesAPI.adminCreate({ name: editItem.name });
+      setCategories(prev => [...prev, created]);
+      showToast('Category created');
+    }
+  } catch (e) { showToast('Failed to save category', 'error'); }
+  setShowModal(null); setEditItem(null);
+  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
+  </div>
+  </div>
+  </Modal>
+  )}
+
+  {selectedItem?.type === 'registration' && (
  <Modal title="Registration Details" onClose={() => setSelectedItem(null)}>
  <div className="space-y-6">
  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 ">
