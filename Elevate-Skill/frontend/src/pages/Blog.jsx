@@ -54,7 +54,7 @@ export default function Blog() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ delay: i * 0.1 }}
-              className="group rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 overflow-hidden hover:border-gray-300 dark:hover:border-white/20 transition-all hover:shadow-2xl"
+              className="group bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 overflow-hidden hover:border-gray-300 dark:hover:border-white/20 transition-all hover:shadow-2xl"
             >
               <div className="h-48 overflow-hidden relative">
                 <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -67,7 +67,7 @@ export default function Blog() {
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#15c8fb] transition-colors line-clamp-2">{post.title}</h3>
                 <p className="text-xs text-gray-500 dark:text-gray-300 mb-4 line-clamp-3 leading-relaxed">{post.excerpt}</p>
-                <button className="flex items-center gap-1.5 text-[#15c8fb] font-bold text-xs hover:gap-2 transition-all">
+                <button className="flex items-center gap-1.5 text-[white] font-bold text-xs hover:gap-2 transition-all">
                   Read More <ChevronRight size={12} />
                 </button>
               </div>
