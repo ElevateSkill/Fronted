@@ -1,9 +1,0 @@
-node_modules/
-dist/
-.vite/
-*.pyc
-__pycache__/
-venv/
-*.sqlite3
-backend/
-Elevate-Skill/
