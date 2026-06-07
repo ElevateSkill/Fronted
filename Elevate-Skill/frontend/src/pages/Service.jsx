@@ -93,8 +93,8 @@ export default function Services() {
           <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white/95 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] backdrop-blur-3xl shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5 rounded-3xl">
             <div className="flex-none max-w-xs">
               <div className="flex items-center gap-3 mb-2 justify-center lg:justify-start">
-                <span className="w-8 h-[2px] bg-[#15c8fb]" />
-                <span className="text-[#15c8fb] font-bold uppercase tracking-widest text-xs">Collaboration Network</span>
+                <span className="w-8 h-[2px] bg-[#fba613]" />
+                <span className="text-[#fba613] font-bold uppercase tracking-widest text-xs">Collaboration Network</span>
               </div>
             </div>
 
@@ -135,7 +135,7 @@ export default function Services() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center lg:items-end gap-5 bg-white/95 dark:bg-white/[0.06] p-6 rounded-3xl backdrop-blur-md border border-slate-200 dark:border-white/[0.08] shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5"
+            className="flex flex-col items-center lg:items-end gap-5 bg-white/95 dark:bg-white/[0.06] p-6 backdrop-blur-md border border-slate-200 dark:border-white/[0.08] shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5"
           >
             <div className="flex justify-between">
               <div className="flex -space-x-3">
@@ -148,12 +148,12 @@ export default function Services() {
                     alt="user"
                   />
                 ))}
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] border-4 border-white dark:border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#2c2260] to-[#291850] border-4 border-white dark:border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
                   24k+
                 </div>
               </div>
             </div>
-            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#15c8fb] to-[#0fa3d4] hover:brightness-110 text-white font-bold rounded-2xl shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
+            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#f85104] to-[#f15805] hover:brightness-110 text-white font-bold shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
               <span className="relative z-10">JOIN PLATFORM</span>
               <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform relative z-10" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -231,15 +231,15 @@ export default function Services() {
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#15c8fb] to-transparent rounded-[3rem]"
+          className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#161d53] to-transparent rounded-[3rem]"
         >
           <div className="bg-white dark:bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20 rounded-[2.9rem]">
             <div className="text-center lg:text-left">
-              <p className="text-slate-600 dark:text-gray-300 text-lg max-w-md">Join 24,000+ visionaries scaling their digital presence today.</p>
+              <p className="text-slate-600 dark:text-gray-300 text-lg max-w-md">JOIN 1000+ visionaries scaling their digital presence today.</p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
-              <button className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white rounded-2xl font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
+              <button className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#a97703] to-[white] text-black rounded-2xl font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
                 GET STARTED NOW
                 <ArrowRight className="group-hover:rotate-[-45deg] transition-transform" />
               </button>
