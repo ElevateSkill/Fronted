@@ -90,7 +90,7 @@ export default function Courses() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -99,7 +99,7 @@ export default function Courses() {
             <span className="h-[2px] w-12 bg-[#f89f29]" />
             <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs">Our Programs</span>
             <span className="h-[2px] w-12 bg-[#f89f29]" />
-          </motion.div>
+          </motion.div> */}
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -107,8 +107,8 @@ export default function Courses() {
             transition={{ delay: 0.1 }}
             className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight"
           >
-            Choose Your{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f89f29] to-[#15c8fb]">Path</span>
+            CHOOSE YOUR PROGRAM{' '}
+            {/* <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4a2ba0] to-[#f27821]">Path</span> */}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -129,7 +129,7 @@ export default function Courses() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ delay: i * 0.1 }}
-              className="group relative rounded-2xl bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 overflow-hidden hover:border-[#15c8fb]/30 dark:hover:border-[#15c8fb]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#15c8fb]/5"
+              className="group relative bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 overflow-hidden hover:border-[#f89f29]/30 dark:hover:border-[#f89f29]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#15c8fb]/5"
             >
               <div className="h-44 overflow-hidden relative">
                 <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -161,7 +161,7 @@ export default function Courses() {
                   <button
                     onClick={() => handleEnroll(course)}
                     disabled={enrollingId === (course.id || course.title)}
-                    className="flex items-center gap-1.5 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-black text-[10px] rounded-xl hover:bg-[#15c8fb] dark:hover:bg-[#15c8fb] hover:text-white dark:hover:text-white transition-all duration-300 uppercase tracking-wider shadow-md disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-5 py-2.5 bg-gray-900 dark:bg-[red] text-white dark:text-white font-black text-[10px] hover:bg-[white] dark:hover:bg-[white] hover:text-white dark:hover:text-black transition-all duration-300 uppercase tracking-wider shadow-md disabled:opacity-50"
                   >
                     {enrollSuccessId === (course.id || course.title) ? (
                       <><CheckCircle size={13} /> Enrolled</>
@@ -183,7 +183,7 @@ export default function Courses() {
           viewport={{ once: true }}
           className="mt-14 text-center"
         >
-          <button className="px-10 py-4 bg-gradient-to-r from-[#f89f29] to-[#15c8fb] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all duration-300 uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl shadow-[#f89f29]/20 hover:shadow-[#15c8fb]/20">
+          <button className="px-10 py-4 bg-gradient-to-r from-[white] to-[white] text-black font-black text-xs hover:brightness-110 transition-all duration-300 uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl shadow-[#f89f29]/20 hover:shadow-[#15c8fb]/20">
             View All Programs <ArrowRight size={16} />
           </button>
         </motion.div>
