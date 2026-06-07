@@ -16,7 +16,7 @@ export default function Blog() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -25,7 +25,7 @@ export default function Blog() {
             <span className="h-[2px] w-12 bg-[#f89f29]" />
             <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs">Latest Posts</span>
             <span className="h-[2px] w-12 bg-[#f89f29]" />
-          </motion.div>
+          </motion.div> */}
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -33,8 +33,7 @@ export default function Blog() {
             transition={{ delay: 0.1 }}
             className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight"
           >
-            From Our{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f89f29] to-[#15c8fb]">Blog</span>
+            From Our BLOG{' '}
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
@@ -82,7 +81,7 @@ export default function Blog() {
           viewport={{ once: true }}
           className="mt-14 text-center"
         >
-          <button className="px-10 py-4 bg-gradient-to-r from-[#f89f29] to-[#15c8fb] text-white font-black text-xs rounded-2xl hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl">
+          <button className="px-10 py-4 bg-gradient-to-r from-[#f8740f] to-[#fb6615] text-white font-black text-xs hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl">
             View All Articles <ArrowRight size={16} />
           </button>
         </motion.div>
