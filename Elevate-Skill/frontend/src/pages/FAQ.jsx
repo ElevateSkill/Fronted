@@ -29,13 +29,13 @@ export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
-    <div id="faq" className="relative w-full bg-gray-50 dark:bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
+    <div id="faq" className="relative w-full bg-gray-50 dark:bg-black md:py-24 transition-colors duration-500 overflow-hidden">
       <div className="absolute top-1/2 left-0 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/3 right-0 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="mx-auto relative z-10">
         <div className="text-center mb-16">
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -44,9 +44,9 @@ export default function FAQ() {
             <span className="h-[2px] w-12 bg-[#f89f29]" />
             <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs">FAQ</span>
             <span className="h-[2px] w-12 bg-[#f89f29]" />
-          </motion.div>
+          </motion.div> */}
           <h2 className="text-4xl sm:text-5xl font-black tracking-tighter dark:text-white text-gray-900 mb-2">
-            Got <span className="text-[#f89f29]">Questions?</span>
+            Got <span className="text-[#f89f29]">QUESTIONS?</span>
           </h2>
           <p className="text-gray-500 dark:text-white/60 text-sm">Find answers to common questions about our platform.</p>
         </div>
@@ -110,7 +110,7 @@ export default function FAQ() {
         <motion.div 
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="mt-16 p-8 md:p-12 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-3xl text-center relative overflow-hidden group shadow-2xl shadow-black/5 dark:shadow-white/5"
+          className="mt-16 p-8 md:p-12 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-center relative overflow-hidden group shadow-2xl shadow-black/5 dark:shadow-white/5"
         >
           <div className="absolute -top-24 -left-24 w-64 h-64 bg-[#15c8fb]/10 blur-[80px] group-hover:bg-[#f89f29]/10 transition-colors duration-700" />
           
@@ -125,7 +125,7 @@ export default function FAQ() {
             <div className="flex flex-wrap justify-center gap-4">
               <motion.button 
                 whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-3 px-8 py-4 bg-[#f89f29] text-white font-black text-xs tracking-widest rounded-2xl uppercase shadow-xl"
+                className="flex items-center gap-3 px-8 py-4 bg-[#f89f29] text-white font-black text-xs tracking-widest uppercase shadow-xl"
               >
                 <MessageCircle size={18} /> Support Chat
               </motion.button>
