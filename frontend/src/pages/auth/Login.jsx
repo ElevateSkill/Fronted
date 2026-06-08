@@ -241,16 +241,16 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 ">Email</label>
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 ">Email / Username</label>
                 <div className="relative group">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400  group-focus-within:text-[#5A2DA8] transition-all" />
                   <input
-                    type="email"
+                    type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    autoComplete="email"
-                    placeholder="your@domain.com"
+                    autoComplete="username"
+                    placeholder="your@domain.com or username"
                     className="w-full pl-11 pr-4 py-3.5 bg-white .06] border border-gray-200 .12] rounded-2xl focus:border-[#5A2DA8] focus:ring-2 focus:ring-[#5A2DA8]/20 transition-all duration-300 text-base placeholder:text-gray-400 :text-white/30 "
                   />
                 </div>
