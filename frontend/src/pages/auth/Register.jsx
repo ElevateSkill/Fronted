@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../services/api';
+import { api, coursesAPI, normalizeApiList } from '../../services/api';
 import {
   Mail, Lock, User, IdCard, Phone,
   ArrowRight, TriangleAlert, Sparkles, Eye, EyeOff,
@@ -62,6 +62,7 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
 }
 
 export default function Register() {
+  const initialCourseId = new URLSearchParams(window.location.search).get('courseId') || '';
   const [form, setForm] = useState({
     email: '', full_name: '', username: '', phone_number: '',
     password: '', confirm_password: ''
@@ -71,22 +72,15 @@ export default function Register() {
   const [msg, setMsg] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [courses, setCourses] = useState([]);
-  const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [selectedCourseId, setSelectedCourseId] = useState(initialCourseId);
   const [proofFile, setProofFile] = useState(null);
 
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
 
-  // Pre-fill course if coming from link
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const courseId = params.get('courseId');
-    if (courseId) setSelectedCourseId(courseId);
-  }, []);
-
-  useEffect(() => {
-    api.get('/courses/')
-      .then(res => setCourses(res.data?.results ?? (Array.isArray(res.data) ? res.data : [])))
+    coursesAPI.list()
+      .then((data) => setCourses(normalizeApiList(data)))
       .catch(() => { });
   }, []);
 
@@ -115,7 +109,6 @@ export default function Register() {
       setStep('Creating your account...');
       const { confirm_password: _, ...payload } = form;
       const regResult = await registerUser(payload);
-      const userId = regResult?.user?.id || regResult?.user;
 
       setStep('Enrolling you in the course...');
       const enrollRes = await api.post('/enrollments/', { course: Number(selectedCourseId) });
@@ -293,7 +286,7 @@ export default function Register() {
 
             {/* Progress Steps */}
             <div className="flex gap-2 mb-8">
-              {steps.map((s, i) => (
+              {steps.map((s) => (
                 <motion.div
                   key={s.id}
                   onClick={() => setCurrentStep(s.id)}

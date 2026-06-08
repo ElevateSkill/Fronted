@@ -13,9 +13,8 @@ import {
  UserCheck, UserX, UserCog, Shield, Award,
  ChevronLeft, ChevronRight as ChevronRightIcon, SlidersHorizontal, Zap, EyeOff, X, HelpCircle, CreditCard
 } from 'lucide-react';
-import { loadData, saveData } from '../../data/dataStore';
 import { useAuth } from '../../context/AuthContext';
-import { api, coursesAPI, testimonialsAPI, announcementsAPI, faqsAPI, newsAPI, categoriesAPI, dashboardAPI, authAPI } from '../../services/api';
+import { coursesAPI, testimonialsAPI, announcementsAPI, faqsAPI, newsAPI, categoriesAPI, dashboardAPI, authAPI, cmsAPI, getMediaUrl } from '../../services/api';
 import UsersSection from './sections/Users';
 import PaymentsSection from './sections/Payments';
 import PaymentDetailModal from '../../components/dashboard/PaymentDetailModal';
@@ -130,10 +129,7 @@ export default function AdminDashboard() {
  const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
  const [registrations, setRegistrations] = useState([]);
-  const [users, setUsers] = useState(() => {
-  const stored = loadData('users');
-  return stored.length ? stored : [];
-  });
+  const [users, setUsers] = useState([]);
   const [userLoading, setUserLoading] = useState(false);
   const [courses, setCourses] = useState([]);
   const [posts, setPosts] = useState([]);
@@ -145,12 +141,18 @@ export default function AdminDashboard() {
   const [faqs, setFaqs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
+  const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
+  const [newCourse, setNewCourse] = useState({ title: '', category_id: '', desc: '', description: '', price: '', status: 'Active', is_published: true });
+  const [paymentList, setPaymentList] = useState([]);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   // Fetch live data from backend API on mount
   useEffect(() => {
     const syncFromAPI = async () => {
       try {
-        const [coursesRes, testimonialsRes, postsRes, announcementsRes, faqsRes, statsRes, categoriesRes] = await Promise.allSettled([
+        const [coursesRes, testimonialsRes, postsRes, announcementsRes, faqsRes, statsRes, categoriesRes, heroRes] = await Promise.allSettled([
           coursesAPI.adminList({ page_size: 100 }),
           testimonialsAPI.adminList({ page_size: 100 }),
           newsAPI.adminList({ page_size: 100 }),
@@ -158,47 +160,49 @@ export default function AdminDashboard() {
           faqsAPI.adminList({ page_size: 100 }),
           dashboardAPI.getStats(),
           categoriesAPI.adminList({ page_size: 100 }),
+          cmsAPI.getHero(),
         ]);
 
-        if (coursesRes.status === 'fulfilled' && coursesRes.value?.results?.length) {
+        if (coursesRes.status === 'fulfilled' && coursesRes.value?.results) {
           const adapted = coursesRes.value.results.map(c => ({
-            id: c.id, title: c.title || '', category: c.category?.name || c.category || '', students: c.students || 0,
+            id: c.id, title: c.title || '', category: c.category?.name || c.category || '', category_id: c.category?.id || '', students: c.students || 0,
             lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price || '',
             desc: c.short_description || '', description: c.description || '',
             is_published: c.is_published ?? false,
           }));
-          setCourses(prev => adapted.length ? adapted : prev);
+          setCourses(adapted);
         }
-        if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value?.results?.length) {
+        if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value?.results) {
           const adapted = testimonialsRes.value.results.map(t => ({
             id: t.id, name: t.student_name || '', role: '', company: '',
             text: t.message || '', rating: t.rating || 5,
-            avatar: t.student_image || '',
+            avatar: getMediaUrl(t.student_image) || '',
             is_active: t.is_active !== false,
           }));
-          setTestimonials(prev => adapted.length ? adapted : prev);
+          setTestimonials(adapted);
         }
-        if (postsRes.status === 'fulfilled' && postsRes.value?.results?.length) {
+        if (postsRes.status === 'fulfilled' && postsRes.value?.results) {
           const adapted = postsRes.value.results.map(p => ({
             id: p.id, title: p.title || '', author: p.author?.full_name || p.author || 'Admin',
             date: p.created_at?.split('T')[0] || p.date || '', status: p.status === 'published' ? 'Published' : 'Draft',
-            image: p.image || '', excerpt: p.excerpt || p.content?.substring(0, 150) || '',
+            image: getMediaUrl(p.image) || '', excerpt: p.excerpt || p.content?.substring(0, 150) || '',
+            content: p.content || p.excerpt || '',
           }));
-          setPosts(prev => adapted.length ? adapted : prev);
+          setPosts(adapted);
         }
-        if (announcementsRes.status === 'fulfilled' && announcementsRes.value?.results?.length) {
+        if (announcementsRes.status === 'fulfilled' && announcementsRes.value?.results) {
           const adapted = announcementsRes.value.results.map(a => ({
             id: a.id, title: a.title || '', body: a.content || '',
             date: a.date || a.created_at?.split('T')[0] || '', is_published: a.is_published !== false,
           }));
-          setAnnouncements(prev => adapted.length ? adapted : prev);
+          setAnnouncements(adapted);
         }
-        if (faqsRes.status === 'fulfilled' && faqsRes.value?.results?.length) {
+        if (faqsRes.status === 'fulfilled' && faqsRes.value?.results) {
           const adapted = faqsRes.value.results.map(f => ({
             id: f.id, question: f.question || '', answer: f.answer || '',
-            order: f.order || 0, is_active: f.is_active !== false,
+            category: 'General', order: f.order || 0, is_active: f.is_active !== false,
           }));
-          setFaqs(prev => adapted.length ? adapted : prev);
+          setFaqs(adapted);
         }
         if (categoriesRes.status === 'fulfilled' && categoriesRes.value?.results) {
           setCategories(categoriesRes.value.results);
@@ -209,7 +213,7 @@ export default function AdminDashboard() {
             totalStudents: s.total_students || 0,
             activeCourses: s.active_courses || 0,
             totalEnrollments: s.total_enrollments || 0,
-            sysTotalCourses: s.total_courses || courses.length,
+            sysTotalCourses: s.total_courses || 0,
             pendingPayments: s.payments?.pending || 0,
             approvedPayments: s.payments?.approved || 0,
             rejectedPayments: s.payments?.rejected || 0,
@@ -226,12 +230,28 @@ export default function AdminDashboard() {
               payment: '—',
             }));
             setRegistrations(mapped);
+          } else {
+            setRegistrations([]);
           }
         }
-      } catch (e) {
+        if (heroRes.status === 'fulfilled' && heroRes.value) {
+          const hero = heroRes.value;
+          const [title, ...rest] = (hero.title || '').split(' ');
+          setHeroSlides(hero.title || hero.subtitle || hero.background_image ? [{
+            id: 'hero',
+            image: getMediaUrl(hero.background_image) || '',
+            title: title || '',
+            highlight: rest.join(' '),
+            subtitle: hero.subtitle || '',
+            cta: hero.cta_text || 'Enroll Now',
+            ctaLink: hero.cta_link || '/register',
+            color: '#EE8433',
+            active: true,
+          }] : []);
+        }
+      } catch {
         // API unavailable
       }
-      setApiSynced(true);
     };
     syncFromAPI();
     // Fetch payments (merges enrollment + payment context)
@@ -252,21 +272,13 @@ export default function AdminDashboard() {
             return { ...r, phone: r.phone || match?.phone || '', email: r.email || match?.email || '', payment: match ? (match.status === 'approved' ? 'Paid' : match.status === 'pending' ? 'Pending' : 'Rejected') : '—' };
           }));
         }
-      } catch (e) {
+      } catch {
         // keep empty
       }
       setPaymentLoading(false);
     };
     fetchPayments();
   }, []);
-
-  const [apiSynced, setApiSynced] = useState(false);
-  const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
-  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', description: '', price: '', status: 'Active', is_published: true });
-  const [paymentList, setPaymentList] = useState([]);
-  const [paymentLoading, setPaymentLoading] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState(null);
-  const [lightboxImage, setLightboxImage] = useState(null);
 
   const stats = {
     total: dashboardStats?.totalEnrollments || registrations.length,
@@ -419,7 +431,7 @@ export default function AdminDashboard() {
   const res = await paymentsAPI.adminList({ page_size: 200 });
   setPaymentList(Array.isArray(res) ? res : res.results || []);
   showToast('Payments refreshed');
-  } catch (e) { showToast('Failed to refresh', 'error'); }
+  } catch { showToast('Failed to refresh', 'error'); }
   setPaymentLoading(false);
   }}
   onApprove={async (id) => {
@@ -427,14 +439,14 @@ export default function AdminDashboard() {
   await paymentsAPI.adminApprove(id);
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'approved' } : p));
   showToast('Payment approved');
-  } catch (e) { showToast('Approve failed', 'error'); }
+  } catch { showToast('Approve failed', 'error'); }
   }}
   onReject={async (id) => {
   try {
   await paymentsAPI.adminReject(id);
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'rejected' } : p));
   showToast('Payment rejected');
-  } catch (e) { showToast('Reject failed', 'error'); }
+  } catch { showToast('Reject failed', 'error'); }
   }}
   onViewDetail={(payment) => setSelectedPayment(payment)}
   />
@@ -463,7 +475,7 @@ export default function AdminDashboard() {
  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Courses</h2>
  <p className="text-gray-500 text-sm font-medium">{courses.length} courses available</p>
  </div>
-  <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', description: '', price: '', status: 'Active', is_published: true }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
+  <button onClick={() => { setEditItem(null); setNewCourse({ title: '', category_id: '', desc: '', description: '', price: '', status: 'Active', is_published: true }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {courses.map((course, i) => (
@@ -515,7 +527,7 @@ export default function AdminDashboard() {
  <div className="flex items-center gap-2">
  <button onClick={() => { setEditItem(post); setShowModal('post'); }} className="p-2 rounded-lg bg-[#E0E0F0] #5A2DA8]/10 text-[#5A2DA8] hover:bg-[#C1C1E0] #5A2DA8]/20 transition-all"><Edit3 size={14} /></button>
  <button onClick={() => { setSelectedItem({ type: 'post', id: post.id }); setShowModal('delete'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
- <button onClick={() => { setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: p.status === 'Published' ? 'Draft' : 'Published' } : p)); showToast(`${post.title} ${post.status === 'Published' ? 'unpublished' : 'published'}`); }} className="ml-auto p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all" title="Toggle Status">{post.status === 'Published' ? <XCircle size={14} /> : <CheckCircle size={14} />}</button>
+ <button onClick={async () => { try { const nextStatus = post.status === 'Published' ? 'draft' : 'published'; await newsAPI.adminUpdate(post.id, { status: nextStatus }); setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: nextStatus === 'published' ? 'Published' : 'Draft' } : p)); showToast(`${post.title} ${nextStatus === 'draft' ? 'unpublished' : 'published'}`); } catch { showToast('Failed to update post', 'error'); } }} className="ml-auto p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all" title="Toggle Status">{post.status === 'Published' ? <XCircle size={14} /> : <CheckCircle size={14} />}</button>
  </div>
  </div>
  </motion.div>
@@ -631,7 +643,7 @@ export default function AdminDashboard() {
  <Input placeholder="Announcement Title" value={newAnnouncement.title} onChange={e => setNewAnnouncement(p => ({ ...p, title: e.target.value }))} />
  <TextArea placeholder="Write your announcement..." rows={4} value={newAnnouncement.body} onChange={e => setNewAnnouncement(p => ({ ...p, body: e.target.value }))} />
  <div className="flex justify-end">
-  <button onClick={async () => { if (!newAnnouncement.title || !newAnnouncement.body) return; try { const created = await announcementsAPI.adminCreate({ title: newAnnouncement.title, content: newAnnouncement.body, is_published: true }); setAnnouncements(prev => [...prev, { ...created, id: created.id, title: created.title, body: created.content || created.body, date: new Date().toISOString().split('T')[0] }]); setNewAnnouncement({ title: '', body: '' }); showToast('Announcement published to backend'); } catch (e) { showToast('Failed to publish', 'error'); } }} className="px-6 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-2"><Sparkles size={14} /> Publish</button>
+  <button onClick={async () => { if (!newAnnouncement.title || !newAnnouncement.body) return; try { const created = await announcementsAPI.adminCreate({ title: newAnnouncement.title, content: newAnnouncement.body, is_published: true }); setAnnouncements(prev => [...prev, { ...created, id: created.id, title: created.title, body: created.content || created.body, date: new Date().toISOString().split('T')[0] }]); setNewAnnouncement({ title: '', body: '' }); showToast('Announcement published to backend'); } catch { showToast('Failed to publish', 'error'); } }} className="px-6 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-2"><Sparkles size={14} /> Publish</button>
  </div>
  </div>
  <div className="space-y-4">
@@ -652,7 +664,7 @@ export default function AdminDashboard() {
  <p className="text-sm text-gray-600 ">{a.body}</p>
  <p className="text-[10px] text-gray-400 mt-2">{a.date}</p>
  </div>
- <button onClick={() => { setAnnouncements(prev => prev.filter(x => x.id !== a.id)); showToast('Announcement deleted'); }} className="p-2 rounded-lg hover:bg-[#FDE0DC] text-gray-400 hover:text-[#D95C4A] transition-all"><Trash2 size={16} /></button>
+ <button onClick={async () => { try { await announcementsAPI.adminDelete(a.id); setAnnouncements(prev => prev.filter(x => x.id !== a.id)); showToast('Announcement deleted'); } catch { showToast('Failed to delete announcement', 'error'); } }} className="p-2 rounded-lg hover:bg-[#FDE0DC] text-gray-400 hover:text-[#D95C4A] transition-all"><Trash2 size={16} /></button>
  </div>
  </motion.div>
  ))}
@@ -686,7 +698,7 @@ export default function AdminDashboard() {
   </div>
   <div className="flex items-center gap-2 shrink-0">
   <button onClick={() => { setEditItem(cat); setShowModal('category'); }} className="p-2 rounded-lg bg-[#E0E0F0] text-[#5A2DA8] hover:bg-[#C1C1E0] transition-all"><Edit3 size={14} /></button>
-  <button onClick={async () => { if (cat.id && typeof cat.id === 'number') try { await categoriesAPI.adminDelete(cat.id); } catch(e) {} setCategories(prev => prev.filter(c => c.id !== cat.id)); showToast('Category deleted'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
+  <button onClick={async () => { if (cat.id && typeof cat.id === 'number') try { await categoriesAPI.adminDelete(cat.id); } catch { showToast('Failed to delete category', 'error'); return; } setCategories(prev => prev.filter(c => c.id !== cat.id)); showToast('Category deleted'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
   </div>
   </div>
   </motion.div>
@@ -724,7 +736,7 @@ export default function AdminDashboard() {
  </div>
  <div className="flex items-center gap-2 shrink-0">
  <button onClick={() => { setEditItem(faq); setShowModal('faq'); }} className="p-2 rounded-lg bg-[#E0E0F0] #5A2DA8]/10 text-[#5A2DA8] hover:bg-[#C1C1E0] #5A2DA8]/20 transition-all"><Edit3 size={14} /></button>
- <button onClick={() => { setFaqs(prev => prev.filter(f => f.id !== faq.id)); showToast('FAQ deleted'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
+ <button onClick={() => { setSelectedItem({ type: 'faq', id: faq.id }); setShowModal('delete'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
  </div>
  </div>
  </motion.div>
@@ -795,11 +807,13 @@ export default function AdminDashboard() {
       if (type === 'course' && typeof id === 'number') await coursesAPI.adminDelete(id);
       if (type === 'post' && typeof id === 'number') await newsAPI.adminDelete(id);
       if (type === 'testimonial' && typeof id === 'number') await testimonialsAPI.adminDelete(id);
-    } catch (e) { /* local-only items won't have API endpoints */ }
+      if (type === 'faq' && typeof id === 'number') await faqsAPI.adminDelete(id);
+    } catch { /* local-only items won't have API endpoints */ }
     if (type === 'user') setUsers(prev => prev.filter(u => u.id !== id));
     if (type === 'course') setCourses(prev => prev.filter(c => c.id !== id));
     if (type === 'post') setPosts(prev => prev.filter(p => p.id !== id));
     if (type === 'testimonial') setTestimonials(prev => prev.filter(t => t.id !== id));
+    if (type === 'faq') setFaqs(prev => prev.filter(f => f.id !== id));
     if (type === 'gallery') setGalleryAlbums(prev => prev.filter(a => a.id !== id));
     if (type === 'hero') setHeroSlides(prev => prev.filter(s => s.id !== id));
     showToast('Item deleted');
@@ -812,7 +826,21 @@ export default function AdminDashboard() {
  <div className="space-y-4">
  <div className="grid grid-cols-2 gap-4">
  <Input label="Title" value={editItem?.title || newCourse.title} onChange={e => editItem ? setEditItem(p => ({ ...p, title: e.target.value })) : setNewCourse(p => ({ ...p, title: e.target.value }))} placeholder="Course title" />
-  <Input label="Category" value={editItem?.category || newCourse.category} onChange={e => editItem ? setEditItem(p => ({ ...p, category: e.target.value })) : setNewCourse(p => ({ ...p, category: e.target.value }))} placeholder="Development" />
+  <div className="space-y-1.5">
+  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
+  <select
+    value={editItem?.category_id || newCourse.category_id || ''}
+    onChange={e => {
+      const categoryId = e.target.value ? Number(e.target.value) : '';
+      if (editItem) setEditItem(p => ({ ...p, category_id: categoryId }));
+      else setNewCourse(p => ({ ...p, category_id: categoryId }));
+    }}
+    className="w-full px-4 py-3 bg-brand-bg border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 transition-all"
+  >
+    <option value="">No category</option>
+    {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+  </select>
+  </div>
  </div>
  <Input label="Price" value={editItem?.price || newCourse.price} onChange={e => editItem ? setEditItem(p => ({ ...p, price: e.target.value })) : setNewCourse(p => ({ ...p, price: e.target.value }))} placeholder="500 ETB" />
  <Select label="Status" value={editItem?.status || newCourse.status} onChange={e => editItem ? setEditItem(p => ({ ...p, status: e.target.value })) : setNewCourse(p => ({ ...p, status: e.target.value }))} options={['Active', 'Inactive']} />
@@ -834,14 +862,39 @@ export default function AdminDashboard() {
     };
     if (editItem?.id && typeof editItem.id === 'number') {
       const upd = await coursesAPI.adminUpdate(editItem.id, payload(editItem));
-      setCourses(prev => prev.map(c => c.id === editItem.id ? { ...c, ...upd, status: upd.is_active ? 'Active' : 'Inactive' } : c));
+      setCourses(prev => prev.map(c => c.id === editItem.id ? {
+        ...c,
+        id: upd.id,
+        title: upd.title || '',
+        category: upd.category?.name || '',
+        category_id: upd.category?.id || '',
+        students: c.students || 0,
+        lessons: upd.lessons || 0,
+        status: upd.is_active ? 'Active' : 'Inactive',
+        price: upd.price || '',
+        desc: upd.short_description || '',
+        description: upd.description || '',
+        is_published: upd.is_published ?? false,
+      } : c));
       showToast('Course saved to backend');
     } else {
       const created = await coursesAPI.adminCreate(payload(editItem || newCourse));
-      setCourses(prev => [...prev, { ...created, id: created.id, status: 'Active', students: 0, lessons: created.lessons || 0 }]);
+      setCourses(prev => [...prev, {
+        id: created.id,
+        title: created.title || '',
+        category: created.category?.name || '',
+        category_id: created.category?.id || '',
+        students: 0,
+        lessons: created.lessons || 0,
+        status: created.is_active ? 'Active' : 'Inactive',
+        price: created.price || '',
+        desc: created.short_description || '',
+        description: created.description || '',
+        is_published: created.is_published ?? false,
+      }]);
       showToast('Course created on backend');
     }
-  } catch (e) { showToast('Failed to save course', 'error'); }
+  } catch { showToast('Failed to save course', 'error'); }
   setShowModal(null); setEditItem(null);
   }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -858,9 +911,33 @@ export default function AdminDashboard() {
  <Select label="Status" value={editItem?.status || 'Draft'} onChange={e => setEditItem(p => ({ ...p, status: e.target.value }))} options={['Draft', 'Published']} />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setPosts(prev => prev.map(p => p.id === editItem.id ? { ...p, ...editItem } : p)); showToast('Post updated'); }
- else { setPosts(prev => [...prev, { id: genId(), ...editItem, author: 'Admin', date: new Date().toISOString().split('T')[0] }]); showToast('Post created'); }
+ <button onClick={async () => {
+ try {
+ const payload = {
+ title: editItem.title,
+ excerpt: editItem.excerpt || '',
+ content: editItem.content || editItem.excerpt || '',
+ status: editItem.status === 'Published' ? 'published' : 'draft',
+ };
+ if (editItem?.id && typeof editItem.id === 'number') {
+ const saved = await newsAPI.adminUpdate(editItem.id, payload);
+ setPosts(prev => prev.map(p => p.id === editItem.id ? { ...p, ...editItem, status: saved.status === 'published' ? 'Published' : 'Draft' } : p));
+ showToast('Post saved to backend');
+ } else {
+ const created = await newsAPI.adminCreate(payload);
+ setPosts(prev => [...prev, {
+ id: created.id,
+ title: created.title,
+ excerpt: created.excerpt,
+ content: created.content,
+ image: getMediaUrl(created.image) || '',
+ author: created.author?.full_name || 'Admin',
+ status: created.status === 'published' ? 'Published' : 'Draft',
+ date: created.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+ }]);
+ showToast('Post created on backend');
+ }
+ } catch { showToast('Failed to save post', 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#5A2DA8] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -892,9 +969,40 @@ export default function AdminDashboard() {
  <TextArea label="Testimonial" rows={3} value={editItem?.text || ''} onChange={e => setEditItem(p => ({ ...p, text: e.target.value }))} placeholder="Write testimonial..." />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setTestimonials(prev => prev.map(t => t.id === editItem.id ? { ...t, ...editItem } : t)); showToast('Testimonial updated'); }
- else { setTestimonials(prev => [...prev, { id: genId(), ...editItem, avatar: editItem.avatar || `https://i.pravatar.cc/100?img=${prev.length + 1}` }]); showToast('Testimonial added'); }
+ <button onClick={async () => {
+ try {
+ const payload = {
+ student_name: editItem.name,
+ message: editItem.text,
+ rating: editItem.rating || 5,
+ is_active: editItem.is_active !== false,
+ };
+ if (editItem?.id && typeof editItem.id === 'number') {
+ const saved = await testimonialsAPI.adminUpdate(editItem.id, payload);
+ setTestimonials(prev => prev.map(t => t.id === editItem.id ? {
+ ...t,
+ name: saved.student_name,
+ text: saved.message,
+ rating: saved.rating,
+ avatar: getMediaUrl(saved.student_image) || t.avatar,
+ is_active: saved.is_active !== false,
+ } : t));
+ showToast('Testimonial saved to backend');
+ } else {
+ const created = await testimonialsAPI.adminCreate(payload);
+ setTestimonials(prev => [...prev, {
+ id: created.id,
+ name: created.student_name,
+ role: '',
+ company: '',
+ text: created.message,
+ rating: created.rating,
+ avatar: getMediaUrl(created.student_image) || '',
+ is_active: created.is_active !== false,
+ }]);
+ showToast('Testimonial created on backend');
+ }
+ } catch { showToast('Failed to save testimonial', 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -939,9 +1047,6 @@ export default function AdminDashboard() {
   showToast('User updated');
   setShowModal(null); setEditItem(null);
   } else {
-  const newUser = { id: genId(), ...editItem, joined: new Date().toISOString().split('T')[0], courses: 0, status: 'Active' };
-  setUsers(prev => [...prev, newUser]);
-  showToast('User added locally');
   try {
   const payload = {
     username: editItem.email?.split('@')[0] || editItem.name?.toLowerCase().replace(/\s/g, ''),
@@ -952,14 +1057,21 @@ export default function AdminDashboard() {
     role: editItem.role?.toLowerCase() || 'student',
   };
   const res = await authAPI.register(payload);
-  if (res?.user?.role === editItem.role?.toLowerCase()) {
-    showToast(`User registered as ${editItem.role}`);
-  } else {
-    showToast(`User created but role set to "${res?.user?.role || 'student'}" — set via admin panel`, 'error');
-  }
+  const created = res?.user || {};
+  setUsers(prev => [...prev, {
+    id: created.id || genId(),
+    name: created.full_name || editItem.name,
+    email: created.email || editItem.email,
+    phone: created.phone_number || editItem.phone,
+    role: (created.role || editItem.role || 'student').replace(/^./, c => c.toUpperCase()),
+    joined: new Date().toISOString().split('T')[0],
+    courses: 0,
+    status: 'Active',
+  }]);
+  showToast(`User registered as ${created.role || editItem.role}`);
   } catch (e) {
   const msg = e?.response?.data?.detail || e?.response?.data?.email?.[0] || e?.response?.data?.username?.[0] || e?.message || 'API unavailable';
-  showToast(`User saved locally (${msg})`, 'error');
+  showToast(`Failed to create user (${msg})`, 'error');
   }
   setShowModal(null); setEditItem(null);
   }
@@ -977,9 +1089,24 @@ export default function AdminDashboard() {
  <TextArea label="Answer" rows={4} value={editItem?.answer || ''} onChange={e => setEditItem(p => ({ ...p, answer: e.target.value }))} placeholder="Write the answer..." />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setFaqs(prev => prev.map(f => f.id === editItem.id ? { ...f, ...editItem } : f)); showToast('FAQ updated'); }
- else { setFaqs(prev => [...prev, { id: genId(), ...editItem }]); showToast('FAQ added'); }
+ <button onClick={async () => {
+ try {
+ const payload = {
+ question: editItem.question,
+ answer: editItem.answer,
+ order: editItem.order || 0,
+ is_active: editItem.is_active !== false,
+ };
+ if (editItem?.id && typeof editItem.id === 'number') {
+ const saved = await faqsAPI.adminUpdate(editItem.id, payload);
+ setFaqs(prev => prev.map(f => f.id === editItem.id ? { ...f, ...editItem, ...saved, category: editItem.category || 'General' } : f));
+ showToast('FAQ saved to backend');
+ } else {
+ const created = await faqsAPI.adminCreate(payload);
+ setFaqs(prev => [...prev, { ...created, category: editItem.category || 'General' }]);
+ showToast('FAQ created on backend');
+ }
+ } catch { showToast('Failed to save FAQ', 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -1002,9 +1129,28 @@ export default function AdminDashboard() {
  </div>
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setHeroSlides(prev => prev.map(s => s.id === editItem.id ? { ...s, ...editItem } : s)); showToast('Hero slide updated'); }
- else { setHeroSlides(prev => [...prev, { id: genId(), ...editItem, active: true }]); showToast('Hero slide added'); }
+ <button onClick={async () => {
+ try {
+ const saved = await cmsAPI.updateHero({
+ title: [editItem.title, editItem.highlight].filter(Boolean).join(' '),
+ subtitle: editItem.subtitle || '',
+ cta_text: editItem.cta || 'Enroll Now',
+ cta_link: editItem.ctaLink || '/register',
+ });
+ const [title, ...rest] = (saved.title || '').split(' ');
+ setHeroSlides([{
+ id: 'hero',
+ image: getMediaUrl(saved.background_image) || editItem.image || '',
+ title: title || '',
+ highlight: rest.join(' '),
+ subtitle: saved.subtitle || '',
+ cta: saved.cta_text || 'Enroll Now',
+ ctaLink: saved.cta_link || '/register',
+ color: '#EE8433',
+ active: true,
+ }]);
+ showToast('Hero saved to backend');
+ } catch { showToast('Failed to save hero', 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-gradient-to-r from-[#3A3992] to-[#EE8433] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -1029,7 +1175,7 @@ export default function AdminDashboard() {
       setCategories(prev => [...prev, created]);
       showToast('Category created');
     }
-  } catch (e) { showToast('Failed to save category', 'error'); }
+  } catch { showToast('Failed to save category', 'error'); }
   setShowModal(null); setEditItem(null);
   }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
   </div>
@@ -1141,7 +1287,7 @@ export default function AdminDashboard() {
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'approved' } : p));
   setSelectedPayment(null);
   showToast('Payment approved');
-  } catch (e) { showToast('Approve failed', 'error'); }
+  } catch { showToast('Approve failed', 'error'); }
   }}
   onReject={async (id) => {
   try {
@@ -1149,7 +1295,7 @@ export default function AdminDashboard() {
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'rejected' } : p));
   setSelectedPayment(null);
   showToast('Payment rejected');
-  } catch (e) { showToast('Reject failed', 'error'); }
+  } catch { showToast('Reject failed', 'error'); }
   }}
   onShowImage={(src) => setLightboxImage(src)}
   />

@@ -21,10 +21,7 @@ const adaptAPIToStory = (t) => ({
 });
 
 export default function VideoSuccessStories() {
-  const { data: fetched, loading } = useBackendData(
-    () => testimonialsAPI.active(),
-    []
-  );
+  const { data: fetched } = useBackendData(testimonialsAPI.active);
 
   const stories = useMemo(() => {
     if (fetched && fetched.length) {

@@ -19,10 +19,7 @@ const adapt = (n) => ({
 });
 
 export default function Blog() {
-  const { data: fetched, loading, source } = useBackendData(
-    () => newsAPI.list(),
-    []
-  );
+  const { data: fetched, loading, source } = useBackendData(newsAPI.list);
 
   const posts = (fetched || [])
     .map(adapt)
@@ -91,7 +88,13 @@ export default function Blog() {
                 className="group rounded-2xl bg-gray-100 border border-gray-200 overflow-hidden hover:border-gray-300 transition-all hover:shadow-2xl"
               >
                 <div className="h-48 overflow-hidden relative">
-                  <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  {post.image ? (
+                    <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[#3A3992]/10 to-[#EE8433]/10 flex items-center justify-center">
+                      <FileText size={40} className="text-gray-300" />
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 </div>
                 <div className="p-5">

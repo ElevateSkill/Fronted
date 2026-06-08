@@ -42,10 +42,7 @@ const adapt = (c) => {
 
 export default function Courses() {
   const navigate = useNavigate();
-  const { data: courses, loading, source } = useBackendData(
-    () => coursesAPI.list(),
-    []
-  );
+  const { data: courses, loading, source } = useBackendData(coursesAPI.list);
 
   const list = (courses || []).map(adapt);
 

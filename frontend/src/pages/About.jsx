@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import heroMain from '../assets/elevat.jpg';
 import aboutImg from '../assets/grad2.jpg';
-import gr1 from '../assets/gr1.jpg';
 import gr3 from '../assets/gr3.jpg';
 import logoImg from '../assets/logo.jpg';
 import useBackendData from '../hooks/useBackendData';
@@ -259,10 +258,7 @@ const NewsItem = ({ date, tag, title }) => (
 );
 
 function AboutBlogSection() {
-  const { data: fetched, loading } = useBackendData(
-    () => newsAPI.list(),
-    []
-  );
+  const { data: fetched, loading } = useBackendData(newsAPI.list);
 
   const posts = (fetched || [])
     .filter((n) => n.status === 'published' || n.status === 'Published')

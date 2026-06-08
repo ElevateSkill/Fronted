@@ -20,11 +20,9 @@ const adapt = (a) => ({
  * (`GET /api/v1/announcements/`).
  */
 export default function AnnouncementTicker({ variant = 'marquee' }) {
-  const { data } = useBackendData(
-    () => announcementsAPI.list(),
-    [],
-    { refreshInterval: 60000 }
-  );
+  const { data } = useBackendData(announcementsAPI.list, {
+    refreshInterval: 60000,
+  });
 
   const [dismissed, setDismissed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);

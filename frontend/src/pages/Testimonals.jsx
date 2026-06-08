@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Quote, Star, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useBackendData from '../hooks/useBackendData';
-import { testimonialsAPI } from '../services/api';
+import { testimonialsAPI, getMediaUrl } from '../services/api';
 
 const safeStr = (v, fallback = '') => (v != null && typeof v !== 'object') ? String(v) : fallback;
 
@@ -14,7 +14,7 @@ const adapt = (t) => ({
   role: safeStr(t.role, 'Graduate'),
   company: safeStr(t.company),
   quote: safeStr(t.message),
-  image: t.student_image || '',
+  image: getMediaUrl(t.student_image) || '',
   score: t.rating || 5,
   outcome: safeStr(t.outcome, 'Verified graduate'),
   color: t.color || '#EE8433',
@@ -22,10 +22,7 @@ const adapt = (t) => ({
 });
 
 export default function Testimonals() {
-  const { data: fetched, loading, source } = useBackendData(
-    () => testimonialsAPI.active(),
-    []
-  );
+  const { data: fetched, loading, source } = useBackendData(testimonialsAPI.active);
 
   const testimonials = (fetched || []).filter((t) => t.is_active !== false).map(adapt);
 

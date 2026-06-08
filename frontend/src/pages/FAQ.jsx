@@ -6,10 +6,7 @@ import useBackendData from '../hooks/useBackendData';
 import { faqsAPI } from '../services/api';
 
 export default function FAQ() {
-  const { data: faqData, loading, source } = useBackendData(
-    () => faqsAPI.active(),
-    []
-  );
+  const { data: faqData, loading, source } = useBackendData(faqsAPI.active);
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
