@@ -22,8 +22,8 @@ const normalizeCtaLink = (link) => {
 const adaptHero = (hero = {}) => ({
   image: getMediaUrl(hero.background_image) || heroImg1,
   title: hero.title || 'Elevate Skill',
-  subtitle: hero.subtitle || 'Explore practical courses, register online, and track your enrollment from your student dashboard.',
-  cta: hero.cta_text || 'Start Enrollment',
+  subtitle: hero.subtitle || 'Project-based learning platform designed for the modern engineer. Master in-demand tech skills with real-world projects and expert mentorship.',
+  cta: hero.cta_text || 'GET STARTED',
   ctaLink: normalizeCtaLink(hero.cta_link),
 });
 
@@ -108,7 +108,7 @@ export default function Landing() {
             transition={{ duration: 0.7 }}
           >
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 backdrop-blur">
-              <GraduationCap size={16} className="text-[#EE8433]" />
+              <GraduationCap size={16} className="text-[#FFD700]" />
               <span className="text-[11px] font-black uppercase tracking-[0.24em] text-white/80">Course Enrollment Platform</span>
             </div>
 
@@ -124,7 +124,7 @@ export default function Landing() {
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 to={hero.ctaLink}
-                className="inline-flex items-center justify-center gap-3 rounded-xl bg-[#EE8433] px-7 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-[#EE8433]/25 transition hover:bg-[#D95C4A]"
+                className="inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#FFD700] via-[#FFC107] to-[#1E40AF] px-7 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-[#FFD700]/25 transition hover:brightness-110"
               >
                 {hero.cta}
                 <ArrowRight size={18} />
