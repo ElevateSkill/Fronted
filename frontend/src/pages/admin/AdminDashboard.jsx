@@ -13,9 +13,8 @@ import {
  UserCheck, UserX, UserCog, Shield, Award,
  ChevronLeft, ChevronRight as ChevronRightIcon, SlidersHorizontal, Zap, EyeOff, X, HelpCircle, CreditCard
 } from 'lucide-react';
-import { loadData, saveData } from '../../data/dataStore';
 import { useAuth } from '../../context/AuthContext';
-import { api, coursesAPI, testimonialsAPI, announcementsAPI, faqsAPI, newsAPI, categoriesAPI, dashboardAPI, authAPI } from '../../services/api';
+import { coursesAPI, testimonialsAPI, announcementsAPI, faqsAPI, newsAPI, categoriesAPI, dashboardAPI, authAPI, cmsAPI, getMediaUrl } from '../../services/api';
 import UsersSection from './sections/Users';
 import PaymentsSection from './sections/Payments';
 import PaymentDetailModal from '../../components/dashboard/PaymentDetailModal';
@@ -38,8 +37,9 @@ const sidebarItems = [
  { id: 'gallery', label: 'Gallery', icon: <Image size={16} /> },
  ]
  },
- { id: 'faqs', label: 'FAQs', icon: <HelpCircle size={20} /> },
- { id: 'announcements', label: 'Announcements', icon: <Megaphone size={20} /> },
+   { id: 'categories', label: 'Categories', icon: <BookOpen size={20} /> },
+   { id: 'faqs', label: 'FAQs', icon: <HelpCircle size={20} /> },
+  { id: 'announcements', label: 'Announcements', icon: <Megaphone size={20} /> },
 ];
 
 const genId = () => Date.now() + Math.random();
@@ -129,37 +129,30 @@ export default function AdminDashboard() {
  const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
  const [registrations, setRegistrations] = useState([]);
-  const [users, setUsers] = useState(() => {
-  const stored = loadData('users');
-  return stored.length ? stored : [];
-  });
+  const [users, setUsers] = useState([]);
   const [userLoading, setUserLoading] = useState(false);
-  const [courses, setCourses] = useState(() => loadData('courses'));
-  const [posts, setPosts] = useState(() => loadData('posts'));
-  const [testimonials, setTestimonials] = useState(() => loadData('testimonials'));
+  const [courses, setCourses] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [testimonials, setTestimonials] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [galleryAlbums, setGalleryAlbums] = useState([]);
-  const [announcements, setAnnouncements] = useState(() => loadData('announcements'));
-  const [heroSlides, setHeroSlides] = useState(() => loadData('heroSlides').length ? loadData('heroSlides') : []);
-  const [faqs, setFaqs] = useState(() => loadData('faqs'));
+  const [announcements, setAnnouncements] = useState([]);
+  const [heroSlides, setHeroSlides] = useState([]);
+  const [faqs, setFaqs] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
+  const [newCourse, setNewCourse] = useState({ title: '', category_id: '', desc: '', description: '', price: '', course_url: '', status: 'Active', is_published: true });
+  const [paymentList, setPaymentList] = useState([]);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [lightboxImage, setLightboxImage] = useState(null);
 
-  // Auto-persist all data to localStorage
-  useEffect(() => {
-  saveData('heroSlides', heroSlides);
-  saveData('courses', courses);
-  saveData('testimonials', testimonials);
-  saveData('posts', posts);
-  saveData('announcements', announcements);
-  saveData('faqs', faqs);
-  saveData('users', users);
-  }, [heroSlides, courses, testimonials, posts, announcements, faqs, users]);
-
-  // Fetch live data from backend API on mount (falls back to localStorage)
+  // Fetch live data from backend API on mount
   useEffect(() => {
     const syncFromAPI = async () => {
       try {
-        const [coursesRes, testimonialsRes, postsRes, announcementsRes, faqsRes, statsRes, categoriesRes] = await Promise.allSettled([
+        const [coursesRes, testimonialsRes, postsRes, announcementsRes, faqsRes, statsRes, categoriesRes, heroRes] = await Promise.allSettled([
           coursesAPI.adminList({ page_size: 100 }),
           testimonialsAPI.adminList({ page_size: 100 }),
           newsAPI.adminList({ page_size: 100 }),
@@ -167,67 +160,120 @@ export default function AdminDashboard() {
           faqsAPI.adminList({ page_size: 100 }),
           dashboardAPI.getStats(),
           categoriesAPI.adminList({ page_size: 100 }),
+          cmsAPI.getHero(),
         ]);
 
-        if (coursesRes.status === 'fulfilled' && coursesRes.value?.results?.length) {
+        if (coursesRes.status === 'fulfilled' && coursesRes.value?.results) {
           const adapted = coursesRes.value.results.map(c => ({
-            id: c.id, title: c.title || '', category: c.category?.name || c.category || '', students: c.students || 0,
-            lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price ? `${c.price} ETB` : 'Free',
-            desc: c.short_description || c.description || '',
+            id: c.id, title: c.title || '', category: c.category?.name || c.category || '', category_id: c.category?.id || '', students: c.students || 0,
+            lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price || '',
+            desc: c.short_description || '', description: c.description || '',
+            course_url: c.course_url || '',
+            is_published: c.is_published ?? false,
           }));
-          setCourses(prev => adapted.length ? adapted : prev);
+          setCourses(adapted);
         }
-        if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value?.results?.length) {
+        if (testimonialsRes.status === 'fulfilled' && testimonialsRes.value?.results) {
           const adapted = testimonialsRes.value.results.map(t => ({
             id: t.id, name: t.student_name || '', role: '', company: '',
             text: t.message || '', rating: t.rating || 5,
-            avatar: t.student_image || '',
+            avatar: getMediaUrl(t.student_image) || '',
             is_active: t.is_active !== false,
           }));
-          setTestimonials(prev => adapted.length ? adapted : prev);
+          setTestimonials(adapted);
         }
-        if (postsRes.status === 'fulfilled' && postsRes.value?.results?.length) {
+        if (postsRes.status === 'fulfilled' && postsRes.value?.results) {
           const adapted = postsRes.value.results.map(p => ({
             id: p.id, title: p.title || '', author: p.author?.full_name || p.author || 'Admin',
             date: p.created_at?.split('T')[0] || p.date || '', status: p.status === 'published' ? 'Published' : 'Draft',
-            image: p.image || '', excerpt: p.excerpt || p.content?.substring(0, 150) || '',
+            image: getMediaUrl(p.image) || '', excerpt: p.excerpt || p.content?.substring(0, 150) || '',
+            content: p.content || p.excerpt || '',
           }));
-          setPosts(prev => adapted.length ? adapted : prev);
+          setPosts(adapted);
         }
-        if (announcementsRes.status === 'fulfilled' && announcementsRes.value?.results?.length) {
+        if (announcementsRes.status === 'fulfilled' && announcementsRes.value?.results) {
           const adapted = announcementsRes.value.results.map(a => ({
             id: a.id, title: a.title || '', body: a.content || '',
             date: a.date || a.created_at?.split('T')[0] || '', is_published: a.is_published !== false,
           }));
-          setAnnouncements(prev => adapted.length ? adapted : prev);
+          setAnnouncements(adapted);
         }
-        if (faqsRes.status === 'fulfilled' && faqsRes.value?.results?.length) {
+        if (faqsRes.status === 'fulfilled' && faqsRes.value?.results) {
           const adapted = faqsRes.value.results.map(f => ({
             id: f.id, question: f.question || '', answer: f.answer || '',
-            order: f.order || 0, is_active: f.is_active !== false,
+            category: 'General', order: f.order || 0, is_active: f.is_active !== false,
           }));
-          setFaqs(prev => adapted.length ? adapted : prev);
-        }
-        if (statsRes.status === 'fulfilled' && statsRes.value) {
-          const s = statsRes.value;
-          if (s.total_registrations !== undefined || s.total_users !== undefined) return;
+          setFaqs(adapted);
         }
         if (categoriesRes.status === 'fulfilled' && categoriesRes.value?.results) {
           setCategories(categoriesRes.value.results);
         }
-      } catch (e) {
-        // API unavailable — keep localStorage data
+        if (statsRes.status === 'fulfilled' && statsRes.value) {
+          const s = statsRes.value;
+          setDashboardStats({
+            totalStudents: s.total_students || 0,
+            activeCourses: s.active_courses || 0,
+            totalEnrollments: s.total_enrollments || 0,
+            sysTotalCourses: s.total_courses || 0,
+            pendingPayments: s.payments?.pending || 0,
+            approvedPayments: s.payments?.approved || 0,
+            rejectedPayments: s.payments?.rejected || 0,
+          });
+          if (s.recent_enrollments?.length) {
+            const mapped = s.recent_enrollments.map(e => ({
+              id: e.id,
+              name: e.student_full_name || e.student_username || 'Student',
+              email: '',
+              phone: '',
+              course: e.course_title || '',
+              status: e.status === 'active' ? 'Approved' : e.status === 'pending' ? 'Pending' : e.status === 'completed' ? 'Completed' : e.status === 'cancelled' ? 'Cancelled' : e.status || 'Pending',
+              date: e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString() : '',
+              payment: '—',
+            }));
+            setRegistrations(mapped);
+          } else {
+            setRegistrations([]);
+          }
+        }
+        if (heroRes.status === 'fulfilled' && heroRes.value) {
+          const hero = heroRes.value;
+          const [title, ...rest] = (hero.title || '').split(' ');
+          setHeroSlides(hero.title || hero.subtitle || hero.background_image ? [{
+            id: 'hero',
+            image: getMediaUrl(hero.background_image) || '',
+            title: title || '',
+            highlight: rest.join(' '),
+            subtitle: hero.subtitle || '',
+            cta: hero.cta_text || 'Enroll Now',
+            ctaLink: hero.cta_link || '/register',
+            color: '#EE8433',
+            active: true,
+          }] : []);
+        }
+      } catch {
+        // API unavailable
       }
-      setApiSynced(true);
     };
     syncFromAPI();
-    // Fetch payments
+    // Fetch payments (merges enrollment + payment context)
     const fetchPayments = async () => {
       setPaymentLoading(true);
       try {
         const res = await paymentsAPI.adminList({ page_size: 200 });
-        setPaymentList(Array.isArray(res) ? res : res.results || []);
-      } catch (e) {
+        const list = Array.isArray(res) ? res : res.results || [];
+        setPaymentList(list);
+        // Enrich registrations with payment status
+        if (list.length) {
+          setRegistrations(prev => prev.map(r => {
+            const match = list.find(p =>
+              p.course_title === r.course &&
+              (p.full_name?.toLowerCase().includes(r.name?.toLowerCase().split(' ')[0] || '') ||
+               r.name?.toLowerCase().includes((p.full_name || '').toLowerCase().split(' ')[0] || ''))
+            );
+            return { ...r, phone: r.phone || match?.phone || '', email: r.email || match?.email || '', payment: match ? (match.status === 'approved' ? 'Paid' : match.status === 'pending' ? 'Pending' : 'Rejected') : '—' };
+          }));
+        }
+      } catch {
         // keep empty
       }
       setPaymentLoading(false);
@@ -235,33 +281,25 @@ export default function AdminDashboard() {
     fetchPayments();
   }, []);
 
-  const [apiSynced, setApiSynced] = useState(false);
-  const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
-  const [newCourse, setNewCourse] = useState({ title: '', category: '', desc: '', price: '', status: 'Active' });
-  const [paymentList, setPaymentList] = useState([]);
-  const [paymentLoading, setPaymentLoading] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState(null);
-  const [lightboxImage, setLightboxImage] = useState(null);
+  const stats = {
+    total: dashboardStats?.totalEnrollments || registrations.length,
+    pending: registrations.filter(r => r.status === 'Pending').length,
+    approved: registrations.filter(r => r.status === 'Approved' || r.status === 'Paid').length,
+    rejected: registrations.filter(r => r.status === 'Rejected').length,
+    activeUsers: dashboardStats?.totalStudents || users.filter(u => u.status === 'Active').length,
+    totalCourses: courses.length || dashboardStats?.sysTotalCourses || 0,
+    totalPosts: posts.length,
+    pendingPayments: dashboardStats?.pendingPayments || paymentList.filter(p => (p.status || '').toLowerCase() === 'pending').length,
+  };
 
- const stats = {
- total: registrations.length,
- pending: registrations.filter(r => r.status === 'Pending').length,
- approved: registrations.filter(r => r.status === 'Approved').length,
- rejected: registrations.filter(r => r.status === 'Rejected').length,
- activeUsers: users.filter(u => u.status === 'Active').length,
- totalCourses: courses.length,
- totalPosts: posts.length,
- totalPhotos: photos.length,
- };
-
- const statCards = [
- { label: 'Total Registrations', value: stats.total, icon: <UserPlus size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
- { label: 'Pending Review', value: stats.pending, icon: <Clock size={24} />, color: 'from-[#3A3992] to-[#3A3992]' },
- { label: 'Approved', value: stats.approved, icon: <CheckCircle size={24} />, color: 'from-green-500 to-green-600' },
- { label: 'Active Users', value: stats.activeUsers, icon: <Users size={24} />, color: 'from-[#7A3FB5] to-[#7A3FB5]' },
- { label: 'Courses', value: stats.totalCourses, icon: <BookOpen size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
- { label: 'Published Posts', value: stats.totalPosts, icon: <Newspaper size={24} />, color: 'from-pink-500 to-pink-600' },
- ];
+  const statCards = [
+    { label: 'Total Enrollments', value: stats.total, icon: <UserPlus size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
+    { label: 'Pending Review', value: stats.pending, icon: <Clock size={24} />, color: 'from-[#3A3992] to-[#3A3992]' },
+    { label: 'Approved', value: stats.approved, icon: <CheckCircle size={24} />, color: 'from-green-500 to-green-600' },
+    { label: 'Active Students', value: stats.activeUsers, icon: <Users size={24} />, color: 'from-[#7A3FB5] to-[#7A3FB5]' },
+    { label: 'Courses', value: stats.totalCourses, icon: <BookOpen size={24} />, color: 'from-[#EE8433] to-[#EE8433]' },
+    { label: 'Pending Payments', value: stats.pendingPayments, icon: <CreditCard size={24} />, color: 'from-amber-500 to-amber-600' },
+  ];
 
  const handleSidebarClick = (id) => {
  if (id === 'media') { setMediaOpen(!mediaOpen); if (!mediaOpen) setActiveTab('posts'); }
@@ -279,7 +317,7 @@ export default function AdminDashboard() {
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
  {statCards.map((card, i) => (
- <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 p-4 group hover:border-gray-300 transition-all cursor-pointer" onClick={() => { const map = { 'Total Registrations': 'registrations', 'Pending Review': 'registrations', 'Approved': 'registrations', 'Active Users': 'users', 'Courses': 'courses', 'Published Posts': 'posts' }; setActiveTab(map[card.label]); }}>
+ <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 p-4 group hover:border-gray-300 transition-all cursor-pointer"             onClick={() => { const map = { 'Total Enrollments': 'registrations', 'Pending Review': 'registrations', 'Approved': 'registrations', 'Active Students': 'users', 'Courses': 'courses', 'Pending Payments': 'payments' }; setActiveTab(map[card.label]); }}>
  <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br ${card.color}`} />
  <div className="flex items-center justify-between mb-3">
  <div className="p-2.5 rounded-xl bg-gray-200 text-gray-600 ">{card.icon}</div>
@@ -351,7 +389,7 @@ export default function AdminDashboard() {
  <table className="w-full text-sm">
  <thead>
  <tr className="border-b border-gray-200 bg-gray-50 ">
- {['Full Name', 'Email', 'Phone', 'Course', 'Status', 'Actions'].map(h => <th key={h} className={`text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-wider ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>)}
+          {['Full Name', 'Email', 'Phone', 'Course', 'Payment', 'Status', 'Actions'].map(h => <th key={h} className={`text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-wider ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>)}
  </tr>
  </thead>
  <tbody>
@@ -364,8 +402,9 @@ export default function AdminDashboard() {
  <td className="p-3"><span className="font-semibold text-gray-900 text-sm">{r.name}</span></td>
  <td className="p-3 text-gray-500 text-xs">{r.email}</td>
  <td className="p-3 text-gray-500 text-xs">{r.phone}</td>
- <td className="p-3 text-gray-500 text-xs">{r.course}</td>
- <td className="p-3"><StatusBadge status={r.status} /></td>
+          <td className="p-3 text-gray-500 text-xs">{r.course}</td>
+          <td className="p-3"><span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider inline-block ${r.payment === 'Paid' ? 'bg-green-100 text-green-700' : r.payment === 'Pending' ? 'bg-amber-100 text-amber-700' : r.payment === 'Rejected' ? 'bg-[#FDE0DC] text-red-700' : 'bg-gray-100 text-gray-400'}`}>{r.payment}</span></td>
+          <td className="p-3"><StatusBadge status={r.status} /></td>
  <td className="p-3">
  <div className="flex items-center justify-end gap-2">
  <button onClick={() => { const updated = registrations.map(x => x.id === r.id ? { ...x, status: 'Approved' } : x); setRegistrations(updated); showToast(`${r.name} approved`); }} disabled={r.status === 'Approved'} className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all" title="Approve"><CheckCircle size={16} /></button>
@@ -393,7 +432,7 @@ export default function AdminDashboard() {
   const res = await paymentsAPI.adminList({ page_size: 200 });
   setPaymentList(Array.isArray(res) ? res : res.results || []);
   showToast('Payments refreshed');
-  } catch (e) { showToast('Failed to refresh', 'error'); }
+  } catch { showToast('Failed to refresh', 'error'); }
   setPaymentLoading(false);
   }}
   onApprove={async (id) => {
@@ -401,14 +440,14 @@ export default function AdminDashboard() {
   await paymentsAPI.adminApprove(id);
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'approved' } : p));
   showToast('Payment approved');
-  } catch (e) { showToast('Approve failed', 'error'); }
+  } catch { showToast('Approve failed', 'error'); }
   }}
   onReject={async (id) => {
   try {
   await paymentsAPI.adminReject(id);
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'rejected' } : p));
   showToast('Payment rejected');
-  } catch (e) { showToast('Reject failed', 'error'); }
+  } catch { showToast('Reject failed', 'error'); }
   }}
   onViewDetail={(payment) => setSelectedPayment(payment)}
   />
@@ -437,7 +476,7 @@ export default function AdminDashboard() {
  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Courses</h2>
  <p className="text-gray-500 text-sm font-medium">{courses.length} courses available</p>
  </div>
- <button onClick={() => { setNewCourse({ title: '', category: '', desc: '', price: '', status: 'Active' }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
+  <button onClick={() => { setEditItem(null); setNewCourse({ title: '', category_id: '', desc: '', description: '', price: '', course_url: '', status: 'Active', is_published: true }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {courses.map((course, i) => (
@@ -455,7 +494,7 @@ export default function AdminDashboard() {
  <span className="font-bold text-[#5A2DA8]">{course.price}</span>
  </div>
  <div className="flex gap-2">
- <button className="flex-1 py-3 border border-[#5A2DA8]/30 text-[#5A2DA8] font-bold text-xs rounded-xl hover:bg-[#5A2DA8] hover:text-white transition-all">Apply</button>
+ <a href={course.course_url || `/register?courseId=${course.id}`} target={course.course_url ? '_blank' : undefined} rel={course.course_url ? 'noreferrer' : undefined} className="flex-1 py-3 border border-[#5A2DA8]/30 text-[#5A2DA8] font-bold text-xs rounded-xl hover:bg-[#5A2DA8] hover:text-white transition-all text-center">Open</a>
  <button onClick={() => { setEditItem(course); setShowModal('course'); }} className="p-3 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-200 transition-all"><Edit3 size={14} /></button>
  <button onClick={() => { setSelectedItem({ type: 'course', id: course.id }); setShowModal('delete'); }} className="p-3 rounded-xl border border-gray-200 text-[#D95C4A]/60 hover:bg-[#FEF0EE] transition-all"><Trash2 size={14} /></button>
  </div>
@@ -489,7 +528,7 @@ export default function AdminDashboard() {
  <div className="flex items-center gap-2">
  <button onClick={() => { setEditItem(post); setShowModal('post'); }} className="p-2 rounded-lg bg-[#E0E0F0] #5A2DA8]/10 text-[#5A2DA8] hover:bg-[#C1C1E0] #5A2DA8]/20 transition-all"><Edit3 size={14} /></button>
  <button onClick={() => { setSelectedItem({ type: 'post', id: post.id }); setShowModal('delete'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
- <button onClick={() => { setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: p.status === 'Published' ? 'Draft' : 'Published' } : p)); showToast(`${post.title} ${post.status === 'Published' ? 'unpublished' : 'published'}`); }} className="ml-auto p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all" title="Toggle Status">{post.status === 'Published' ? <XCircle size={14} /> : <CheckCircle size={14} />}</button>
+ <button onClick={async () => { try { const nextStatus = post.status === 'Published' ? 'draft' : 'published'; await newsAPI.adminUpdate(post.id, { status: nextStatus }); setPosts(prev => prev.map(p => p.id === post.id ? { ...p, status: nextStatus === 'published' ? 'Published' : 'Draft' } : p)); showToast(`${post.title} ${nextStatus === 'draft' ? 'unpublished' : 'published'}`); } catch { showToast('Failed to update post', 'error'); } }} className="ml-auto p-2 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 transition-all" title="Toggle Status">{post.status === 'Published' ? <XCircle size={14} /> : <CheckCircle size={14} />}</button>
  </div>
  </div>
  </motion.div>
@@ -605,7 +644,7 @@ export default function AdminDashboard() {
  <Input placeholder="Announcement Title" value={newAnnouncement.title} onChange={e => setNewAnnouncement(p => ({ ...p, title: e.target.value }))} />
  <TextArea placeholder="Write your announcement..." rows={4} value={newAnnouncement.body} onChange={e => setNewAnnouncement(p => ({ ...p, body: e.target.value }))} />
  <div className="flex justify-end">
-  <button onClick={async () => { if (!newAnnouncement.title || !newAnnouncement.body) return; try { const created = await announcementsAPI.adminCreate({ title: newAnnouncement.title, content: newAnnouncement.body, is_published: true }); setAnnouncements(prev => [...prev, { ...created, id: created.id, title: created.title, body: created.content || created.body, date: new Date().toISOString().split('T')[0] }]); setNewAnnouncement({ title: '', body: '' }); showToast('Announcement published to backend'); } catch (e) { showToast('Failed to publish', 'error'); } }} className="px-6 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-2"><Sparkles size={14} /> Publish</button>
+  <button onClick={async () => { if (!newAnnouncement.title || !newAnnouncement.body) return; try { const created = await announcementsAPI.adminCreate({ title: newAnnouncement.title, content: newAnnouncement.body, is_published: true }); setAnnouncements(prev => [...prev, { ...created, id: created.id, title: created.title, body: created.content || created.body, date: new Date().toISOString().split('T')[0] }]); setNewAnnouncement({ title: '', body: '' }); showToast('Announcement published to backend'); } catch { showToast('Failed to publish', 'error'); } }} className="px-6 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider flex items-center gap-2"><Sparkles size={14} /> Publish</button>
  </div>
  </div>
  <div className="space-y-4">
@@ -626,7 +665,7 @@ export default function AdminDashboard() {
  <p className="text-sm text-gray-600 ">{a.body}</p>
  <p className="text-[10px] text-gray-400 mt-2">{a.date}</p>
  </div>
- <button onClick={() => { setAnnouncements(prev => prev.filter(x => x.id !== a.id)); showToast('Announcement deleted'); }} className="p-2 rounded-lg hover:bg-[#FDE0DC] text-gray-400 hover:text-[#D95C4A] transition-all"><Trash2 size={16} /></button>
+ <button onClick={async () => { try { await announcementsAPI.adminDelete(a.id); setAnnouncements(prev => prev.filter(x => x.id !== a.id)); showToast('Announcement deleted'); } catch { showToast('Failed to delete announcement', 'error'); } }} className="p-2 rounded-lg hover:bg-[#FDE0DC] text-gray-400 hover:text-[#D95C4A] transition-all"><Trash2 size={16} /></button>
  </div>
  </motion.div>
  ))}
@@ -634,7 +673,42 @@ export default function AdminDashboard() {
  </div>
  );
 
- case 'faqs':
+  case 'categories':
+  return (
+  <div className="space-y-4">
+  <div className="flex items-center justify-between">
+  <div>
+  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Categories</h2>
+  <p className="text-gray-500 text-sm font-medium">{categories.length} categories</p>
+  </div>
+  <button onClick={() => { setEditItem({ name: '' }); setShowModal('category'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Category</button>
+  </div>
+  <div className="space-y-3">
+  {categories.length === 0 ? (
+  <div className="rounded-2xl border border-gray-200 bg-gray-100 p-12 text-center">
+  <BookOpen size={40} className="mx-auto text-gray-300 mb-4" />
+  <h3 className="text-lg font-bold text-gray-500 mb-1">No categories yet</h3>
+  <p className="text-gray-400 text-sm">Create categories to organize your courses</p>
+  </div>
+  ) : categories.map((cat, i) => (
+  <motion.div key={cat.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="rounded-2xl border border-gray-200 bg-gray-100 p-5 hover:border-[#5A2DA8]/30 transition-all">
+  <div className="flex items-start justify-between gap-4">
+  <div className="flex-1">
+  <h3 className="font-bold text-gray-900 mb-1">{cat.name}</h3>
+  <p className="text-xs text-gray-400">Slug: {cat.slug} · Created: {cat.created_at?.split('T')[0] || cat.created_at}</p>
+  </div>
+  <div className="flex items-center gap-2 shrink-0">
+  <button onClick={() => { setEditItem(cat); setShowModal('category'); }} className="p-2 rounded-lg bg-[#E0E0F0] text-[#5A2DA8] hover:bg-[#C1C1E0] transition-all"><Edit3 size={14} /></button>
+  <button onClick={async () => { if (cat.id && typeof cat.id === 'number') try { await categoriesAPI.adminDelete(cat.id); } catch { showToast('Failed to delete category', 'error'); return; } setCategories(prev => prev.filter(c => c.id !== cat.id)); showToast('Category deleted'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
+  </div>
+  </div>
+  </motion.div>
+  ))}
+  </div>
+  </div>
+  );
+ 
+  case 'faqs':
  return (
  <div className="space-y-4">
  <div className="flex items-center justify-between">
@@ -663,7 +737,7 @@ export default function AdminDashboard() {
  </div>
  <div className="flex items-center gap-2 shrink-0">
  <button onClick={() => { setEditItem(faq); setShowModal('faq'); }} className="p-2 rounded-lg bg-[#E0E0F0] #5A2DA8]/10 text-[#5A2DA8] hover:bg-[#C1C1E0] #5A2DA8]/20 transition-all"><Edit3 size={14} /></button>
- <button onClick={() => { setFaqs(prev => prev.filter(f => f.id !== faq.id)); showToast('FAQ deleted'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
+ <button onClick={() => { setSelectedItem({ type: 'faq', id: faq.id }); setShowModal('delete'); }} className="p-2 rounded-lg bg-[#FDE0DC] text-[#D95C4A] hover:bg-red-200 transition-all"><Trash2 size={14} /></button>
  </div>
  </div>
  </motion.div>
@@ -734,11 +808,13 @@ export default function AdminDashboard() {
       if (type === 'course' && typeof id === 'number') await coursesAPI.adminDelete(id);
       if (type === 'post' && typeof id === 'number') await newsAPI.adminDelete(id);
       if (type === 'testimonial' && typeof id === 'number') await testimonialsAPI.adminDelete(id);
-    } catch (e) { /* local-only items won't have API endpoints */ }
+      if (type === 'faq' && typeof id === 'number') await faqsAPI.adminDelete(id);
+    } catch { /* local-only items won't have API endpoints */ }
     if (type === 'user') setUsers(prev => prev.filter(u => u.id !== id));
     if (type === 'course') setCourses(prev => prev.filter(c => c.id !== id));
     if (type === 'post') setPosts(prev => prev.filter(p => p.id !== id));
     if (type === 'testimonial') setTestimonials(prev => prev.filter(t => t.id !== id));
+    if (type === 'faq') setFaqs(prev => prev.filter(f => f.id !== id));
     if (type === 'gallery') setGalleryAlbums(prev => prev.filter(a => a.id !== id));
     if (type === 'hero') setHeroSlides(prev => prev.filter(s => s.id !== id));
     showToast('Item deleted');
@@ -751,30 +827,78 @@ export default function AdminDashboard() {
  <div className="space-y-4">
  <div className="grid grid-cols-2 gap-4">
  <Input label="Title" value={editItem?.title || newCourse.title} onChange={e => editItem ? setEditItem(p => ({ ...p, title: e.target.value })) : setNewCourse(p => ({ ...p, title: e.target.value }))} placeholder="Course title" />
-  <Input label="Category" value={editItem?.category || newCourse.category} onChange={e => editItem ? setEditItem(p => ({ ...p, category: e.target.value })) : setNewCourse(p => ({ ...p, category: e.target.value }))} placeholder="Development" />
+  <div className="space-y-1.5">
+  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
+  <select
+    value={editItem?.category_id || newCourse.category_id || ''}
+    onChange={e => {
+      const categoryId = e.target.value ? Number(e.target.value) : '';
+      if (editItem) setEditItem(p => ({ ...p, category_id: categoryId }));
+      else setNewCourse(p => ({ ...p, category_id: categoryId }));
+    }}
+    className="w-full px-4 py-3 bg-brand-bg border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 transition-all"
+  >
+    <option value="">No category</option>
+    {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+  </select>
+  </div>
  </div>
  <Input label="Price" value={editItem?.price || newCourse.price} onChange={e => editItem ? setEditItem(p => ({ ...p, price: e.target.value })) : setNewCourse(p => ({ ...p, price: e.target.value }))} placeholder="500 ETB" />
+ <Input label="Course URL" type="url" value={editItem?.course_url || newCourse.course_url} onChange={e => editItem ? setEditItem(p => ({ ...p, course_url: e.target.value })) : setNewCourse(p => ({ ...p, course_url: e.target.value }))} placeholder="https://example.com/course" />
  <Select label="Status" value={editItem?.status || newCourse.status} onChange={e => editItem ? setEditItem(p => ({ ...p, status: e.target.value })) : setNewCourse(p => ({ ...p, status: e.target.value }))} options={['Active', 'Inactive']} />
- <TextArea label="Description" rows={3} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Course description..." />
- <div className="flex justify-end gap-3 pt-2">
- <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
-  <button onClick={async () => {
+  <TextArea label="Short Description" rows={2} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Brief summary..." />
+  <TextArea label="Full Description" rows={4} value={editItem?.description || newCourse.description} onChange={e => editItem ? setEditItem(p => ({ ...p, description: e.target.value })) : setNewCourse(p => ({ ...p, description: e.target.value }))} placeholder="Detailed course content..." />
+  <label className="flex items-center gap-3 text-sm font-bold text-gray-600">
+  <input type="checkbox" checked={editItem?.is_published ?? newCourse.is_published} onChange={e => editItem ? setEditItem(p => ({ ...p, is_published: e.target.checked })) : setNewCourse(p => ({ ...p, is_published: e.target.checked }))} className="w-5 h-5 rounded border-gray-300 text-[#3A3992] focus:ring-[#3A3992]" />
+  Published (visible on public site)
+  </label>
+  <div className="flex justify-end gap-3 pt-2">
+  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
+   <button onClick={async () => {
   try {
+    const parsePrice = (v) => String(v).replace(/[^0-9.]/g, '');
     const payload = (item) => {
-      const p = { title: item.title, short_description: item.desc, price: item.price };
+      const p = { title: item.title, short_description: item.desc, description: item.description || item.desc, price: parsePrice(item.price), course_url: item.course_url || '', is_published: item.is_published ?? true, is_active: item.status === 'Active' };
       if (item.category_id) p.category_id = item.category_id;
       return p;
     };
     if (editItem?.id && typeof editItem.id === 'number') {
       const upd = await coursesAPI.adminUpdate(editItem.id, payload(editItem));
-      setCourses(prev => prev.map(c => c.id === editItem.id ? { ...c, ...upd, status: upd.is_active ? 'Active' : 'Inactive' } : c));
+      setCourses(prev => prev.map(c => c.id === editItem.id ? {
+        ...c,
+        id: upd.id,
+        title: upd.title || '',
+        category: upd.category?.name || '',
+        category_id: upd.category?.id || '',
+        students: c.students || 0,
+        lessons: upd.lessons || 0,
+        status: upd.is_active ? 'Active' : 'Inactive',
+        price: upd.price || '',
+        desc: upd.short_description || '',
+        description: upd.description || '',
+        course_url: upd.course_url || '',
+        is_published: upd.is_published ?? false,
+      } : c));
       showToast('Course saved to backend');
     } else {
       const created = await coursesAPI.adminCreate(payload(editItem || newCourse));
-      setCourses(prev => [...prev, { ...created, id: created.id, status: 'Active', students: 0, lessons: created.lessons || 0 }]);
+      setCourses(prev => [...prev, {
+        id: created.id,
+        title: created.title || '',
+        category: created.category?.name || '',
+        category_id: created.category?.id || '',
+        students: 0,
+        lessons: created.lessons || 0,
+        status: created.is_active ? 'Active' : 'Inactive',
+        price: created.price || '',
+        desc: created.short_description || '',
+        description: created.description || '',
+        course_url: created.course_url || '',
+        is_published: created.is_published ?? false,
+      }]);
       showToast('Course created on backend');
     }
-  } catch (e) { showToast('Failed to save course', 'error'); }
+  } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save course'; showToast(msg, 'error'); }
   setShowModal(null); setEditItem(null);
   }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -791,9 +915,33 @@ export default function AdminDashboard() {
  <Select label="Status" value={editItem?.status || 'Draft'} onChange={e => setEditItem(p => ({ ...p, status: e.target.value }))} options={['Draft', 'Published']} />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setPosts(prev => prev.map(p => p.id === editItem.id ? { ...p, ...editItem } : p)); showToast('Post updated'); }
- else { setPosts(prev => [...prev, { id: genId(), ...editItem, author: 'Admin', date: new Date().toISOString().split('T')[0] }]); showToast('Post created'); }
+ <button onClick={async () => {
+ try {
+ const payload = {
+ title: editItem.title,
+ excerpt: editItem.excerpt || '',
+ content: editItem.content || editItem.excerpt || '',
+ status: editItem.status === 'Published' ? 'published' : 'draft',
+ };
+ if (editItem?.id && typeof editItem.id === 'number') {
+ const saved = await newsAPI.adminUpdate(editItem.id, payload);
+ setPosts(prev => prev.map(p => p.id === editItem.id ? { ...p, ...editItem, status: saved.status === 'published' ? 'Published' : 'Draft' } : p));
+ showToast('Post saved to backend');
+ } else {
+ const created = await newsAPI.adminCreate(payload);
+ setPosts(prev => [...prev, {
+ id: created.id,
+ title: created.title,
+ excerpt: created.excerpt,
+ content: created.content,
+ image: getMediaUrl(created.image) || '',
+ author: created.author?.full_name || 'Admin',
+ status: created.status === 'published' ? 'Published' : 'Draft',
+ date: created.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+ }]);
+ showToast('Post created on backend');
+ }
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save post'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#5A2DA8] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -825,9 +973,40 @@ export default function AdminDashboard() {
  <TextArea label="Testimonial" rows={3} value={editItem?.text || ''} onChange={e => setEditItem(p => ({ ...p, text: e.target.value }))} placeholder="Write testimonial..." />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setTestimonials(prev => prev.map(t => t.id === editItem.id ? { ...t, ...editItem } : t)); showToast('Testimonial updated'); }
- else { setTestimonials(prev => [...prev, { id: genId(), ...editItem, avatar: editItem.avatar || `https://i.pravatar.cc/100?img=${prev.length + 1}` }]); showToast('Testimonial added'); }
+ <button onClick={async () => {
+ try {
+ const payload = {
+ student_name: editItem.name,
+ message: editItem.text,
+ rating: editItem.rating || 5,
+ is_active: editItem.is_active !== false,
+ };
+ if (editItem?.id && typeof editItem.id === 'number') {
+ const saved = await testimonialsAPI.adminUpdate(editItem.id, payload);
+ setTestimonials(prev => prev.map(t => t.id === editItem.id ? {
+ ...t,
+ name: saved.student_name,
+ text: saved.message,
+ rating: saved.rating,
+ avatar: getMediaUrl(saved.student_image) || t.avatar,
+ is_active: saved.is_active !== false,
+ } : t));
+ showToast('Testimonial saved to backend');
+ } else {
+ const created = await testimonialsAPI.adminCreate(payload);
+ setTestimonials(prev => [...prev, {
+ id: created.id,
+ name: created.student_name,
+ role: '',
+ company: '',
+ text: created.message,
+ rating: created.rating,
+ avatar: getMediaUrl(created.student_image) || '',
+ is_active: created.is_active !== false,
+ }]);
+ showToast('Testimonial created on backend');
+ }
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save testimonial'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -872,9 +1051,6 @@ export default function AdminDashboard() {
   showToast('User updated');
   setShowModal(null); setEditItem(null);
   } else {
-  const newUser = { id: genId(), ...editItem, joined: new Date().toISOString().split('T')[0], courses: 0, status: 'Active' };
-  setUsers(prev => [...prev, newUser]);
-  showToast('User added locally');
   try {
   const payload = {
     username: editItem.email?.split('@')[0] || editItem.name?.toLowerCase().replace(/\s/g, ''),
@@ -885,14 +1061,21 @@ export default function AdminDashboard() {
     role: editItem.role?.toLowerCase() || 'student',
   };
   const res = await authAPI.register(payload);
-  if (res?.user?.role === editItem.role?.toLowerCase()) {
-    showToast(`User registered as ${editItem.role}`);
-  } else {
-    showToast(`User created but role set to "${res?.user?.role || 'student'}" — set via admin panel`, 'error');
-  }
+  const created = res?.user || {};
+  setUsers(prev => [...prev, {
+    id: created.id || genId(),
+    name: created.full_name || editItem.name,
+    email: created.email || editItem.email,
+    phone: created.phone_number || editItem.phone,
+    role: (created.role || editItem.role || 'student').replace(/^./, c => c.toUpperCase()),
+    joined: new Date().toISOString().split('T')[0],
+    courses: 0,
+    status: 'Active',
+  }]);
+  showToast(`User registered as ${created.role || editItem.role}`);
   } catch (e) {
   const msg = e?.response?.data?.detail || e?.response?.data?.email?.[0] || e?.response?.data?.username?.[0] || e?.message || 'API unavailable';
-  showToast(`User saved locally (${msg})`, 'error');
+  showToast(`Failed to create user (${msg})`, 'error');
   }
   setShowModal(null); setEditItem(null);
   }
@@ -910,9 +1093,24 @@ export default function AdminDashboard() {
  <TextArea label="Answer" rows={4} value={editItem?.answer || ''} onChange={e => setEditItem(p => ({ ...p, answer: e.target.value }))} placeholder="Write the answer..." />
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setFaqs(prev => prev.map(f => f.id === editItem.id ? { ...f, ...editItem } : f)); showToast('FAQ updated'); }
- else { setFaqs(prev => [...prev, { id: genId(), ...editItem }]); showToast('FAQ added'); }
+ <button onClick={async () => {
+ try {
+ const payload = {
+ question: editItem.question,
+ answer: editItem.answer,
+ order: editItem.order || 0,
+ is_active: editItem.is_active !== false,
+ };
+ if (editItem?.id && typeof editItem.id === 'number') {
+ const saved = await faqsAPI.adminUpdate(editItem.id, payload);
+ setFaqs(prev => prev.map(f => f.id === editItem.id ? { ...f, ...editItem, ...saved, category: editItem.category || 'General' } : f));
+ showToast('FAQ saved to backend');
+ } else {
+ const created = await faqsAPI.adminCreate(payload);
+ setFaqs(prev => [...prev, { ...created, category: editItem.category || 'General' }]);
+ showToast('FAQ created on backend');
+ }
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save FAQ'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -935,9 +1133,28 @@ export default function AdminDashboard() {
  </div>
  <div className="flex justify-end gap-3 pt-2">
  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
- <button onClick={() => {
- if (editItem?.id) { setHeroSlides(prev => prev.map(s => s.id === editItem.id ? { ...s, ...editItem } : s)); showToast('Hero slide updated'); }
- else { setHeroSlides(prev => [...prev, { id: genId(), ...editItem, active: true }]); showToast('Hero slide added'); }
+ <button onClick={async () => {
+ try {
+ const saved = await cmsAPI.updateHero({
+ title: [editItem.title, editItem.highlight].filter(Boolean).join(' '),
+ subtitle: editItem.subtitle || '',
+ cta_text: editItem.cta || 'Enroll Now',
+ cta_link: editItem.ctaLink || '/register',
+ });
+ const [title, ...rest] = (saved.title || '').split(' ');
+ setHeroSlides([{
+ id: 'hero',
+ image: getMediaUrl(saved.background_image) || editItem.image || '',
+ title: title || '',
+ highlight: rest.join(' '),
+ subtitle: saved.subtitle || '',
+ cta: saved.cta_text || 'Enroll Now',
+ ctaLink: saved.cta_link || '/register',
+ color: '#EE8433',
+ active: true,
+ }]);
+ showToast('Hero saved to backend');
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save hero'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-gradient-to-r from-[#3A3992] to-[#EE8433] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -945,7 +1162,32 @@ export default function AdminDashboard() {
  </Modal>
  )}
 
- {selectedItem?.type === 'registration' && (
+  {showModal === 'category' && (
+  <Modal title={editItem?.id ? 'Edit Category' : 'New Category'} onClose={() => setShowModal(null)}>
+  <div className="space-y-4">
+  <Input label="Category Name" value={editItem?.name || ''} onChange={e => setEditItem(p => ({ ...p, name: e.target.value }))} placeholder="e.g. Development, Design, AI" />
+  <div className="flex justify-end gap-3 pt-2">
+  <button onClick={() => setShowModal(null)} className="px-6 py-3 border border-gray-200 rounded-xl text-gray-500 font-bold text-xs hover:bg-gray-50 transition-all">Cancel</button>
+  <button onClick={async () => {
+  try {
+    if (editItem?.id && typeof editItem.id === 'number') {
+      await categoriesAPI.adminUpdate(editItem.id, { name: editItem.name });
+      setCategories(prev => prev.map(c => c.id === editItem.id ? { ...c, name: editItem.name } : c));
+      showToast('Category updated');
+    } else {
+      const created = await categoriesAPI.adminCreate({ name: editItem.name });
+      setCategories(prev => [...prev, created]);
+      showToast('Category created');
+    }
+  } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save category'; showToast(msg, 'error'); }
+  setShowModal(null); setEditItem(null);
+  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
+  </div>
+  </div>
+  </Modal>
+  )}
+
+  {selectedItem?.type === 'registration' && (
  <Modal title="Registration Details" onClose={() => setSelectedItem(null)}>
  <div className="space-y-6">
  <div className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 ">
@@ -956,13 +1198,14 @@ export default function AdminDashboard() {
  </div>
  <div className="ml-auto"><StatusBadge status={selectedItem.data.status} /></div>
  </div>
- <div className="grid grid-cols-2 gap-4 text-sm">
- {[
- { icon: <Phone size={16} />, label: 'Phone', value: selectedItem.data.phone },
- { icon: <Mail size={16} />, label: 'Email', value: selectedItem.data.email },
- { icon: <BookOpen size={16} />, label: 'Course', value: selectedItem.data.course },
- { icon: <Calendar size={16} />, label: 'Registered', value: selectedItem.data.date },
- ].map((item, i) => (
+  <div className="grid grid-cols-2 gap-4 text-sm">
+              {[
+              { icon: <Phone size={16} />, label: 'Phone', value: selectedItem.data.phone },
+              { icon: <Mail size={16} />, label: 'Email', value: selectedItem.data.email },
+              { icon: <BookOpen size={16} />, label: 'Course', value: selectedItem.data.course },
+              { icon: <CreditCard size={16} />, label: 'Payment', value: selectedItem.data.payment },
+              { icon: <Calendar size={16} />, label: 'Enrolled', value: selectedItem.data.date },
+              ].map((item, i) => (
  <div key={i} className="p-3 rounded-xl bg-gray-50 border border-gray-200 ">
  <div className="flex items-center gap-2 text-gray-400 text-[10px] uppercase tracking-wider font-bold mb-1">{item.icon} {item.label}</div>
  <p className="text-gray-900 font-semibold">{item.value}</p>
@@ -1048,7 +1291,7 @@ export default function AdminDashboard() {
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'approved' } : p));
   setSelectedPayment(null);
   showToast('Payment approved');
-  } catch (e) { showToast('Approve failed', 'error'); }
+  } catch { showToast('Approve failed', 'error'); }
   }}
   onReject={async (id) => {
   try {
@@ -1056,7 +1299,7 @@ export default function AdminDashboard() {
   setPaymentList(prev => prev.map(p => p.id === id ? { ...p, status: 'rejected' } : p));
   setSelectedPayment(null);
   showToast('Payment rejected');
-  } catch (e) { showToast('Reject failed', 'error'); }
+  } catch { showToast('Reject failed', 'error'); }
   }}
   onShowImage={(src) => setLightboxImage(src)}
   />

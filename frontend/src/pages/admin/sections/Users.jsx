@@ -1,8 +1,13 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Edit3, Trash2, Plus, Search, Users as UsersIcon, RefreshCw, Loader2 } from 'lucide-react';
+import { Edit3, Trash2, Plus, Search, Users as UsersIcon, RefreshCw, Loader2, Shield, GraduationCap, Mail, Phone, Calendar, ChevronRight } from 'lucide-react';
 import StatusBadge from '../../../components/dashboard/StatusBadge';
 import EmptyState from '../../../components/dashboard/EmptyState';
+
+const RoleIcon = ({ role }) => {
+  if (role?.toLowerCase() === 'admin') return <Shield size={14} className="text-brand-primary" />;
+  return <GraduationCap size={14} className="text-brand-orange" />;
+};
 
 export default function Users({ users, loading, onEdit, onDelete, onAdd, onRefresh }) {
   const [search, setSearch] = useState('');
@@ -19,11 +24,15 @@ export default function Users({ users, loading, onEdit, onDelete, onAdd, onRefre
     });
   }, [users, search, roleFilter]);
 
+  const admins = (users || []).filter(u => u.role?.toLowerCase() === 'admin');
+  const students = (users || []).filter(u => u.role?.toLowerCase() !== 'admin');
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-black text-brand-text tracking-tight">Users</h2>
+          <h2 className="text-3xl font-black text-brand-text tracking-tight">Users</h2>
           <p className="text-sm text-brand-muted font-medium mt-1">
             {users?.length || 0} total users
             {loading && <span className="ml-2 inline-flex items-center gap-1 text-brand-primary"><Loader2 size={12} className="animate-spin" /> Loading...</span>}
@@ -41,6 +50,38 @@ export default function Users({ users, loading, onEdit, onDelete, onAdd, onRefre
         </div>
       </div>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="rounded-2xl border border-brand-border bg-brand-card p-5 flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-brand-primary/10 text-brand-primary">
+            <UsersIcon size={24} />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-brand-text">{users?.length || 0}</p>
+            <p className="text-xs font-bold text-brand-muted uppercase tracking-wider">Total Users</p>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-brand-border bg-brand-card p-5 flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-purple-100 text-brand-primary">
+            <Shield size={24} />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-brand-text">{admins.length}</p>
+            <p className="text-xs font-bold text-brand-muted uppercase tracking-wider">Admins</p>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-brand-border bg-brand-card p-5 flex items-center gap-4">
+          <div className="p-3 rounded-xl bg-orange-100 text-brand-orange">
+            <GraduationCap size={24} />
+          </div>
+          <div>
+            <p className="text-2xl font-black text-brand-text">{students.length}</p>
+            <p className="text-xs font-bold text-brand-muted uppercase tracking-wider">Students</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-md">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" />
@@ -67,6 +108,7 @@ export default function Users({ users, loading, onEdit, onDelete, onAdd, onRefre
         </div>
       </div>
 
+      {/* Table */}
       {filtered.length === 0 ? (
         <EmptyState
           icon={UsersIcon}
@@ -83,7 +125,7 @@ export default function Users({ users, loading, onEdit, onDelete, onAdd, onRefre
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-brand-border bg-black/40">
-                {['Name', 'Username', 'Email', 'Phone', 'Role', 'Joined', 'Actions'].map(h => (
+                {['User', 'Contact', 'Role', 'Joined', 'Actions'].map(h => (
                   <th key={h} className={`p-4 text-[10px] font-black text-brand-muted uppercase tracking-wider text-left ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>
                 ))}
               </tr>
@@ -92,28 +134,61 @@ export default function Users({ users, loading, onEdit, onDelete, onAdd, onRefre
               {filtered.map((u, i) => (
                 <motion.tr
                   key={u.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.02 }}
-                  className="border-b border-brand-border/50 hover:bg-white/5 transition-colors"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="border-b border-brand-border/50 hover:bg-brand-primary/[0.03] transition-colors group"
                 >
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-orange to-brand-primary flex items-center justify-center text-white font-black text-xs">
-                        {(u.name || u.email || 'U')[0]?.toUpperCase()}
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-orange to-brand-primary flex items-center justify-center text-white font-black text-sm shadow-lg">
+                          {(u.name || u.email || 'U')[0]?.toUpperCase()}
+                        </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" />
                       </div>
-                      <span className="font-semibold text-brand-text text-sm">{u.name || u.full_name || '—'}</span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-brand-text text-sm">{u.name || u.full_name || '—'}</span>
+                          <RoleIcon role={u.role} />
+                        </div>
+                        <span className="text-[11px] text-brand-muted">@{u.username || '—'}</span>
+                      </div>
                     </div>
                   </td>
-                  <td className="p-4 text-brand-muted text-xs">@{u.username || '—'}</td>
-                  <td className="p-4 text-brand-muted text-xs">{u.email || '—'}</td>
-                  <td className="p-4 text-brand-muted text-xs">{u.phone_number || u.phone || '—'}</td>
-                  <td className="p-4"><StatusBadge status={u.role} /></td>
-                  <td className="p-4 text-brand-muted text-xs">{u.joined || (u.created_at ? new Date(u.created_at).toLocaleDateString() : '—')}</td>
                   <td className="p-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => onEdit(u)} className="p-2 rounded-lg bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/20 transition-all cursor-pointer" title="Edit"><Edit3 size={16} /></button>
-                      <button onClick={() => onDelete(u.id)} className="p-2 rounded-lg bg-brand-red/20 text-brand-red hover:bg-brand-red/30 transition-all cursor-pointer" title="Delete"><Trash2 size={16} /></button>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1.5 text-brand-muted text-xs">
+                        <Mail size={11} />
+                        {u.email || '—'}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-brand-muted text-xs">
+                        <Phone size={11} />
+                        {u.phone_number || u.phone || '—'}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider"
+                      style={{
+                        backgroundColor: u.role?.toLowerCase() === 'admin' ? 'rgba(90,45,168,0.1)' : 'rgba(238,132,51,0.1)',
+                        color: u.role?.toLowerCase() === 'admin' ? '#5A2DA8' : '#EE8433',
+                      }}
+                    >
+                      <RoleIcon role={u.role} />
+                      {u.role || 'Student'}
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-1.5 text-brand-muted text-xs">
+                      <Calendar size={11} />
+                      {u.joined || (u.created_at ? new Date(u.created_at).toLocaleDateString() : '—')}
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => onEdit(u)} className="p-2 rounded-lg text-brand-muted hover:bg-brand-primary/10 hover:text-brand-primary transition-all cursor-pointer" title="Edit"><Edit3 size={15} /></button>
+                      <button onClick={() => onDelete(u.id)} className="p-2 rounded-lg text-brand-muted hover:bg-brand-red/10 hover:text-brand-red transition-all cursor-pointer" title="Delete"><Trash2 size={15} /></button>
                     </div>
                   </td>
                 </motion.tr>
