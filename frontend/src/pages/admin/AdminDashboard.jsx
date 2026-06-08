@@ -142,7 +142,7 @@ export default function AdminDashboard() {
   const [categories, setCategories] = useState([]);
   const [dashboardStats, setDashboardStats] = useState(null);
   const [newAnnouncement, setNewAnnouncement] = useState({ title: '', body: '' });
-  const [newCourse, setNewCourse] = useState({ title: '', category_id: '', desc: '', description: '', price: '', status: 'Active', is_published: true });
+  const [newCourse, setNewCourse] = useState({ title: '', category_id: '', desc: '', description: '', price: '', course_url: '', status: 'Active', is_published: true });
   const [paymentList, setPaymentList] = useState([]);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
@@ -168,6 +168,7 @@ export default function AdminDashboard() {
             id: c.id, title: c.title || '', category: c.category?.name || c.category || '', category_id: c.category?.id || '', students: c.students || 0,
             lessons: c.lessons || 0, status: c.is_active ? 'Active' : 'Inactive', price: c.price || '',
             desc: c.short_description || '', description: c.description || '',
+            course_url: c.course_url || '',
             is_published: c.is_published ?? false,
           }));
           setCourses(adapted);
@@ -475,7 +476,7 @@ export default function AdminDashboard() {
  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-1">Courses</h2>
  <p className="text-gray-500 text-sm font-medium">{courses.length} courses available</p>
  </div>
-  <button onClick={() => { setEditItem(null); setNewCourse({ title: '', category_id: '', desc: '', description: '', price: '', status: 'Active', is_published: true }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
+  <button onClick={() => { setEditItem(null); setNewCourse({ title: '', category_id: '', desc: '', description: '', price: '', course_url: '', status: 'Active', is_published: true }); setShowModal('course'); }} className="flex items-center gap-2 px-5 py-2.5 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider"><Plus size={16} /> Add Course</button>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {courses.map((course, i) => (
@@ -493,7 +494,7 @@ export default function AdminDashboard() {
  <span className="font-bold text-[#5A2DA8]">{course.price}</span>
  </div>
  <div className="flex gap-2">
- <button className="flex-1 py-3 border border-[#5A2DA8]/30 text-[#5A2DA8] font-bold text-xs rounded-xl hover:bg-[#5A2DA8] hover:text-white transition-all">Apply</button>
+ <a href={course.course_url || `/register?courseId=${course.id}`} target={course.course_url ? '_blank' : undefined} rel={course.course_url ? 'noreferrer' : undefined} className="flex-1 py-3 border border-[#5A2DA8]/30 text-[#5A2DA8] font-bold text-xs rounded-xl hover:bg-[#5A2DA8] hover:text-white transition-all text-center">Open</a>
  <button onClick={() => { setEditItem(course); setShowModal('course'); }} className="p-3 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-200 transition-all"><Edit3 size={14} /></button>
  <button onClick={() => { setSelectedItem({ type: 'course', id: course.id }); setShowModal('delete'); }} className="p-3 rounded-xl border border-gray-200 text-[#D95C4A]/60 hover:bg-[#FEF0EE] transition-all"><Trash2 size={14} /></button>
  </div>
@@ -843,6 +844,7 @@ export default function AdminDashboard() {
   </div>
  </div>
  <Input label="Price" value={editItem?.price || newCourse.price} onChange={e => editItem ? setEditItem(p => ({ ...p, price: e.target.value })) : setNewCourse(p => ({ ...p, price: e.target.value }))} placeholder="500 ETB" />
+ <Input label="Course URL" type="url" value={editItem?.course_url || newCourse.course_url} onChange={e => editItem ? setEditItem(p => ({ ...p, course_url: e.target.value })) : setNewCourse(p => ({ ...p, course_url: e.target.value }))} placeholder="https://example.com/course" />
  <Select label="Status" value={editItem?.status || newCourse.status} onChange={e => editItem ? setEditItem(p => ({ ...p, status: e.target.value })) : setNewCourse(p => ({ ...p, status: e.target.value }))} options={['Active', 'Inactive']} />
   <TextArea label="Short Description" rows={2} value={editItem?.desc || newCourse.desc} onChange={e => editItem ? setEditItem(p => ({ ...p, desc: e.target.value })) : setNewCourse(p => ({ ...p, desc: e.target.value }))} placeholder="Brief summary..." />
   <TextArea label="Full Description" rows={4} value={editItem?.description || newCourse.description} onChange={e => editItem ? setEditItem(p => ({ ...p, description: e.target.value })) : setNewCourse(p => ({ ...p, description: e.target.value }))} placeholder="Detailed course content..." />
@@ -856,7 +858,7 @@ export default function AdminDashboard() {
   try {
     const parsePrice = (v) => String(v).replace(/[^0-9.]/g, '');
     const payload = (item) => {
-      const p = { title: item.title, short_description: item.desc, description: item.description || item.desc, price: parsePrice(item.price), is_published: item.is_published ?? true, is_active: item.status === 'Active' };
+      const p = { title: item.title, short_description: item.desc, description: item.description || item.desc, price: parsePrice(item.price), course_url: item.course_url || '', is_published: item.is_published ?? true, is_active: item.status === 'Active' };
       if (item.category_id) p.category_id = item.category_id;
       return p;
     };
@@ -874,6 +876,7 @@ export default function AdminDashboard() {
         price: upd.price || '',
         desc: upd.short_description || '',
         description: upd.description || '',
+        course_url: upd.course_url || '',
         is_published: upd.is_published ?? false,
       } : c));
       showToast('Course saved to backend');
@@ -890,6 +893,7 @@ export default function AdminDashboard() {
         price: created.price || '',
         desc: created.short_description || '',
         description: created.description || '',
+        course_url: created.course_url || '',
         is_published: created.is_published ?? false,
       }]);
       showToast('Course created on backend');

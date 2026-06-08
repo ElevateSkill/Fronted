@@ -25,6 +25,7 @@ class Course(models.Model):
     short_description = models.CharField(max_length=500)
     description = models.TextField()
     thumbnail = models.ImageField(upload_to='courses/thumbnails/', null=True, blank=True)
+    course_url = models.URLField(max_length=500, blank=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     duration = models.CharField(max_length=100, blank=True)
     requirements = models.TextField(blank=True)

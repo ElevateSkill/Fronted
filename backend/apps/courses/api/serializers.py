@@ -19,7 +19,7 @@ class CourseListSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'title', 'slug', 'short_description', 'thumbnail',
-            'category', 'category_id', 'price', 'instructor',
+            'course_url', 'category', 'category_id', 'price', 'instructor',
             'lessons', 'duration', 'is_active', 'is_published',
         ]
         read_only_fields = ['slug']
@@ -35,7 +35,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'title', 'slug', 'short_description', 'description',
-            'thumbnail', 'category', 'category_id', 'duration',
+            'thumbnail', 'course_url', 'category', 'category_id', 'duration',
             'requirements', 'learning_outcomes', 'price', 'instructor',
             'lessons', 'is_active', 'is_published', 'created_at', 'updated_at',
         ]

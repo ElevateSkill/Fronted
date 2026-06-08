@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, GraduationCap, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { coursesAPI, homepageAPI, getMediaUrl, normalizeApiCount } from '../services/api';
-import heroImage from '../assets/photo_2026-06-07_22-56-48.jpg';
+import heroImg1 from '../assets/gr1.jpg';
+import heroImg2 from '../assets/gr3.jpg';
+import heroImg3 from '../assets/grad2.jpg';
+
+const heroImages = [heroImg1, heroImg2, heroImg3];
 
 const normalizeCtaLink = (link) => {
   if (!link) return '/register';
@@ -12,7 +16,7 @@ const normalizeCtaLink = (link) => {
 };
 
 const adaptHero = (hero = {}) => ({
-  image: getMediaUrl(hero.background_image) || heroImage,
+  image: getMediaUrl(hero.background_image) || heroImg1,
   title: hero.title || 'Elevate Skill',
   subtitle: hero.subtitle || 'Explore practical courses, register online, and track your enrollment from your student dashboard.',
   cta: hero.cta_text || 'Start Enrollment',
@@ -22,6 +26,7 @@ const adaptHero = (hero = {}) => ({
 export default function Landing() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +52,13 @@ export default function Landing() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   const hero = data[0]?.hero || adaptHero();
   const stats = data[0]?.stats || [];
 
@@ -61,11 +73,25 @@ export default function Landing() {
   return (
     <div id="home" className="relative min-h-[92vh] w-full overflow-hidden bg-[#0F0A3A] text-white">
       <div className="absolute inset-0">
-        <img
-          src={hero.image}
-          alt={hero.title}
-          className="h-full w-full object-cover"
-        />
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentSlide}
+            src={heroImages[currentSlide]}
+            alt="Graduate"
+            className="h-full w-full object-cover absolute inset-0"
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+          />
+        </AnimatePresence>
+        {hero.image && hero.image !== heroImages[currentSlide] && (
+          <img
+            src={hero.image}
+            alt={hero.title}
+            className="h-full w-full object-cover absolute inset-0 opacity-0 pointer-events-none"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-[#0F0A3A]/95 via-[#1E1B4B]/78 to-[#3A3992]/55" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0F0A3A] to-transparent" />
       </div>
@@ -101,6 +127,18 @@ export default function Landing() {
               </Link>
             </div>
           </motion.div>
+
+          <div className="mt-6 flex items-center gap-2">
+            {heroImages.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentSlide(i)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === currentSlide ? 'w-8 bg-[#EE8433]' : 'w-1.5 bg-white/30 hover:bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
 
           {stats.length > 0 && (
             <motion.div

@@ -39,35 +39,35 @@ export default function Blog() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex items-center justify-center gap-3 mb-4"
+            className="inline-flex items-center gap-2 rounded-full border border-[#3A3992]/25 bg-[#3A3992]/10 px-4 py-2 backdrop-blur mb-5"
           >
-            <span className="h-[2px] w-12 bg-[#3A3992]" />
-            <span className="text-[#3A3992] font-black uppercase tracking-[0.3em] text-xs">Latest News</span>
-            <span className="h-[2px] w-12 bg-[#3A3992]" />
+            <FileText size={14} className="text-[#3A3992]" />
+            <span className="text-[#3A3992] font-black uppercase tracking-[0.28em] text-[10px]">Latest News</span>
           </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black text-gray-900  tracking-tight"
+            className="text-4xl sm:text-5xl font-black tracking-tight"
           >
-            From Our{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3A3992] to-[#5A2DA8]">Blog</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3A3992] via-[#5A2DA8] to-[#EE8433]">
+              From Our Blog
+            </span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-gray-500  text-sm mt-3 max-w-xl mx-auto"
+            className="text-transparent bg-clip-text bg-gradient-to-r from-gray-600 via-gray-500 to-[#3A3992]/70 text-sm mt-3 max-w-xl mx-auto font-medium"
           >
             Insights, tutorials, and updates from the Elevate Skill team.
           </motion.p>
           {source === 'api' && (
-            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+            <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 ">Live from /news/</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-600">Live from /news/</span>
             </div>
           )}
         </div>

@@ -110,10 +110,12 @@ class CoursesTests(APITestCase):
 			'description': 'Long',
 			'category_id': self.category.id,
 			'price': '9.99',
+			'course_url': 'https://example.com/new-admin-course',
 		}
 		resp = self.client.post(self.admin_list_url, payload)
 		self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 		self.assertEqual(resp.data['title'], payload['title'])
+		self.assertEqual(resp.data['course_url'], payload['course_url'])
 		self.assertIsNotNone(resp.data.get('slug'))
 
 	def test_admin_patch_toggle_publish_and_active(self):
@@ -199,4 +201,3 @@ class CategoriesTests(APITestCase):
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
 		ids = [c['id'] for c in get_results(resp)]
 		self.assertIn(self.course.id, ids)
-
