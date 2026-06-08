@@ -42,10 +42,14 @@ export default function Testimonals() {
           className="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"
         >
           <div className="max-w-3xl">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.05] tracking-tight">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#EE8433]/25 bg-[#EE8433]/10 px-4 py-2 backdrop-blur">
+              <Quote size={14} className="text-[#EE8433]" />
+              <span className="text-[10px] font-black uppercase tracking-[0.28em] text-[#EE8433]">Testimonials</span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.05] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] via-[#FFC107] to-[#1565C0]">
               Real stories from people who kept going.
             </h2>
-            <p className="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-white/70">
+            <p className="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-white/90 via-white/80 to-[#FFD700]/80">
               Every testimonial is a real graduate from our platform. Powered by the backend, always up to date.
             </p>
             {source === 'api' && (
