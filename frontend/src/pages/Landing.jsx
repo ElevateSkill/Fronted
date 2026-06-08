@@ -82,7 +82,7 @@ export default function Landing() {
               <span className="text-[11px] font-black uppercase tracking-[0.24em] text-white/80">Course Enrollment Platform</span>
             </div>
 
-            <h1 className="text-5xl font-black leading-[1.02] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#EE8433] via-[#D95C4A] to-[#5A2DA8] sm:text-6xl lg:text-7xl">
+            <h1 className="text-5xl font-black leading-[1.02] tracking-tight animate-hero-title sm:text-6xl lg:text-7xl">
               {hero.title}{' '}
               <span>works end to end.</span>
             </h1>
