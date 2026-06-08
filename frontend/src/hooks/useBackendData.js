@@ -1,84 +1,63 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { normalizeApiList } from '../services/api';
-
-const EMPTY_FALLBACK = [];
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
- * useBackendData — generic hook that fetches from an API function.
+ * useBackendData — generic hook that fetches from an API function
+ * and gracefully falls back to local data when the backend is unreachable.
  *
  * @param {Function} fetcher  - async (params) => data
- * @param {Array|Object} fallbackOrOptions - legacy fallback array, or options
+ * @param {Array}    fallback - data to use if the request fails
  * @param {Object}   options  - { params, dependencies, refreshInterval, enabled }
  */
-export default function useBackendData(fetcher, fallbackOrOptions = EMPTY_FALLBACK, options = {}) {
-  const hasLegacyFallback = Array.isArray(fallbackOrOptions);
-  const fallback = useMemo(
-    () => (hasLegacyFallback ? fallbackOrOptions : (fallbackOrOptions.fallback || EMPTY_FALLBACK)),
-    [fallbackOrOptions, hasLegacyFallback]
-  );
-  const resolvedOptions = hasLegacyFallback ? options : fallbackOrOptions;
+export default function useBackendData(fetcher, fallback = [], options = {}) {
   const {
     params,
     dependencies = [],
     refreshInterval = null,
     enabled = true,
-  } = resolvedOptions;
+  } = options;
 
   const [data, setData] = useState(fallback);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [source, setSource] = useState(fallback.length ? 'fallback' : 'api-empty');
-  const paramsKey = JSON.stringify(params || {});
-  const dependenciesKey = JSON.stringify(dependencies || []);
+  const [source, setSource] = useState('fallback'); // 'api' | 'fallback' | 'api-empty'
   const fetcherRef = useRef(fetcher);
-  const paramsRef = useRef(params);
-  const fallbackRef = useRef(fallback);
-
-  useEffect(() => {
-    fetcherRef.current = fetcher;
-    paramsRef.current = params;
-    fallbackRef.current = fallback;
-  }, [fetcher, params, fallback]);
+  fetcherRef.current = fetcher;
 
   const load = useCallback(async () => {
     if (!enabled) {
-      setData(fallbackRef.current);
+      setData(fallback);
       setLoading(false);
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const result = await fetcherRef.current(paramsRef.current);
-      const arr = normalizeApiList(result);
+      const result = await fetcherRef.current(params);
+      const arr = Array.isArray(result) ? result : (result?.results || result?.data || []);
       if (arr && arr.length > 0) {
         setData(arr);
         setSource('api');
-      } else if (
-        Array.isArray(result) ||
-        Array.isArray(result?.results) ||
-        Array.isArray(result?.data) ||
-        Array.isArray(result?.items)
-      ) {
+      } else if (Array.isArray(result) || result?.results || result?.data) {
+        // API returned successfully but with empty results
         setData([]);
         setSource('api-empty');
       } else {
-        setData(fallbackRef.current);
-        setSource(fallbackRef.current.length ? 'fallback' : 'api-empty');
+        setData(fallback);
+        setSource('fallback');
       }
     } catch (err) {
       setError(err);
-      setData(fallbackRef.current);
-      setSource(fallbackRef.current.length ? 'fallback' : 'error');
+      setData(fallback);
+      setSource('fallback');
     } finally {
       setLoading(false);
     }
-  }, [enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(params || {}), enabled, ...dependencies]);
 
   useEffect(() => {
-    const timer = setTimeout(load, 0);
-    return () => clearTimeout(timer);
-  }, [load, paramsKey, dependenciesKey]);
+    load();
+  }, [load]);
 
   // Optional background polling
   useEffect(() => {

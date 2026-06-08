@@ -31,7 +31,6 @@ const adapt = (c) => {
     description: safeStr(c.description || c.short_description),
     category: catName,
     image: getMediaUrl(c.thumbnail) || '',
-    courseUrl: safeStr(c.course_url),
     instructor: safeStr(c.instructor, 'Staff'),
     duration: safeStr(c.duration, 'Self-paced'),
     lessons: c.lessons || 0,
@@ -43,15 +42,14 @@ const adapt = (c) => {
 
 export default function Courses() {
   const navigate = useNavigate();
-  const { data: courses, loading, source } = useBackendData(coursesAPI.list);
+  const { data: courses, loading, source } = useBackendData(
+    () => coursesAPI.list(),
+    []
+  );
 
   const list = (courses || []).map(adapt);
 
-  const handleEnroll = (courseId, courseUrl = '') => {
-    if (courseUrl) {
-      window.open(courseUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
+  const handleEnroll = (courseId) => {
     navigate(`/register?courseId=${courseId}`);
   };
 
@@ -153,7 +151,7 @@ export default function Courses() {
                   <div className="flex items-center justify-between pt-4 border-t border-white/10">
                     <span className="text-xl font-black text-[#3A3992] drop-shadow-lg">{course.price}</span>
                     <button
-                      onClick={() => handleEnroll(course.id, course.courseUrl)}
+                      onClick={() => handleEnroll(course.id)}
                       className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#3A3992] to-[#D95C4A] text-white font-black text-[11px] rounded-xl hover:from-[#D95C4A] hover:to-[#3A3992] transition-all uppercase tracking-wider shadow-lg shadow-[#3A3992]/40 hover:shadow-[#3A3992]/60 hover:scale-105 active:scale-95"
                     >
                       <GraduationCap size={14} />
@@ -189,7 +187,7 @@ export default function Courses() {
                 Join thousands of learners building real-world skills. Enroll today and transform your career.
               </p>
               <button
-                onClick={() => handleEnroll(list[0]?.id || '', list[0]?.courseUrl || '')}
+                onClick={() => handleEnroll(list[0]?.id || '')}
                 className="px-10 py-4 bg-white text-[#3A3992] font-black text-sm rounded-2xl hover:bg-white/90 transition-all uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl hover:scale-105 active:scale-95"
               >
                 <GraduationCap size={18} />

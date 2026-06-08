@@ -20,15 +20,17 @@ const adapt = (a) => ({
  * (`GET /api/v1/announcements/`).
  */
 export default function AnnouncementTicker({ variant = 'marquee' }) {
-  const { data } = useBackendData(announcementsAPI.list, {
-    refreshInterval: 60000,
-  });
+  const { data } = useBackendData(
+    () => announcementsAPI.list(),
+    [],
+    { refreshInterval: 60000 }
+  );
 
   const [dismissed, setDismissed] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [showCallout, setShowCallout] = useState(true);
 
-  const list = data.map(adapt).filter((a) => a.is_published);
+  const list = data.filter((a) => a.is_published);
 
   useEffect(() => {
     if (list.length <= 1) return undefined;

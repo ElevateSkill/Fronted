@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
  User, Mail, Phone, Lock,
  CheckCircle, Upload, FileText,
  GraduationCap, ShieldCheck, Sparkles, LogOut,
  Bell, Home, BookOpen, MessageCircle, Settings,
   AlertTriangle, Clock, Play,
-  Send, Headphones,
+ ChevronDown, Send, Headphones, HelpCircle,
  Save, CreditCard, TrendingUp, BarChart3, ArrowRight,
   Eye, X, Download
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { enrollmentsAPI, paymentsAPI, authAPI, getMediaUrl } from '../../services/api';
+
+const genId = () => Date.now() + Math.random();
 
 const sidebarItems = [
  { id: 'home', label: 'Home', icon: <Home size={18} /> },
@@ -21,14 +23,25 @@ const sidebarItems = [
  { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
 ];
 
+const initialEnrolledCourses = [
+  { id: genId(), title: 'Full-Stack Web Development', progress: 65, instructor: 'Lidetu Tesfaye', lessons: 48, completed: 31, nextLesson: 'API Integration with Node.js', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400' },
+  { id: genId(), title: 'UI/UX Design Mastery', progress: 30, instructor: 'Meron Tadesse', lessons: 36, completed: 11, nextLesson: 'Color Theory & Typography', image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=400' },
+];
 
+const faqData = [
+ { q: 'How do I reset my password?', a: 'Go to Settings and click "Change Password". Follow the instructions sent to your email.' },
+ { q: 'How do I access my courses?', a: 'Your enrolled courses appear under "My Courses" in the sidebar. Click any course to continue learning.' },
+ { q: 'How do I get my certificate?', a: 'Certificates are awarded upon completing all lessons and the final project in your course.' },
+ { q: 'How do I contact support?', a: 'Use the Support tab to submit a ticket. Our team typically responds within 24 hours.' },
+];
 
 export default function UserDashboard() {
   const { user, logout } = useAuth();
 
   const [activeTab, setActiveTab] = useState('home');
-  const [toast, setToast] = useState(null);
-  const [ticketForm, setTicketForm] = useState({ subject: '', message: '', priority: 'Normal' });
+ const [toast, setToast] = useState(null);
+ const [faqOpen, setFaqOpen] = useState(null);
+ const [ticketForm, setTicketForm] = useState({ subject: '', message: '', priority: 'Normal' });
  const [showTicketSuccess, setShowTicketSuccess] = useState(false);
 
  const [profile, setProfile] = useState(() => ({
@@ -40,15 +53,14 @@ export default function UserDashboard() {
  const [passwordForm, setPasswordForm] = useState({ current: '', newPass: '', confirm: '' });
  const [notifications, setNotifications] = useState({ email: true, sms: false, push: true });
 
-  const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '', enrollment_id: '' });
+  const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '', amount: '', comment: '' });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [paymentSubmitted, setPaymentSubmitted] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState([]);
   const [viewingPayment, setViewingPayment] = useState(null);
   const [lightboxImage, setLightboxImage] = useState(null);
 
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
-  const [rawEnrollments, setRawEnrollments] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState(initialEnrolledCourses);
 
   const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
@@ -61,28 +73,26 @@ export default function UserDashboard() {
           paymentsAPI.myPayments(),
           authAPI.getProfile(),
         ]);
-          if (enrollRes.status === 'fulfilled' && Array.isArray(enrollRes.value?.results ? enrollRes.value.results : enrollRes.value)) {
-            const raw = enrollRes.value?.results || enrollRes.value;
-            setRawEnrollments(raw);
-            const adapted = raw.map(e => ({
-              id: e.id, title: e.course?.title || e.title || 'Course',
-              status: e.status || 'active',
-              instructor: e.course?.instructor || 'Instructor',
-              lessons: e.course?.lessons || 0,
-              image: e.course?.thumbnail || '',
-            }));
-            setEnrolledCourses(adapted);
-          }
-          if (payRes.status === 'fulfilled' && Array.isArray(payRes.value?.results ? payRes.value.results : payRes.value)) {
-            const raw = payRes.value?.results || payRes.value;
-            setPaymentHistory(raw);
-          }
+        if (enrollRes.status === 'fulfilled' && enrollRes.value?.length) {
+          const adapted = enrollRes.value.map(e => ({
+            id: e.id, title: e.course?.title || e.title || 'Course',
+            progress: e.progress || 0, instructor: e.course?.instructor || 'Instructor',
+            lessons: e.course?.lessons || 0, completed: e.completed_lessons || 0,
+            nextLesson: e.next_lesson || 'Continue learning',
+            image: e.course?.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400',
+          }));
+          setEnrolledCourses(adapted);
+        }
+        if (payRes.status === 'fulfilled' && payRes.value?.length) {
+          setPaymentHistory(payRes.value);
+        }
         if (profileRes.status === 'fulfilled' && profileRes.value) {
           const p = profileRes.value;
           setProfile({
             full_name: p.full_name || p.username || 'Student',
             email: p.email || '',
             phone: p.phone_number || '',
+            bio: p.bio || 'Passionate about learning.',
           });
         }
       } catch (e) { /* API unavailable — keep local state */ }
@@ -91,14 +101,15 @@ export default function UserDashboard() {
   }, []);
 
   const handlePaymentSubmit = async () => {
-  if (!paymentForm.full_name || !paymentForm.email || !paymentForm.phone || !paymentForm.enrollment_id) { showToast('Please fill in all required fields', 'error'); return; }
+  if (!paymentForm.full_name || !paymentForm.email || !paymentForm.phone || !paymentForm.amount) { showToast('Please fill in all required fields', 'error'); return; }
   if (!uploadedFile) { showToast('Please upload payment proof', 'error'); return; }
   try {
     const formData = new FormData();
-    formData.append('enrollment_id', paymentForm.enrollment_id);
     formData.append('full_name', paymentForm.full_name);
     formData.append('email', paymentForm.email);
     formData.append('phone', paymentForm.phone);
+    formData.append('amount', paymentForm.amount);
+    if (paymentForm.comment) formData.append('comment', paymentForm.comment);
     formData.append('proof_file', uploadedFile);
     await paymentsAPI.submitProof(formData);
     setPaymentSubmitted(true);
@@ -165,14 +176,14 @@ export default function UserDashboard() {
  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#3A3992] to-[#5A2DA8] flex items-center justify-center text-white font-black text-base">D</div>
  <div>
  <h2 className="text-base font-black text-gray-900 ">Welcome back, {user?.full_name || 'Student'}!</h2>
- <p className="text-xs text-gray-500 ">{profile.email || user?.email || ''}</p>
+ <p className="text-xs text-gray-500 ">dawit@example.com</p>
  </div>
  </div>
  <div className="grid grid-cols-3 gap-3">
  {[
  { label: 'Enrolled Courses', value: enrolledCourses.length, icon: <BookOpen size={16} />, color: 'text-[#5A2DA8]' },
-  { label: 'Active Courses', value: enrolledCourses.filter(c => c.status === 'active').length, icon: <CheckCircle size={16} />, color: 'text-green-500' },
-  { label: 'Completed', value: enrolledCourses.filter(c => c.status === 'completed').length, icon: <ShieldCheck size={16} />, color: 'text-[#3A3992]' }
+ { label: 'Lessons Completed', value: enrolledCourses.reduce((a, c) => a + c.completed, 0), icon: <CheckCircle size={16} />, color: 'text-green-500' },
+ { label: 'Overall Progress', value: `${Math.round(enrolledCourses.reduce((a, c) => a + c.progress, 0) / Math.max(enrolledCourses.length, 1))}%`, icon: <TrendingUp size={16} />, color: 'text-[#3A3992]' }
  ].map((stat, i) => (
  <div key={i} className="p-3 rounded-xl border border-gray-200 bg-gray-50 shadow-sm">
  <div className={`${stat.color} mb-1`}>{stat.icon}</div>
@@ -248,12 +259,18 @@ export default function UserDashboard() {
  </div>
  <div className="flex-1 p-4 flex flex-col justify-between">
  <div>
-                    <h3 className="text-sm font-bold text-gray-900 mb-0.5">{course.title}</h3>
-                    <p className="text-xs text-gray-500 mb-2">by {course.instructor}</p>
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
-                      <span>{course.lessons} lessons</span>
-                      <span className={`font-bold capitalize ${course.status === 'active' ? 'text-green-600' : course.status === 'completed' ? 'text-[#3A3992]' : 'text-amber-600'}`}>{course.status}</span>
-                    </div>
+ <h3 className="text-sm font-bold text-gray-900 mb-0.5">{course.title}</h3>
+ <p className="text-xs text-gray-500 mb-2">by {course.instructor}</p>
+ <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
+ <span>{course.completed}/{course.lessons} lessons</span>
+ <span className="text-[#5A2DA8] font-bold">{course.progress}% complete</span>
+ </div>
+ <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden mb-2">
+ <motion.div initial={{ width: 0 }} animate={{ width: `${course.progress}%` }} transition={{ duration: 1, delay: 0.3 }} className="h-full bg-gradient-to-r from-[#3A3992] to-[#5A2DA8] rounded-full" />
+ </div>
+ <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
+ <Play size={11} className="text-[#3A3992]" /> Next: {course.nextLesson}
+ </div>
  </div>
  <button className="flex items-center gap-1.5 px-4 py-2 bg-[#5A2DA8] text-white font-bold text-[10px] rounded-lg hover:brightness-110 transition-all w-fit shadow-sm">
  <Play size={12} /> Continue
@@ -283,29 +300,31 @@ export default function UserDashboard() {
   </div>
   ) : (
   <div className="space-y-3">
-                    <div className="relative mb-2">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Select Course</span>
-                      <select value={paymentForm.enrollment_id} onChange={e => setPaymentForm(p => ({ ...p, enrollment_id: e.target.value }))} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50">
-                        <option value="">Choose an enrolled course...</option>
-                        {rawEnrollments.map(e => (
-                          <option key={e.id} value={e.id}>{e.course?.title || `Enrollment #${e.id}`} ({e.status})</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      <div className="relative">
-                        <User size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input value={paymentForm.full_name} onChange={e => setPaymentForm(p => ({ ...p, full_name: e.target.value }))} placeholder="Full Name" className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
-                      </div>
-                      <div className="relative">
-                        <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input value={paymentForm.email} onChange={e => setPaymentForm(p => ({ ...p, email: e.target.value }))} placeholder="Email" className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
-                      </div>
-                      <div className="relative">
-                        <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input value={paymentForm.phone} onChange={e => setPaymentForm(p => ({ ...p, phone: e.target.value }))} placeholder="Phone" className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
-                      </div>
-                    </div>
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+  <div className="relative">
+  <User size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+  <input value={paymentForm.full_name} onChange={e => setPaymentForm(p => ({ ...p, full_name: e.target.value }))} placeholder="Full Name" className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
+  </div>
+  <div className="relative">
+  <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+  <input value={paymentForm.email} onChange={e => setPaymentForm(p => ({ ...p, email: e.target.value }))} placeholder="Email" className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
+  </div>
+  <div className="relative">
+  <Phone size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+  <input value={paymentForm.phone} onChange={e => setPaymentForm(p => ({ ...p, phone: e.target.value }))} placeholder="Phone" className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
+  </div>
+  </div>
+  <div className="relative">
+  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Amount Paid (ETB)</span>
+  <div className="relative">
+  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 ">Birr</span>
+  <input value={paymentForm.amount} onChange={e => setPaymentForm(p => ({ ...p, amount: e.target.value }))} type="number" placeholder="0.00" className="w-full pl-12 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
+  </div>
+  </div>
+  <div className="relative">
+  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Comment <span className="text-gray-500 font-normal normal-case tracking-normal">(optional)</span></span>
+  <textarea value={paymentForm.comment} onChange={e => setPaymentForm(p => ({ ...p, comment: e.target.value }))} rows={2} placeholder="Any additional notes..." className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400 resize-none" />
+  </div>
   <div className="flex items-center gap-2 pt-1">
   <label className="flex-1 flex items-center gap-2 px-3 py-2 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-[#3A3992]/50 transition-all bg-gray-50 group">
   <Upload size={16} className="text-gray-300 group-hover:text-[#3A3992] transition-colors" />
@@ -401,7 +420,26 @@ export default function UserDashboard() {
  </div>
  )}
 
-
+ <div className="rounded-2xl border border-gray-200 bg-gray-100 p-5 shadow-sm">
+ <h3 className="text-xs font-bold text-gray-900 mb-3 flex items-center gap-1.5 uppercase tracking-wider"><HelpCircle size={13} className="text-[#3A3992]" /> FAQ</h3>
+ <div className="space-y-1.5">
+ {faqData.map((faq, i) => (
+ <div key={i} className="rounded-lg border border-gray-200 overflow-hidden">
+ <button onClick={() => setFaqOpen(faqOpen === i ? null : i)} className="w-full flex items-center justify-between p-3 text-left bg-gray-50 hover:bg-gray-100 transition-all">
+ <span className="text-xs font-semibold text-gray-900 ">{faq.q}</span>
+ <ChevronDown size={12} className={`text-gray-400 transition-transform shrink-0 ${faqOpen === i ? 'rotate-180' : ''}`} />
+ </button>
+ <AnimatePresence>
+ {faqOpen === i && (
+ <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
+ <p className="px-3 pb-3 text-xs text-gray-500 ">{faq.a}</p>
+ </motion.div>
+ )}
+ </AnimatePresence>
+ </div>
+ ))}
+ </div>
+ </div>
  </div>
  )}
 
@@ -427,9 +465,12 @@ export default function UserDashboard() {
  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Phone</label>
  <input value={profile.phone} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#5A2DA8]/50" />
  </div>
-
+ <div>
+ <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Bio</label>
+ <textarea rows={1} value={profile.bio} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#5A2DA8]/50 resize-none" />
  </div>
-   <button onClick={async () => { try { await authAPI.updateProfile({ full_name: profile.full_name, email: profile.email, phone_number: profile.phone }); showToast('Profile updated!'); } catch (e) { showToast('Update failed', 'error'); } }} className="mt-3 px-5 py-2 bg-[#5A2DA8] text-white font-black text-[10px] rounded-lg hover:brightness-110 transition-all flex items-center gap-1.5 shadow-sm"><Save size={12} /> Save Changes</button>
+ </div>
+  <button onClick={async () => { try { await authAPI.updateProfile({ full_name: profile.full_name, email: profile.email, phone_number: profile.phone, bio: profile.bio }); showToast('Profile updated!'); } catch (e) { showToast('Update failed', 'error'); } }} className="mt-3 px-5 py-2 bg-[#5A2DA8] text-white font-black text-[10px] rounded-lg hover:brightness-110 transition-all flex items-center gap-1.5 shadow-sm"><Save size={12} /> Save Changes</button>
  </div>
 
  <div className="rounded-2xl border border-gray-200 bg-gray-100 p-5 shadow-sm">
@@ -440,7 +481,7 @@ export default function UserDashboard() {
  <input value={passwordForm.newPass} onChange={e => setPasswordForm(p => ({ ...p, newPass: e.target.value }))} type="password" placeholder="New Password" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
  <input value={passwordForm.confirm} onChange={e => setPasswordForm(p => ({ ...p, confirm: e.target.value }))} type="password" placeholder="Confirm Password" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
  </div>
-   <button onClick={async () => { if (passwordForm.newPass !== passwordForm.confirm) { showToast('Passwords do not match', 'error'); return; } if (passwordForm.newPass.length < 6) { showToast('Password too short', 'error'); return; } try { await authAPI.updateProfile({ password: passwordForm.newPass }); showToast('Password updated!'); setPasswordForm({ current: '', newPass: '', confirm: '' }); } catch (e) { showToast('Password update failed', 'error'); } }} className="px-5 py-2 bg-[#3A3992] text-white font-black text-[10px] rounded-lg hover:brightness-110 transition-all shadow-sm">Update Password</button>
+  <button onClick={async () => { if (passwordForm.newPass !== passwordForm.confirm) { showToast('Passwords do not match', 'error'); return; } if (passwordForm.newPass.length < 6) { showToast('Password too short', 'error'); return; } try { await authAPI.changePassword({ old_password: passwordForm.current, new_password: passwordForm.newPass }); showToast('Password updated!'); setPasswordForm({ current: '', newPass: '', confirm: '' }); } catch (e) { showToast('Password update failed', 'error'); } }} className="px-5 py-2 bg-[#3A3992] text-white font-black text-[10px] rounded-lg hover:brightness-110 transition-all shadow-sm">Update Password</button>
  </div>
  </div>
 
