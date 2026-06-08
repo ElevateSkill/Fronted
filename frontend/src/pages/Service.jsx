@@ -206,7 +206,7 @@ export default function Services() {
               </div>
 
               <div className="p-8">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-[#3C83F6] transition-colors tracking-tight">{service.title}</h3>
+                <h3 className="text-2xl font-black mb-3 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] via-[#FFC107] via-[#F59E0B] to-[#1E40AF]">{service.title}</h3>
                 <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
                   {service.short}
                 </p>
