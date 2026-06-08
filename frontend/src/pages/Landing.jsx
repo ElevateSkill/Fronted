@@ -94,7 +94,7 @@ export default function Landing() {
             className="h-full w-full object-cover absolute inset-0 opacity-0 pointer-events-none"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0A3A]/95 via-[#1E1B4B]/78 to-[#3A3992]/55" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0A3A]/70 via-[#1E1B4B]/50 to-[#3A3992]/30" />
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0F0A3A] to-transparent" />
       </div>
 
