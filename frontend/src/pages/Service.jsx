@@ -187,10 +187,10 @@ export default function Services() {
               viewport={{ once: true, margin: "-100px" }}
               layout
                className={`group relative overflow-hidden rounded-[2.5rem] transition-all duration-500 border-2 ${
-                activeService === service.id 
-                ? 'bg-white dark:bg-[#111] border-[#3C83F6] shadow-2xl shadow-blue-500/10' 
-                : 'bg-white/70 dark:bg-white/[0.03] border-transparent hover:border-slate-200 dark:hover:border-white/10 shadow-xl shadow-black/5 dark:shadow-white/5'
-              }`}
+                 activeService === service.id 
+                 ? 'bg-white dark:bg-[#1a1a2e] border-[#3C83F6] shadow-2xl shadow-blue-500/10' 
+                 : 'bg-white/70 dark:bg-[#111827]/90 border-transparent hover:border-slate-200 dark:hover:border-white/20 shadow-xl shadow-black/5 dark:shadow-white/5'
+               }`}
             >
               {/* Image Header */}
               <div className="h-52 w-full overflow-hidden relative">
@@ -207,7 +207,7 @@ export default function Services() {
 
               <div className="p-8">
                 <h3 className="text-2xl font-black mb-3 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] via-[#FFC107] via-[#F59E0B] to-[#1E40AF]">{service.title}</h3>
-                <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm leading-relaxed font-medium">
+                <p className="text-slate-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
                   {service.short}
                 </p>
 
@@ -217,7 +217,7 @@ export default function Services() {
                   className={`flex items-center justify-between w-full p-4 rounded-2xl transition-all duration-300 ${
                     activeService === service.id 
                     ? 'bg-[#3C83F6] text-white' 
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
+                    : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/15'
                   }`}
                 >
                   <span className="font-bold text-xs uppercase tracking-[0.2em]">Explore Service</span>
@@ -239,10 +239,10 @@ export default function Services() {
                       className="overflow-hidden"
                     >
                       <div className="pt-8 space-y-6 relative z-10">
-                        <div className="relative p-4 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-100 dark:border-white/5">
+                        <div className="relative p-4 rounded-2xl bg-slate-50 dark:bg-[#1e1b4b]/60 border border-slate-100 dark:border-white/10">
                             <Sparkles className="absolute -top-3 -left-3 text-[#f89f29]" size={20} />
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 italic">
-                            "{service.desc}"
+                            <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-200 italic">
+                              "{service.desc}"
                             </p>
                         </div>
                         
