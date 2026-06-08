@@ -898,7 +898,7 @@ export default function AdminDashboard() {
       }]);
       showToast('Course created on backend');
     }
-  } catch { showToast('Failed to save course', 'error'); }
+  } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save course'; showToast(msg, 'error'); }
   setShowModal(null); setEditItem(null);
   }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -941,7 +941,7 @@ export default function AdminDashboard() {
  }]);
  showToast('Post created on backend');
  }
- } catch { showToast('Failed to save post', 'error'); }
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save post'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#5A2DA8] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -1006,7 +1006,7 @@ export default function AdminDashboard() {
  }]);
  showToast('Testimonial created on backend');
  }
- } catch { showToast('Failed to save testimonial', 'error'); }
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save testimonial'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -1110,7 +1110,7 @@ export default function AdminDashboard() {
  setFaqs(prev => [...prev, { ...created, category: editItem.category || 'General' }]);
  showToast('FAQ created on backend');
  }
- } catch { showToast('Failed to save FAQ', 'error'); }
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save FAQ'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -1154,7 +1154,7 @@ export default function AdminDashboard() {
  active: true,
  }]);
  showToast('Hero saved to backend');
- } catch { showToast('Failed to save hero', 'error'); }
+ } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save hero'; showToast(msg, 'error'); }
  setShowModal(null); setEditItem(null);
  }} className="px-6 py-3 bg-gradient-to-r from-[#3A3992] to-[#EE8433] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
  </div>
@@ -1179,7 +1179,7 @@ export default function AdminDashboard() {
       setCategories(prev => [...prev, created]);
       showToast('Category created');
     }
-  } catch { showToast('Failed to save category', 'error'); }
+  } catch (e) { const msg = e?.response?.data ? Object.values(e.response.data).flat().join('; ') : 'Failed to save category'; showToast(msg, 'error'); }
   setShowModal(null); setEditItem(null);
   }} className="px-6 py-3 bg-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all">Save</button>
   </div>
