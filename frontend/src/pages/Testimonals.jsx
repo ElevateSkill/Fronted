@@ -46,14 +46,17 @@ export default function Testimonals() {
               <Quote size={14} className="text-[#EE8433]" />
               <span className="text-[10px] font-black uppercase tracking-[0.28em] text-[#EE8433]">Testimonials</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.05] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] via-[#FFC107] to-[#1565C0]">
-              Real stories from people who kept going.
-            </h2>
-            <p className="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-white/90 via-white/80 to-[#FFD700]/80">
-              Every testimonial is a real graduate from our platform. Powered by the backend, always up to date.
+            <div className="relative">
+              <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FFD700] via-[#FFC107] to-[#1565C0] rounded-full hidden sm:block" />
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.05] tracking-tight animate-hero-title pl-0 sm:pl-6">
+                Real stories from people who kept going.
+              </h2>
+            </div>
+            <p className="mt-6 max-w-2xl text-base md:text-lg leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-white/90 via-[#FFD700]/90 to-[#1565C0]/80">
+              Every testimonial is a <strong className="text-[#FFD700]">real</strong> graduate from our platform. <span className="text-white/60">Powered by the backend,</span> <span className="text-[#FFD700]/80">always up to date.</span>
             </p>
             {source === 'api' && (
-              <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+              <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Live from /homepage/</span>
               </div>
