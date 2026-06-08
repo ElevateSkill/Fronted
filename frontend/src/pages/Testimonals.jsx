@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Quote, Star, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import useBackendData from '../hooks/useBackendData';
-import { testimonialsAPI, getMediaUrl } from '../services/api';
+import { testimonialsAPI } from '../services/api';
 
 const safeStr = (v, fallback = '') => (v != null && typeof v !== 'object') ? String(v) : fallback;
 
@@ -14,7 +14,7 @@ const adapt = (t) => ({
   role: safeStr(t.role, 'Graduate'),
   company: safeStr(t.company),
   quote: safeStr(t.message),
-  image: getMediaUrl(t.student_image) || '',
+  image: t.student_image || '',
   score: t.rating || 5,
   outcome: safeStr(t.outcome, 'Verified graduate'),
   color: t.color || '#EE8433',
@@ -22,7 +22,10 @@ const adapt = (t) => ({
 });
 
 export default function Testimonals() {
-  const { data: fetched, loading, source } = useBackendData(testimonialsAPI.active);
+  const { data: fetched, loading, source } = useBackendData(
+    () => testimonialsAPI.active(),
+    []
+  );
 
   const testimonials = (fetched || []).filter((t) => t.is_active !== false).map(adapt);
 
@@ -42,21 +45,14 @@ export default function Testimonals() {
           className="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"
         >
           <div className="max-w-3xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#EE8433]/25 bg-[#EE8433]/10 px-4 py-2 backdrop-blur">
-              <Quote size={14} className="text-[#EE8433]" />
-              <span className="text-[10px] font-black uppercase tracking-[0.28em] text-[#EE8433]">Testimonials</span>
-            </div>
-            <div className="relative">
-              <div className="absolute -left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FFD700] via-[#FFC107] to-[#1565C0] rounded-full hidden sm:block" />
-              <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.05] tracking-tight animate-hero-title pl-0 sm:pl-6">
-                Real stories from people who kept going.
-              </h2>
-            </div>
-            <p className="mt-6 max-w-2xl text-base md:text-lg leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-white/90 via-[#FFD700]/90 to-[#1565C0]/80">
-              Every testimonial is a <strong className="text-[#FFD700]">real</strong> graduate from our platform. <span className="text-white/60">Powered by the backend,</span> <span className="text-[#FFD700]/80">always up to date.</span>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.05] tracking-tight">
+              Real stories from people who kept going.
+            </h2>
+            <p className="mt-5 max-w-2xl text-base md:text-lg leading-relaxed text-white/70">
+              Every testimonial is a real graduate from our platform. Powered by the backend, always up to date.
             </p>
             {source === 'api' && (
-              <div className="mt-5 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+              <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">Live from /homepage/</span>
               </div>

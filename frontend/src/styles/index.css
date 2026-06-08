@@ -226,22 +226,6 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 0% 50%; }
 }
 
-@keyframes hero-shimmer {
-  0% { background-position: 0% 50%; }
-  25% { background-position: 100% 50%; }
-  50% { background-position: 100% 50%; }
-  75% { background-position: 0% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.animate-hero-title {
-  background: linear-gradient(90deg, #FFD700 0%, #FFC107 22%, #FF8F00 42%, #1565C0 68%, #0D47A1 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: hero-shimmer 4s ease-in-out infinite;
-}
-
 @keyframes float-slow {
   0%, 100% { transform: translate(0, 0) scale(1); }
   33% { transform: translate(30px, -20px) scale(1.05); }
