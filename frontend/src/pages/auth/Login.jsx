@@ -38,7 +38,7 @@ const passwordStrength = (pwd) => {
 
 export default function Login() {
   const [current, setCurrent] = useState(0);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
@@ -62,7 +62,7 @@ export default function Login() {
 
   useEffect(() => {
     const r = localStorage.getItem('elevate_remembered_user');
-    if (r) { setUsername(r); setRememberMe(true); }
+    if (r) { setEmail(r); setRememberMe(true); }
   }, []);
 
   const strength = useMemo(() => passwordStrength(password), [password]);
@@ -73,8 +73,8 @@ export default function Login() {
     setSuccess(false);
     setSubmitting(true);
     try {
-      const user = await login({ username, password });
-      if (rememberMe) localStorage.setItem('elevate_remembered_user', username);
+      const user = await login({ username: email, password });
+      if (rememberMe) localStorage.setItem('elevate_remembered_user', email);
       else localStorage.removeItem('elevate_remembered_user');
       setSuccess(true);
       const role = user?.role?.toLowerCase();
@@ -89,7 +89,7 @@ export default function Login() {
         const k = Object.keys(data)[0];
         const v = data[k];
         setError(Array.isArray(v) ? v[0] : v);
-      } else setError(err?.message || 'Invalid username or password. Please try again.');
+      } else setError(err?.message || 'Invalid email or password. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -241,15 +241,15 @@ export default function Login() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 ">Username / Email</label>
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 ">Email</label>
                 <div className="relative group">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400  group-focus-within:text-[#5A2DA8] transition-all" />
                   <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
-                    autoComplete="username"
+                    autoComplete="email"
                     placeholder="your@domain.com"
                     className="w-full pl-11 pr-4 py-3.5 bg-white .06] border border-gray-200 .12] rounded-2xl focus:border-[#5A2DA8] focus:ring-2 focus:ring-[#5A2DA8]/20 transition-all duration-300 text-base placeholder:text-gray-400 :text-white/30 "
                   />

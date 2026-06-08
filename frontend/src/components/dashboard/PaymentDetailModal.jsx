@@ -1,4 +1,4 @@
-import { Phone, Mail, BookOpen, Calendar, Eye, FileText, Download, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Phone, Mail, BookOpen, Calendar, Eye, FileText, Download, CheckCircle, XCircle, Clock, ShieldCheck } from 'lucide-react';
 import Modal from './Modal';
 import StatusBadge from './StatusBadge';
 import { getMediaUrl } from '../../services/api';
@@ -7,6 +7,7 @@ export default function PaymentDetailModal({ payment, onClose, onApprove, onReje
   if (!payment) return null;
 
   const isPending = (payment.status || '').toLowerCase() === 'pending';
+  const isApproved = (payment.status || '').toLowerCase() === 'approved';
   const isImage = getMediaUrl(payment.proof_file).match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
 
   const timeline = [
@@ -23,13 +24,13 @@ export default function PaymentDetailModal({ payment, onClose, onApprove, onReje
       desc: isPending ? 'Awaiting admin decision' : 'Admin has reviewed'
     },
     {
-      label: payment.status === 'Approved' ? 'Approved — Access Granted' : payment.status === 'Rejected' ? 'Rejected' : 'Pending',
+      label: isApproved ? 'Approved — Access Granted' : payment.status === 'Rejected' ? 'Rejected' : 'Pending',
       date: !isPending ? payment.updated_at : null,
       done: !isPending,
-      icon: payment.status === 'Approved' ? '✅' : payment.status === 'Rejected' ? '❌' : '⏳',
-      desc: payment.status === 'Approved' ? 'Enrollment has been activated' :
-            payment.status === 'Rejected' ? 'Payment was declined' :
-            'Waiting for decision'
+      icon: isApproved ? '✅' : payment.status === 'Rejected' ? '❌' : '⏳',
+      desc: isApproved ? '✅ Enrollment activated — student can now access the course' :
+            payment.status === 'Rejected' ? 'Enrollment cancelled' :
+            'Approving will activate the student\'s enrollment'
     }
   ];
 
@@ -119,19 +120,42 @@ export default function PaymentDetailModal({ payment, onClose, onApprove, onReje
         )}
 
         {isPending && (
-          <div className="flex gap-3 pt-2">
-            <button
-              onClick={() => onApprove(payment.id)}
-              className="flex-1 py-3 bg-brand-violet text-white font-black text-xs rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <CheckCircle size={16} /> Approve
-            </button>
-            <button
-              onClick={() => onReject(payment.id)}
-              className="flex-1 py-3 bg-red-600 text-white font-black text-xs rounded-xl hover:bg-red-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <XCircle size={16} /> Reject
-            </button>
+          <>
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+              <div className="flex items-start gap-3">
+                <ShieldCheck size={20} className="text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-bold text-amber-800">Enrollment Impact</p>
+                  <p className="text-xs text-amber-700 mt-1">Approving this payment will <span className="font-bold">activate the enrollment</span> for <span className="font-bold">{payment.course_title}</span>. The student will gain immediate access to the course in their dashboard.</p>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => onApprove(payment.id)}
+                className="flex-1 py-3 bg-brand-violet text-white font-black text-xs rounded-xl hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <CheckCircle size={16} /> Approve & Activate
+              </button>
+              <button
+                onClick={() => onReject(payment.id)}
+                className="flex-1 py-3 bg-red-600 text-white font-black text-xs rounded-xl hover:bg-red-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <XCircle size={16} /> Reject
+              </button>
+            </div>
+          </>
+        )}
+
+        {isApproved && (
+          <div className="p-4 rounded-2xl bg-green-50 border border-green-200">
+            <div className="flex items-start gap-3">
+              <ShieldCheck size={20} className="text-green-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-green-800">Enrollment Active</p>
+                <p className="text-xs text-green-700 mt-1">The student's enrollment for <span className="font-bold">{payment.course_title}</span> has been activated. They can now access the course from their dashboard.</p>
+              </div>
+            </div>
           </div>
         )}
       </div>

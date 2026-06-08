@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, LayoutDashboard, GraduationCap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import logoSvg from '../assets/logo-elevate.svg';
+import logoJpg from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
@@ -71,8 +71,8 @@ export default function Navbar() {
         <Link to="/" className="relative z-[71] flex items-center gap-3 group">
           <div className="relative">
             <img
-              src={logoSvg}
-              className="h-10 sm:h-12 w-auto drop-shadow-lg"
+              src={logoJpg}
+              className="h-12 sm:h-14 w-auto rounded-xl shadow-xl shadow-black/20 object-cover ring-2 ring-[#3A3992]/20 group-hover:ring-[#3A3992]/40 transition-all"
               alt='ELEVATE'
             />
           </div>

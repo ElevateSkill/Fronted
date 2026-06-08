@@ -165,9 +165,45 @@ export const schemaAPI = {
 };
 
 // ===================== MEDIA UTILITY =====================
+/**
+ * Convert any "viewable" GitHub URL into a raw.githubusercontent.com URL
+ * so that <img src=...> can actually load the binary image.
+ *
+ * Examples:
+ *   https://github.com/user/repo/blob/main/img.png
+ *     -> https://raw.githubusercontent.com/user/repo/main/img.png
+ *
+ *   https://github.com/user/repo/blob/abc1234/img.png
+ *     -> https://raw.githubusercontent.com/user/repo/abc1234/img.png
+ *
+ * Already-raw URLs and non-GitHub URLs are returned unchanged.
+ */
+function normalizeGithubUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  // Only touch github.com (NOT raw.githubusercontent.com — those are already raw)
+  if (!/^https?:\/\/(www\.)?github\.com\//i.test(url)) return url;
+  try {
+    // Replace /blob/<branch>/ with the raw equivalent. Use a permissive regex
+    // so it works for branch names that contain slashes via the tree path.
+    // Pattern: github.com/<user>/<repo>/blob/<ref>/<path...>
+    const m = url.match(
+      /^https?:\/\/(?:www\.)?github\.com\/([^/]+)\/([^/]+)\/blob\/([^/]+)\/(.+?)(?:\?.*)?(?:#.*)?$/i
+    );
+    if (m) {
+      const [, user, repo, ref, path] = m;
+      return `https://raw.githubusercontent.com/${user}/${repo}/${ref}/${path}`;
+    }
+  } catch {
+    /* fall through and return original */
+  }
+  return url;
+}
+
 export function getMediaUrl(path) {
   if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return normalizeGithubUrl(path);
+  }
   if (path.startsWith('/media/')) {
     const base = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
     const origin = base.replace(/\/api\/.*$/, '');

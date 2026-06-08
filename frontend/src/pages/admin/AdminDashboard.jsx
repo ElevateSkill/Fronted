@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
  LayoutDashboard, Users, BookOpen, Megaphone, LogOut,
@@ -24,7 +24,7 @@ import { paymentsAPI } from '../../services/api';
 const sidebarItems = [
  { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
  { id: 'hero', label: 'Hero Slides', icon: <SlidersHorizontal size={20} /> },
-  { id: 'registrations', label: 'Registrations', icon: <UserPlus size={20} /> },
+  { id: 'enrollments', label: 'Enrollments', icon: <GraduationCap size={20} /> },
   { id: 'payments', label: 'Payments', icon: <CreditCard size={20} /> },
   { id: 'users', label: 'Users', icon: <Users size={20} /> },
  { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
@@ -281,6 +281,28 @@ export default function AdminDashboard() {
     fetchPayments();
   }, []);
 
+  // Seed users list with current admin profile
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (user && !seededRef.current) {
+      seededRef.current = true;
+      setUsers(prev => {
+        if (prev.some(u => u.email === user.email || u.id === user.id)) return prev;
+        return [{
+          id: user.id || 'me',
+          name: user.full_name || user.username || 'Admin',
+          email: user.email || '',
+          username: user.username || '',
+          phone: user.phone_number || '',
+          role: 'Admin',
+          joined: user.created_at ? new Date(user.created_at).toLocaleDateString() : new Date().toISOString().split('T')[0],
+          status: 'Active',
+          courses: 0,
+        }, ...prev];
+      });
+    }
+  }, [user]);
+
   const stats = {
     total: dashboardStats?.totalEnrollments || registrations.length,
     pending: registrations.filter(r => r.status === 'Pending').length,
@@ -317,7 +339,7 @@ export default function AdminDashboard() {
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
  {statCards.map((card, i) => (
- <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 p-4 group hover:border-gray-300 transition-all cursor-pointer"             onClick={() => { const map = { 'Total Enrollments': 'registrations', 'Pending Review': 'registrations', 'Approved': 'registrations', 'Active Students': 'users', 'Courses': 'courses', 'Pending Payments': 'payments' }; setActiveTab(map[card.label]); }}>
+ <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="relative overflow-hidden rounded-2xl bg-gray-100 border border-gray-200 p-4 group hover:border-gray-300 transition-all cursor-pointer"             onClick={() => { const map = { 'Total Enrollments': 'enrollments', 'Pending Review': 'enrollments', 'Approved': 'enrollments', 'Active Students': 'users', 'Courses': 'courses', 'Pending Payments': 'payments' }; setActiveTab(map[card.label]); }}>
  <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity bg-gradient-to-br ${card.color}`} />
  <div className="flex items-center justify-between mb-3">
  <div className="p-2.5 rounded-xl bg-gray-200 text-gray-600 ">{card.icon}</div>
@@ -365,61 +387,101 @@ export default function AdminDashboard() {
  </div>
  );
 
- case 'registrations':
- return (
- <div className="space-y-4">
- <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
- <div>
- <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Registrations</h2>
- <p className="text-gray-500 text-sm font-medium">Manage user registrations</p>
- </div>
- <div className="flex items-center gap-3">
- <div className="relative">
- <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 " />
- <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-48 pl-10 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 placeholder:text-gray-400 " />
- </div>
- <div className="flex gap-1 p-1 bg-gray-100 rounded-xl border border-gray-200 ">
- {['All', 'Pending', 'Approved', 'Rejected'].map(s => (
- <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all uppercase tracking-wider ${statusFilter === s ? 'bg-brand-bg text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700 '}`}>{s}</button>
- ))}
- </div>
- </div>
- </div>
- <div className="overflow-x-auto rounded-2xl border border-gray-200 ">
- <table className="w-full text-sm">
- <thead>
- <tr className="border-b border-gray-200 bg-gray-50 ">
-          {['Full Name', 'Email', 'Phone', 'Course', 'Payment', 'Status', 'Actions'].map(h => <th key={h} className={`text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-wider ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>)}
- </tr>
- </thead>
- <tbody>
- {(searchQuery || statusFilter !== 'All' ? registrations.filter(r => {
- const matchesSearch = !searchQuery || r.name.toLowerCase().includes(searchQuery.toLowerCase()) || r.email.toLowerCase().includes(searchQuery.toLowerCase());
- const matchesStatus = statusFilter === 'All' || r.status === statusFilter;
- return matchesSearch && matchesStatus;
- }) : registrations).map((r, i) => (
- <motion.tr key={r.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
- <td className="p-3"><span className="font-semibold text-gray-900 text-sm">{r.name}</span></td>
- <td className="p-3 text-gray-500 text-xs">{r.email}</td>
- <td className="p-3 text-gray-500 text-xs">{r.phone}</td>
-          <td className="p-3 text-gray-500 text-xs">{r.course}</td>
-          <td className="p-3"><span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider inline-block ${r.payment === 'Paid' ? 'bg-green-100 text-green-700' : r.payment === 'Pending' ? 'bg-amber-100 text-amber-700' : r.payment === 'Rejected' ? 'bg-[#FDE0DC] text-red-700' : 'bg-gray-100 text-gray-400'}`}>{r.payment}</span></td>
+  case 'enrollments':
+  return (
+  <div className="space-y-4">
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+  <div>
+  <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">Enrollments</h2>
+  <p className="text-gray-500 text-sm font-medium">Student course registrations — approval is done via <span className="font-bold text-[#5A2DA8] cursor-pointer hover:underline" onClick={() => setActiveTab('payments')}>Payments</span></p>
+  </div>
+  <div className="flex items-center gap-3">
+  <div className="relative">
+  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 " />
+  <input type="text" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-48 pl-10 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 placeholder:text-gray-400 " />
+  </div>
+  <div className="flex gap-1 p-1 bg-gray-100 rounded-xl border border-gray-200 ">
+  {['All', 'Pending', 'Active', 'Completed', 'Cancelled'].map(s => (
+  <button key={s} onClick={() => setStatusFilter(s)} className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all uppercase tracking-wider ${statusFilter === s ? 'bg-brand-bg text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700 '}`}>{s}</button>
+  ))}
+  </div>
+  </div>
+  </div>
+  <div className="overflow-x-auto rounded-2xl border border-gray-200 ">
+  <table className="w-full text-sm">
+  <thead>
+  <tr className="border-b border-gray-200 bg-gray-50 ">
+          {['Student', 'Course', 'Enrolled', 'Payment', 'Status', 'Actions'].map(h => <th key={h} className={`text-left p-3 text-[10px] font-black text-gray-500 uppercase tracking-wider ${h === 'Actions' ? 'text-right' : ''}`}>{h}</th>)}
+  </tr>
+  </thead>
+  <tbody>
+  {(searchQuery || statusFilter !== 'All' ? registrations.filter(r => {
+  const matchesSearch = !searchQuery || r.name.toLowerCase().includes(searchQuery.toLowerCase()) || r.email.toLowerCase().includes(searchQuery.toLowerCase()) || r.course.toLowerCase().includes(searchQuery.toLowerCase());
+  const matchesStatus = statusFilter === 'All' || r.status === statusFilter;
+  return matchesSearch && matchesStatus;
+  }) : registrations).map((r, i) => {
+    const pendingPayment = paymentList.find(p =>
+      p.course_title === r.course &&
+      (p.full_name?.toLowerCase().includes(r.name?.toLowerCase().split(' ')[0] || '') ||
+       r.name?.toLowerCase().includes((p.full_name || '').toLowerCase().split(' ')[0] || ''))
+    );
+    return (
+  <motion.tr key={r.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+  <td className="p-3">
+    <div className="flex items-center gap-2">
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5A2DA8] to-[#3A3992] flex items-center justify-center text-white font-black text-xs">{(r.name || 'S')[0]}</div>
+      <div>
+        <span className="font-semibold text-gray-900 text-sm">{r.name}</span>
+        {r.email && <p className="text-[10px] text-gray-400">{r.email}</p>}
+      </div>
+    </div>
+  </td>
+          <td className="p-3 text-gray-500 text-xs font-medium">{r.course || '—'}</td>
+          <td className="p-3 text-gray-500 text-xs">{r.date || '—'}</td>
+          <td className="p-3">
+            {r.payment && r.payment !== '—' ? (
+              <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider inline-block ${
+                r.payment === 'Paid' ? 'bg-green-100 text-green-700' :
+                r.payment === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                r.payment === 'Rejected' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400'
+              }`}>{r.payment}</span>
+            ) : (
+              <span className="text-[10px] text-gray-400 italic">No payment</span>
+            )}
+          </td>
           <td className="p-3"><StatusBadge status={r.status} /></td>
- <td className="p-3">
- <div className="flex items-center justify-end gap-2">
- <button onClick={() => { const updated = registrations.map(x => x.id === r.id ? { ...x, status: 'Approved' } : x); setRegistrations(updated); showToast(`${r.name} approved`); }} disabled={r.status === 'Approved'} className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all" title="Approve"><CheckCircle size={16} /></button>
- <button onClick={() => { const updated = registrations.map(x => x.id === r.id ? { ...x, status: 'Rejected' } : x); setRegistrations(updated); showToast(`${r.name} rejected`); }} disabled={r.status === 'Rejected'} className="p-2 rounded-lg bg-[#FDE0DC] text-red-700 hover:bg-red-200 disabled:opacity-30 disabled:cursor-not-allowed transition-all" title="Reject"><XCircle size={16} /></button>
- <button onClick={() => setSelectedItem({ type: 'registration', data: r })} className="p-2 rounded-lg bg-[#E0E0F0] #5A2DA8]/10 text-[#5A2DA8] hover:bg-[#C1C1E0] #5A2DA8]/20 transition-all" title="View Details"><Eye size={16} /></button>
- </div>
- </td>
- </motion.tr>
- ))}
- </tbody>
- </table>
- {registrations.length === 0 && <div className="p-12 text-center"><UserPlus size={40} className="mx-auto text-gray-300 mb-4" /><p className="text-gray-400 text-sm">No registrations yet</p></div>}
- </div>
- </div>
- );
+  <td className="p-3">
+  <div className="flex items-center justify-end gap-2">
+    {pendingPayment && r.status === 'Pending' && (
+      <button onClick={() => { setActiveTab('payments'); setSelectedPayment(pendingPayment); }}
+        className="p-2 rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition-all cursor-pointer" title="Review Payment">
+        <CreditCard size={16} />
+      </button>
+    )}
+    {pendingPayment && r.status === 'Pending' && (
+      <button onClick={async () => {
+        try {
+          await paymentsAPI.adminApprove(pendingPayment.id);
+          setPaymentList(prev => prev.map(p => p.id === pendingPayment.id ? { ...p, status: 'approved' } : p));
+          setRegistrations(prev => prev.map(x => x.id === r.id ? { ...x, status: 'Active', payment: 'Paid' } : x));
+          showToast(`${r.name} approved — enrollment activated`);
+        } catch { showToast('Approve failed', 'error'); }
+      }} className="p-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-all cursor-pointer" title="Approve & Activate">
+        <CheckCircle size={16} />
+      </button>
+    )}
+  <button onClick={() => setSelectedItem({ type: 'registration', data: r })} className="p-2 rounded-lg bg-[#E0E0F0] text-[#5A2DA8] hover:bg-[#C1C1E0] transition-all cursor-pointer" title="View Details"><Eye size={16} /></button>
+  </div>
+  </td>
+  </motion.tr>
+    );
+  })}
+  </tbody>
+  </table>
+  {registrations.length === 0 && <div className="p-12 text-center"><GraduationCap size={40} className="mx-auto text-gray-300 mb-4" /><p className="text-gray-400 text-sm">No enrollments yet</p></div>}
+  </div>
+  </div>
+  );
 
   case 'payments':
   return (
@@ -457,10 +519,24 @@ export default function AdminDashboard() {
   return (
   <UsersSection
   users={users}
+  currentUser={user}
   loading={userLoading}
   onEdit={(u) => { setEditItem(u); setShowModal('user'); }}
   onDelete={(id) => { setSelectedItem({ type: 'user', id }); setShowModal('delete'); }}
-  onAdd={() => { setEditItem({ name: '', email: '', role: 'Student', status: 'Active', phone: '' }); setShowModal('user'); }}
+  onAdd={() => { setEditItem({ name: '', email: '', role: 'Admin', status: 'Active', phone: '' }); setShowModal('user'); }}
+  onAddMe={() => {
+  if (user) {
+  setEditItem({
+    name: user.full_name || user.username || '',
+    email: user.email || '',
+    role: 'Admin',
+    status: 'Active',
+    phone: user.phone_number || '',
+    username: user.username || '',
+  });
+  setShowModal('user');
+  }
+  }}
   onRefresh={() => {
   setUserLoading(true);
   Promise.resolve().then(() => { setUserLoading(false); showToast('Users refreshed'); });

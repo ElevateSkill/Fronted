@@ -19,6 +19,9 @@ const categoryMeta = {
   'Cloud & DevOps':  { icon: 'Rocket', color: '#EE8433' },
 };
 
+// Brand yellow used in the logo / hero shimmer — keeps course titles visible on the dark card gradient
+const TITLE_YELLOW = '#FFD700';
+
 const safeStr = (v, fallback = '') => (v != null && typeof v !== 'object') ? String(v) : fallback;
 
 const adapt = (c) => {
@@ -27,8 +30,7 @@ const adapt = (c) => {
   return {
     id: c.id,
     title: safeStr(c.title),
-    desc: safeStr(c.short_description || c.description),
-    description: safeStr(c.description || c.short_description),
+    desc: safeStr(c.short_description),
     category: catName,
     image: getMediaUrl(c.thumbnail) || '',
     instructor: safeStr(c.instructor, 'Staff'),
@@ -132,11 +134,19 @@ export default function Courses() {
                     </div>
                   )}
                   <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-lg font-black text-white mb-1 line-clamp-1 drop-shadow-lg">{course.title}</h3>
+                    {/* Course title — bright yellow to match logo / brand accent and stay readable on the dark gradient overlay */}
+                    <h3
+                      className="text-lg font-black mb-1 line-clamp-1 drop-shadow-lg"
+                      style={{ color: TITLE_YELLOW, textShadow: '0 1px 2px rgba(0,0,0,0.6)' }}
+                    >
+                      {course.title}
+                    </h3>
                   </div>
                 </div>
                 <div className="p-5">
-                  <p className="text-xs text-white/50  mb-4 leading-relaxed line-clamp-2">{course.desc || course.description}</p>
+                  <div className="mb-4">
+                    <p className="text-xs text-white/60 leading-relaxed">{course.desc}</p>
+                  </div>
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     <div className="flex items-center gap-1.5 text-[10px] text-white/50 ">
                       <User size={12} className="text-[#3A3992]" /> {course.instructor}

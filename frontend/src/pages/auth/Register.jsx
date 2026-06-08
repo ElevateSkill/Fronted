@@ -90,7 +90,14 @@ export default function Register() {
       .catch(() => { });
   }, []);
 
-  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'email') {
+      setForm({ ...form, email: value, username: value });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -322,7 +329,21 @@ export default function Register() {
             <form onSubmit={onSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <InputField name="full_name" label="Full Name" Icon={IdCard} placeholder="Melke Alemu" form={form} onChange={onChange} />
-                <InputField name="username" label="Username" Icon={User} placeholder="melke" form={form} onChange={onChange} />
+                <div>
+                  <label className="text-[10px] font-bold text-gray-600  mb-1 block uppercase tracking-wider">
+                    Username (auto-set)
+                  </label>
+                  <div className="relative group">
+                    <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <input
+                      name="username"
+                      type="text"
+                      value={form.username}
+                      readOnly
+                      className="w-full pl-11 pr-4 py-3.5 bg-gray-100  border border-gray-200  rounded-2xl text-base text-gray-500  cursor-not-allowed"
+                    />
+                  </div>
+                </div>
                 <InputField name="phone_number" label="Phone Number" type="tel" Icon={Phone} placeholder="+251 9XX XXX XXX" form={form} onChange={onChange} />
                 <InputField name="email" label="Email Address" type="email" Icon={Mail} placeholder="you@example.com" span form={form} onChange={onChange} />
                 <InputField name="password" label="Password" type="password" Icon={Lock} placeholder="••••••••" showToggle form={form} onChange={onChange} />

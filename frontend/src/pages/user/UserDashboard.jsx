@@ -8,17 +8,53 @@ import {
   AlertTriangle, Clock, Play,
   ChevronDown, Send, Headphones, HelpCircle,
   Save, CreditCard, TrendingUp, BarChart3, ArrowRight,
-  Eye, X, Download, Target, Award, Zap
+  Eye, X, Download, Target, Award, Zap, History, UserCircle,
+  Info, ShieldX, Ban, Hourglass
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { enrollmentsAPI, paymentsAPI, authAPI, getMediaUrl } from '../../services/api';
+import { enrollmentsAPI, paymentsAPI, authAPI, getMediaUrl, normalizeApiList } from '../../services/api';
+import StatusBadge from '../../components/dashboard/StatusBadge';
 
-const genId = () => Date.now() + Math.random();
+// --- Enrollment status helpers (mirror backend logic) ---
+const ENROLLMENT_STATUS = {
+  PENDING: 'pending',
+  UNDER_REVIEW: 'under_review',
+  ACTIVE: 'active',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+  REJECTED: 'rejected',
+};
+
+function getDisplayStatus(rawStatus) {
+  const s = (rawStatus || '').toLowerCase();
+  if (s === ENROLLMENT_STATUS.ACTIVE || s === ENROLLMENT_STATUS.COMPLETED) return 'Approved';
+  if (s === ENROLLMENT_STATUS.UNDER_REVIEW) return 'Under Review';
+  if (s === ENROLLMENT_STATUS.REJECTED) return 'Rejected';
+  if (s === ENROLLMENT_STATUS.CANCELLED) return 'Cancelled';
+  return 'Pending';
+}
+
+function isAccessible(rawStatus) {
+  const s = (rawStatus || '').toLowerCase();
+  return s === ENROLLMENT_STATUS.ACTIVE || s === ENROLLMENT_STATUS.COMPLETED;
+}
+
+function isBlocked(rawStatus) {
+  const s = (rawStatus || '').toLowerCase();
+  return s === ENROLLMENT_STATUS.REJECTED || s === ENROLLMENT_STATUS.CANCELLED;
+}
+
+function isInReview(rawStatus) {
+  const s = (rawStatus || '').toLowerCase();
+  return s === ENROLLMENT_STATUS.PENDING || s === ENROLLMENT_STATUS.UNDER_REVIEW;
+}
 
 const sidebarItems = [
   { id: 'home', label: 'Home', icon: <Home size={18} /> },
   { id: 'courses', label: 'My Courses', icon: <BookOpen size={18} /> },
   { id: 'payment', label: 'Payment Proof', icon: <Upload size={18} /> },
+  { id: 'payment-history', label: 'Payment History', icon: <History size={18} /> },
+  { id: 'profile', label: 'My Profile', icon: <UserCircle size={18} /> },
   { id: 'support', label: 'Support', icon: <MessageCircle size={18} /> },
   { id: 'settings', label: 'Settings', icon: <Settings size={18} /> },
 ];
@@ -33,16 +69,55 @@ const faqData = [
 function buildActivityLog(enrollments, payments) {
   const entries = [];
   enrollments.forEach(e => {
-    if (e.completed_lessons > 0) {
-      entries.push({ action: `Completed ${e.completed_lessons} lessons in ${e.course?.title || 'a course'}`, time: 'Ongoing', icon: <CheckCircle size={12} />, color: 'text-green-500 bg-green-100' });
+    const courseTitle = e.course?.title || 'a course';
+    // Surface admin actions on the enrollment prominently
+    if (e.status === ENROLLMENT_STATUS.ACTIVE || e.status === ENROLLMENT_STATUS.COMPLETED) {
+      entries.push({
+        action: `Course approved: ${courseTitle}`,
+        time: e.reviewed_at || e.updated_at || e.created_at,
+        icon: <CheckCircle size={12} />,
+        color: 'text-emerald-600 bg-emerald-100',
+        note: e.admin_note || null,
+      });
+    } else if (e.status === ENROLLMENT_STATUS.REJECTED) {
+      entries.push({
+        action: `Course rejected: ${courseTitle}`,
+        time: e.reviewed_at || e.updated_at || e.created_at,
+        icon: <ShieldX size={12} />,
+        color: 'text-[#D95C4A] bg-[#FDE0DC]',
+        note: e.admin_note || null,
+      });
+    } else if (e.status === ENROLLMENT_STATUS.UNDER_REVIEW) {
+      entries.push({
+        action: `Under review: ${courseTitle}`,
+        time: e.updated_at || e.created_at,
+        icon: <Hourglass size={12} />,
+        color: 'text-[#3A3992] bg-blue-100',
+        note: e.admin_note || null,
+      });
+    } else {
+      entries.push({
+        action: `Enrolled in ${courseTitle}`,
+        time: e.created_at,
+        icon: <BookOpen size={12} />,
+        color: 'text-[#5A2DA8] bg-[#5A2DA8]/10',
+        note: e.admin_note || null,
+      });
     }
-    entries.push({ action: `Enrolled in ${e.course?.title || 'a course'}`, time: e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString() : 'Recently', icon: <BookOpen size={12} />, color: 'text-[#5A2DA8] bg-[#5A2DA8]/10' });
   });
   payments.forEach(p => {
     const label = p.status === 'approved' ? 'Approved' : p.status === 'rejected' ? 'Rejected' : 'Pending';
-    entries.push({ action: `Payment ${label}${p.course_title ? ` for ${p.course_title}` : ''}`, time: p.submitted_at ? new Date(p.submitted_at).toLocaleDateString() : '', icon: <CreditCard size={12} />, color: p.status === 'approved' ? 'text-green-600 bg-green-100' : p.status === 'rejected' ? 'text-[#D95C4A] bg-[#D95C4A]/10' : 'text-amber-600 bg-amber-100' });
+    entries.push({
+      action: `Payment ${label}${p.course_title ? ` for ${p.course_title}` : ''}`,
+      time: p.submitted_at,
+      icon: <CreditCard size={12} />,
+      color: p.status === 'approved' ? 'text-green-600 bg-green-100' : p.status === 'rejected' ? 'text-[#D95C4A] bg-[#D95C4A]/10' : 'text-amber-600 bg-amber-100',
+    });
   });
-  return entries.sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 10);
+  return entries
+    .filter(e => e.time)
+    .sort((a, b) => new Date(b.time) - new Date(a.time))
+    .slice(0, 10);
 }
 
 export default function UserDashboard() {
@@ -77,25 +152,42 @@ export default function UserDashboard() {
   const showToast = (message, type = 'success') => { setToast({ message, type }); setTimeout(() => setToast(null), 3000); };
 
   useEffect(() => {
+    let cancelled = false;
     const fetchData = async () => {
+      setLoading(true);
       try {
         const [enrollRes, payRes, profileRes] = await Promise.allSettled([
           enrollmentsAPI.myEnrollments(),
           paymentsAPI.myPayments(),
           authAPI.getProfile(),
         ]);
-        if (enrollRes.status === 'fulfilled' && enrollRes.value?.length) {
-          const adapted = enrollRes.value.map(e => ({
-            id: e.id, title: e.course?.title || e.title || 'Course',
-            progress: e.progress || 0, instructor: e.course?.instructor || 'Instructor',
-            lessons: e.course?.lessons || 0, completed: e.completed_lessons || 0,
-            nextLesson: e.next_lesson || 'Continue learning',
-            image: e.course?.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400',
-          }));
-          setEnrolledCourses(adapted);
+        if (cancelled) return;
+        if (enrollRes.status === 'fulfilled') {
+          const list = normalizeApiList(enrollRes.value);
+          if (list.length) {
+            const adapted = list.map(e => {
+              const course = e.course || {};
+              return {
+                id: e.id,
+                title: course.title || 'Course',
+                status: (e.status || 'pending').toLowerCase(),
+                instructor: course.instructor || 'Instructor',
+                lessons: course.lessons || 0,
+                duration: course.duration || 'Self-paced',
+                image: getMediaUrl(course.thumbnail) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400',
+                enrolledAt: e.created_at ? new Date(e.created_at).toLocaleDateString() : '',
+                reviewedAt: e.reviewed_at ? new Date(e.reviewed_at).toLocaleDateString() : '',
+                adminNote: e.admin_note || '',
+                price: course.price || '',
+                courseUrl: course.course_url || '',
+              };
+            });
+            setEnrolledCourses(adapted);
+          }
         }
-        if (payRes.status === 'fulfilled' && payRes.value?.length) {
-          setPaymentHistory(payRes.value);
+        if (payRes.status === 'fulfilled') {
+          const list = normalizeApiList(payRes.value);
+          if (list.length) setPaymentHistory(list);
         }
         if (profileRes.status === 'fulfilled' && profileRes.value) {
           const p = profileRes.value;
@@ -106,13 +198,14 @@ export default function UserDashboard() {
             bio: p.bio || 'Passionate about learning.',
           });
         }
-        const enr = enrollRes.status === 'fulfilled' && enrollRes.value?.length ? enrollRes.value : [];
-        const pay = payRes.status === 'fulfilled' && payRes.value?.length ? payRes.value : [];
-        setActivityLog(buildActivityLog(enr, pay));
-      } catch (e) { /* API unavailable — keep local state */ }
-      setLoading(false);
+        const enr = enrollRes.status === 'fulfilled' ? normalizeApiList(enrollRes.value) : [];
+        const pay = payRes.status === 'fulfilled' ? normalizeApiList(payRes.value) : [];
+        if (!cancelled) setActivityLog(buildActivityLog(enr, pay));
+      } catch { /* API unavailable — keep local state */ }
+      if (!cancelled) setLoading(false);
     };
     fetchData();
+    return () => { cancelled = true; };
   }, []);
 
   const handlePaymentSubmit = async () => {
@@ -129,16 +222,13 @@ export default function UserDashboard() {
       await paymentsAPI.submitProof(formData);
       setPaymentSubmitted(true);
       showToast('Payment proof submitted! Pending admin approval.');
-    } catch (e) {
+    } catch {
       showToast('Submission failed. Please try again.', 'error');
     }
   };
 
-  const totalCompleted = enrolledCourses.reduce((a, c) => a + c.completed, 0);
-  const totalLessons = enrolledCourses.reduce((a, c) => a + c.lessons, 0);
-  const overallProgress = enrolledCourses.length > 0
-    ? Math.round(enrolledCourses.reduce((a, c) => a + c.progress, 0) / enrolledCourses.length)
-    : 0;
+  const activeEnrollments = enrolledCourses.filter(c => c.status === 'active').length;
+  const completedEnrollments = enrolledCourses.filter(c => c.status === 'completed').length;
   const approvedPayments = paymentHistory.filter(p => (p.status || '').toLowerCase() === 'approved').length;
 
   return (
@@ -225,8 +315,8 @@ export default function UserDashboard() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { label: 'Enrolled Courses', value: enrolledCourses.length, icon: <BookOpen size={16} />, color: 'from-[#5A2DA8] to-[#7A3FB5]', bg: 'bg-[#5A2DA8]/10 text-[#5A2DA8]' },
-                    { label: 'Lessons Done', value: totalCompleted, icon: <CheckCircle size={16} />, color: 'from-green-500 to-emerald-600', bg: 'bg-green-100 text-green-600' },
-                    { label: 'Progress', value: `${overallProgress}%`, icon: <TrendingUp size={16} />, color: 'from-[#EE8433] to-[#D95C4A]', bg: 'bg-[#EE8433]/10 text-[#EE8433]' },
+                    { label: 'Active Courses', value: activeEnrollments, icon: <Play size={16} />, color: 'from-green-500 to-emerald-600', bg: 'bg-green-100 text-green-600' },
+                    { label: 'Completed', value: completedEnrollments, icon: <CheckCircle size={16} />, color: 'from-[#EE8433] to-[#D95C4A]', bg: 'bg-[#EE8433]/10 text-[#EE8433]' },
                     { label: 'Payments Approved', value: approvedPayments, icon: <ShieldCheck size={16} />, color: 'from-[#3A3992] to-[#5A2DA8]', bg: 'bg-[#3A3992]/10 text-[#3A3992]' },
                   ].map((stat, i) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 * i }}
@@ -279,7 +369,10 @@ export default function UserDashboard() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-gray-900 truncate">{act.action}</p>
-                            <p className="text-[10px] text-gray-500">{act.time}</p>
+                            {act.note && (
+                              <p className="text-[10px] text-gray-600 italic mt-0.5 line-clamp-2">“{act.note}”</p>
+                            )}
+                            <p className="text-[10px] text-gray-400 mt-0.5">{act.time && new Date(act.time).toLocaleDateString()}</p>
                           </div>
                         </motion.div>
                       ))}
@@ -294,60 +387,162 @@ export default function UserDashboard() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-xl font-black text-gray-900 tracking-tight">My Courses</h2>
-                    <p className="text-xs text-gray-500 mt-0.5">{enrolledCourses.length > 0 ? `${totalCompleted} of ${totalLessons} lessons completed` : 'Continue learning where you left off'}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{loading ? 'Fetching your enrollments...' : enrolledCourses.length > 0 ? `${enrolledCourses.length} course${enrolledCourses.length > 1 ? 's' : ''} enrolled` : 'Enroll in a course to get started'}</p>
                   </div>
                   {enrolledCourses.length > 0 && (
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#5A2DA8]/10 text-[#5A2DA8] text-[10px] font-black">
-                      <Target size={14} /> {overallProgress}% Overall
+                      <Target size={14} /> {activeEnrollments} Approved
                     </div>
                   )}
                 </div>
-                {enrolledCourses.length === 0 ? (
+
+                {/* Admin notification banner: surfaces admin notes (approval/rejection messages) */}
+                {enrolledCourses.some(c => (c.status === 'active' || c.status === 'completed') && c.adminNote) && (
+                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                    className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 flex items-start gap-3 shadow-sm">
+                    <div className="w-9 h-9 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                      <CheckCircle size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-black uppercase tracking-wider text-emerald-700 mb-1">Message from Admin</p>
+                      {enrolledCourses.filter(c => (c.status === 'active' || c.status === 'completed') && c.adminNote).map(c => (
+                        <p key={c.id} className="text-xs text-gray-800 mb-1">
+                          <span className="font-bold text-emerald-700">{c.title}:</span> “{c.adminNote}”
+                        </p>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {enrolledCourses.some(c => c.status === 'rejected' || c.status === 'cancelled') && (
+                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                    className="rounded-2xl border border-red-200 bg-red-50/60 p-4 flex items-start gap-3 shadow-sm">
+                    <div className="w-9 h-9 rounded-full bg-red-100 text-[#D95C4A] flex items-center justify-center shrink-0">
+                      <ShieldX size={18} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-black uppercase tracking-wider text-[#D95C4A] mb-1">Action Required — Course Access Denied</p>
+                      {enrolledCourses.filter(c => c.status === 'rejected' || c.status === 'cancelled').map(c => (
+                        <p key={c.id} className="text-xs text-gray-800 mb-1">
+                          <span className="font-bold text-[#D95C4A]">{c.title}:</span>{' '}
+                          {c.adminNote ? `“${c.adminNote}”` : 'Your enrollment was not approved. Please contact support to resubmit or get more information.'}
+                        </p>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {loading ? (
+                  <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+                    <div className="mx-auto mb-3 w-8 h-8 border-2 border-[#5A2DA8] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-xs text-gray-400">Loading your courses...</p>
+                  </div>
+                ) : enrolledCourses.length === 0 ? (
                   <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
                     <BookOpen size={36} className="mx-auto text-gray-300 mb-2" />
                     <h3 className="text-base font-bold text-gray-500 mb-1">No courses yet</h3>
                     <p className="text-xs text-gray-400">Enrolled courses will appear here after registration.</p>
                   </div>
-                ) : enrolledCourses.map((course, i) => (
+                ) : enrolledCourses.map((course, i) => {
+                  const display = getDisplayStatus(course.status);
+                  const accessible = isAccessible(course.status);
+                  const blocked = isBlocked(course.status);
+                  const inReview = isInReview(course.status);
+                  // Card border reflects status
+                  const borderClass = accessible
+                    ? 'border-emerald-200'
+                    : blocked
+                    ? 'border-red-200'
+                    : 'border-amber-200';
+                  return (
                   <motion.div key={course.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }}
-                    className="rounded-2xl border border-gray-200 bg-white overflow-hidden hover:border-[#5A2DA8]/30 hover:shadow-lg transition-all group">
+                    className={`rounded-2xl border ${borderClass} bg-white overflow-hidden hover:shadow-lg transition-all group`}>
                     <div className="flex flex-col md:flex-row">
                       <div className="md:w-44 h-28 md:h-auto overflow-hidden shrink-0 relative">
                         <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                        <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-black/50 backdrop-blur text-white text-[9px] font-black">
-                          {course.progress}%
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                        <div className="absolute top-2 left-2">
+                          <StatusBadge status={display} size="sm" className="shadow-md" />
                         </div>
                       </div>
                       <div className="flex-1 p-4 flex flex-col justify-between">
                         <div>
-                          <div className="flex items-start justify-between mb-1">
+                          <div className="flex items-start justify-between gap-2 mb-1">
                             <h3 className="text-sm font-bold text-gray-900">{course.title}</h3>
-                            <span className="text-[10px] font-bold text-[#5A2DA8] bg-[#5A2DA8]/10 px-2 py-0.5 rounded-full">{course.progress}%</span>
                           </div>
                           <p className="text-xs text-gray-500 mb-2">by {course.instructor}</p>
-                          <div className="flex items-center gap-3 text-xs text-gray-500 mb-2">
-                            <span><CheckCircle size={12} className="inline mr-1 text-green-500" />{course.completed}/{course.lessons} lessons</span>
+                          <div className="flex items-center gap-3 text-xs text-gray-500 mb-2 flex-wrap">
+                            <span><BookOpen size={12} className="inline mr-1 text-[#5A2DA8]" />{course.lessons} lessons</span>
+                            <span><Clock size={12} className="inline mr-1 text-[#EE8433]" />{course.duration}</span>
+                            {course.reviewedAt && (
+                              <span className="inline-flex items-center gap-1 text-[10px] text-gray-500">
+                                <Info size={10} /> Reviewed {course.reviewedAt}
+                              </span>
+                            )}
                           </div>
-                          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
-                            <motion.div initial={{ width: 0 }} animate={{ width: `${course.progress}%` }} transition={{ duration: 1, delay: 0.3 }}
-                              className="h-full bg-gradient-to-r from-[#EE8433] via-[#D95C4A] to-[#5A2DA8] rounded-full relative">
-                              <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                            </motion.div>
-                          </div>
-                          {course.nextLesson && (
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-2">
-                              <Play size={11} className="text-[#EE8433]" /> Next: {course.nextLesson}
+
+                          {/* Status-specific message */}
+                          {blocked && (
+                            <div className="mt-2 mb-2 p-3 rounded-lg bg-red-50 border border-red-200">
+                              <p className="text-[11px] font-bold text-[#D95C4A] mb-1 flex items-center gap-1">
+                                <Ban size={12} /> You can't access this course
+                              </p>
+                              <p className="text-[11px] text-gray-700 leading-relaxed">
+                                {course.adminNote || 'Your enrollment request was not approved. If you think this is a mistake, contact support or submit a new payment proof.'}
+                              </p>
                             </div>
                           )}
+
+                          {inReview && (
+                            <div className="mt-2 mb-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                              <p className="text-[11px] font-bold text-amber-700 mb-1 flex items-center gap-1">
+                                <Hourglass size={12} /> Waiting for admin review
+                              </p>
+                              <p className="text-[11px] text-gray-700 leading-relaxed">
+                                {course.status === 'under_review'
+                                  ? 'Our team is currently reviewing your enrollment. You will get full access as soon as it is approved.'
+                                  : 'Your enrollment is submitted. The admin will review it shortly. You will be notified here when the status changes.'}
+                                {course.adminNote && <> Admin note: “{course.adminNote}”</>}
+                              </p>
+                            </div>
+                          )}
+
+                          {accessible && course.adminNote && (
+                            <div className="mt-2 mb-2 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+                              <p className="text-[11px] font-bold text-emerald-700 mb-1 flex items-center gap-1">
+                                <CheckCircle size={12} /> Welcome! Admin message
+                              </p>
+                              <p className="text-[11px] text-gray-700 leading-relaxed">“{course.adminNote}”</p>
+                            </div>
+                          )}
+
+                          {course.enrolledAt && (
+                            <p className="text-[10px] text-gray-400 mb-1">Enrolled {course.enrolledAt}</p>
+                          )}
                         </div>
-                        <button className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#5A2DA8] to-[#3A3992] text-white font-bold text-[10px] rounded-lg hover:brightness-110 transition-all w-fit shadow-md">
-                          <Play size={12} /> Continue Learning
-                        </button>
+
+                        {/* Action button — disabled / styled by status */}
+                        {accessible ? (
+                          course.courseUrl ? (
+                            <a href={course.courseUrl} target="_blank" rel="noreferrer"
+                              className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#5A2DA8] to-[#3A3992] text-white font-bold text-[10px] rounded-lg hover:brightness-110 transition-all w-fit shadow-md">
+                              <Play size={12} /> {course.status === 'completed' ? 'Review Course' : 'Continue Learning'}
+                            </a>
+                          ) : (
+                            <button className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#5A2DA8] to-[#3A3992] text-white font-bold text-[10px] rounded-lg hover:brightness-110 transition-all w-fit shadow-md">
+                              <Play size={12} /> {course.status === 'completed' ? 'Review Course' : 'Continue Learning'}
+                            </button>
+                          )
+                        ) : (
+                          <button disabled className="flex items-center gap-1.5 px-4 py-2 bg-gray-200 text-gray-500 font-bold text-[10px] rounded-lg cursor-not-allowed w-fit">
+                            {blocked ? <><Ban size={12} /> Access Denied</> : <><Hourglass size={12} /> Awaiting Review</>}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -443,6 +638,123 @@ export default function UserDashboard() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'payment-history' && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 tracking-tight">Payment History</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">Track all your payment submissions and their status</p>
+                </div>
+                {paymentHistory.length === 0 ? (
+                  <div className="rounded-2xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+                    <History size={36} className="mx-auto text-gray-300 mb-2" />
+                    <h3 className="text-base font-bold text-gray-500 mb-1">No payments yet</h3>
+                    <p className="text-xs text-gray-400">Your payment history will appear here after you submit payment proof.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <p className="text-2xl font-black text-gray-900">{paymentHistory.length}</p>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Total Submissions</p>
+                      </div>
+                      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <p className="text-2xl font-black text-green-600">{approvedPayments}</p>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Approved</p>
+                      </div>
+                      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <p className="text-2xl font-black text-amber-600">{paymentHistory.length - approvedPayments}</p>
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Pending / Rejected</p>
+                      </div>
+                    </div>
+                    {paymentHistory.map((p, i) => (
+                      <motion.div key={p.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                        className="rounded-xl border border-gray-200 bg-white p-4 hover:border-[#5A2DA8]/30 hover:shadow-md transition-all cursor-pointer"
+                        onClick={() => setViewingPayment(p)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              (p.status || '').toLowerCase() === 'approved' ? 'bg-green-100 text-green-600' :
+                              (p.status || '').toLowerCase() === 'rejected' ? 'bg-[#FDE0DC] text-[#D95C4A]' : 'bg-amber-100 text-amber-600'}`}>
+                              {(p.status || '').toLowerCase() === 'approved' ? <CheckCircle size={18} /> :
+                               (p.status || '').toLowerCase() === 'rejected' ? <AlertTriangle size={18} /> : <Clock size={18} />}
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-gray-900 capitalize">{p.status || 'Pending'}</p>
+                              <p className="text-xs text-gray-500">{p.course_title || 'Course Payment'}</p>
+                              <p className="text-[10px] text-gray-400 mt-0.5">{p.submitted_at ? new Date(p.submitted_at).toLocaleDateString() : ''}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider ${
+                              (p.status || '').toLowerCase() === 'approved' ? 'bg-green-100 text-green-700' :
+                              (p.status || '').toLowerCase() === 'rejected' ? 'bg-[#FDE0DC] text-[#D95C4A]' : 'bg-amber-100 text-amber-700'}`}>
+                              {p.status || 'Pending'}
+                            </span>
+                            <Eye size={14} className="text-gray-400" />
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'profile' && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 tracking-tight">My Profile</h2>
+                  <p className="text-xs text-gray-500 mt-0.5">Manage your personal information</p>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#3A3992] via-[#5A2DA8] to-[#EE8433] flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-[#5A2DA8]/20">
+                      {(profile.full_name || 'U')[0]}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-black text-gray-900">{profile.full_name}</h3>
+                      <p className="text-sm text-gray-500">{profile.email}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#5A2DA8]/10 text-[#5A2DA8] text-[9px] font-black uppercase tracking-wider">
+                          <GraduationCap size={10} /> Student
+                        </span>
+                        {enrolledCourses.length > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 text-[9px] font-black uppercase tracking-wider">
+                            <BookOpen size={10} /> {enrolledCourses.length} Course{enrolledCourses.length > 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Full Name</label>
+                      <input value={profile.full_name} onChange={e => setProfile(p => ({ ...p, full_name: e.target.value }))} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 transition-all" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Email</label>
+                      <input value={profile.email} onChange={e => setProfile(p => ({ ...p, email: e.target.value }))} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 transition-all" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Phone</label>
+                      <input value={profile.phone} onChange={e => setProfile(p => ({ ...p, phone: e.target.value }))} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 transition-all" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1 block">Bio</label>
+                      <textarea rows={2} value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-[#5A2DA8]/50 transition-all resize-none" />
+                    </div>
+                  </div>
+                  <button onClick={async () => { try { await authAPI.updateProfile({ full_name: profile.full_name, email: profile.email, phone_number: profile.phone, bio: profile.bio }); showToast('Profile updated!'); } catch { showToast('Update failed', 'error'); } }}
+                    className="mt-5 px-6 py-2.5 bg-gradient-to-r from-[#5A2DA8] to-[#3A3992] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all flex items-center gap-2 shadow-md w-fit">
+                    <Save size={14} /> Save Changes
+                  </button>
+                </div>
               </div>
             )}
 
@@ -555,7 +867,7 @@ export default function UserDashboard() {
                       <textarea rows={1} value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#5A2DA8]/50 resize-none" />
                     </div>
                   </div>
-                  <button onClick={async () => { try { await authAPI.updateProfile({ full_name: profile.full_name, email: profile.email, phone_number: profile.phone, bio: profile.bio }); showToast('Profile updated!'); } catch (e) { showToast('Update failed', 'error'); } }}
+                  <button onClick={async () => { try { await authAPI.updateProfile({ full_name: profile.full_name, email: profile.email, phone_number: profile.phone, bio: profile.bio }); showToast('Profile updated!'); } catch { showToast('Update failed', 'error'); } }}
                     className="mt-3 px-5 py-2 bg-gradient-to-r from-[#5A2DA8] to-[#3A3992] text-white font-black text-[10px] rounded-lg hover:brightness-110 transition-all flex items-center gap-1.5 shadow-sm">
                     <Save size={12} /> Save Changes
                   </button>
@@ -571,7 +883,7 @@ export default function UserDashboard() {
                       <input value={passwordForm.newPass} onChange={e => setPasswordForm(p => ({ ...p, newPass: e.target.value }))} type="password" placeholder="New Password" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
                       <input value={passwordForm.confirm} onChange={e => setPasswordForm(p => ({ ...p, confirm: e.target.value }))} type="password" placeholder="Confirm Password" className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 text-xs focus:outline-none focus:border-[#3A3992]/50 placeholder:text-gray-400" />
                     </div>
-                    <button onClick={async () => { if (passwordForm.newPass !== passwordForm.confirm) { showToast('Passwords do not match', 'error'); return; } if (passwordForm.newPass.length < 6) { showToast('Password too short', 'error'); return; } try { await authAPI.updateProfile({ old_password: passwordForm.current, new_password: passwordForm.newPass }); showToast('Password updated!'); setPasswordForm({ current: '', newPass: '', confirm: '' }); } catch (e) { showToast('Password update failed', 'error'); } }}
+                    <button onClick={async () => { if (passwordForm.newPass !== passwordForm.confirm) { showToast('Passwords do not match', 'error'); return; } if (passwordForm.newPass.length < 6) { showToast('Password too short', 'error'); return; } try { await authAPI.updateProfile({ old_password: passwordForm.current, new_password: passwordForm.newPass }); showToast('Password updated!'); setPasswordForm({ current: '', newPass: '', confirm: '' }); } catch { showToast('Password update failed', 'error'); } }}
                       className="px-5 py-2 bg-gradient-to-r from-[#EE8433] to-[#D95C4A] text-white font-black text-[10px] rounded-lg hover:brightness-110 transition-all shadow-sm">Update Password</button>
                   </div>
                 </div>
