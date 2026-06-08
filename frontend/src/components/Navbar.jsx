@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, LayoutDashboard, GraduationCap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import logoSvg from '../assets/logo-elevate.svg';
-import logoJpg from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
