@@ -6,8 +6,12 @@ import { coursesAPI, homepageAPI, getMediaUrl, normalizeApiCount } from '../serv
 import heroImg1 from '../assets/gr1.jpg';
 import heroImg2 from '../assets/gr3.jpg';
 import heroImg3 from '../assets/grad2.jpg';
+import heroImg4 from '../assets/photo1.jpg';
+import heroImg5 from '../assets/photo2.jpg';
+import heroImg6 from '../assets/elevat.jpg';
+import heroImg7 from '../assets/photo_2026-06-07_22-56-48.jpg';
 
-const heroImages = [heroImg1, heroImg2, heroImg3];
+const heroImages = [heroImg1, heroImg2, heroImg3, heroImg4, heroImg5, heroImg6, heroImg7];
 
 const normalizeCtaLink = (link) => {
   if (!link) return '/register';

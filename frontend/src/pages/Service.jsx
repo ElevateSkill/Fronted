@@ -129,11 +129,20 @@ export default function Services() {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center justify-center lg:justify-start gap-3 mb-4"
+              className="inline-flex items-center gap-2 rounded-full border border-[#f89f29]/25 bg-[#f89f29]/10 px-4 py-2 backdrop-blur mb-4"
             >
-              <span className="h-[2px] w-12 bg-[#f89f29]" />
-              <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs md:text-sm">Our Expertise</span>
+              <span className="w-2 h-2 rounded-full bg-[#f89f29]" />
+              <span className="text-[#f89f29] font-black uppercase tracking-[0.28em] text-[10px]">Our Expertise</span>
             </motion.div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white">
+              What We{' '}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f89f29] via-[#D95C4A] to-[#3C83F6]">
+                Do Best
+              </span>
+            </h2>
+            <p className="mt-3 text-slate-500 dark:text-slate-400 text-sm max-w-lg mx-auto lg:mx-0">
+              From concept to launch — we deliver digital excellence every step of the way.
+            </p>
           </div>
 
           {/* Social Proof Join Button */}
