@@ -1,220 +1,164 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Loader2, GraduationCap } from 'lucide-react';
+import { ArrowRight, GraduationCap, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import useBackendData from '../hooks/useBackendData';
-import { homepageAPI, getMediaUrl } from '../services/api';
+import { coursesAPI, homepageAPI, getMediaUrl, normalizeApiCount } from '../services/api';
+import heroImg1 from '../assets/gr1.jpg';
+import heroImg2 from '../assets/gr3.jpg';
+import heroImg3 from '../assets/grad2.jpg';
+import heroImg4 from '../assets/elevat.jpg';
+import heroImg5 from '../assets/photo1.jpg';
 
-const adaptHero = (hero) => ({
-  id: 'hero',
-  image: getMediaUrl(hero?.background_image) || '',
-  title: hero?.title?.split(' ')[0]?.toUpperCase() || '',
-  highlight: hero?.title?.split(' ').slice(1).join(' ')?.toUpperCase() || '',
-  subtitle: hero?.subtitle || '',
-  cta: hero?.cta_text || '',
-  ctaLink: hero?.cta_link || '/register',
-  color: '#EE8433',
-  active: true
+const heroImages = [heroImg1, heroImg2, heroImg3, heroImg4, heroImg5];
+
+const normalizeCtaLink = (link) => {
+  if (!link) return '/register';
+  if (link === '/courses/' || link === '/courses') return '/#courses';
+  return link;
+};
+
+const adaptHero = (hero = {}) => ({
+  image: getMediaUrl(hero.background_image) || heroImg1,
+  title: hero.title || 'Elevate Skill',
+  subtitle: hero.subtitle || 'Project-based learning platform designed for the modern engineer. Master in-demand tech skills with real-world projects and expert mentorship.',
+  cta: hero.cta_text || 'GET STARTED',
+  ctaLink: normalizeCtaLink(hero.cta_link),
 });
 
 export default function Landing() {
-  const { data, loading } = useBackendData(
-    () => homepageAPI.get().then((r) => [adaptHero(r.hero)]),
-    []
-  );
-
-  const slides = data.filter((s) => s.active !== false);
-  const [current, setCurrent] = useState(0);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    if (slides.length <= 1) return undefined;
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [slides.length]);
+    let cancelled = false;
+    Promise.all([homepageAPI.get(), coursesAPI.list()])
+      .then(([home, courseRes]) => {
+        if (cancelled) return;
+        setData([{
+          hero: adaptHero(home.hero),
+          stats: [
+            { label: 'Published Courses', value: normalizeApiCount(courseRes) },
+            { label: 'Student Stories', value: home.testimonials?.length || 0 },
+            { label: 'Helpful FAQs', value: home.faqs?.length || 0 },
+          ],
+        }]);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setData([{ hero: adaptHero(), stats: [] }]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
-  if (loading && slides.length === 0) {
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const hero = data[0]?.hero || adaptHero();
+  const stats = data[0]?.stats || [];
+
+  if (loading && data.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-[92vh] flex items-center justify-center bg-[#0F0A3A]">
         <Loader2 size={32} className="text-white animate-spin" />
       </div>
     );
   }
 
-  if (slides.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <p className="text-white/60 text-sm font-medium">Loading...</p>
-      </div>
-    );
-  }
-
-  const slide = slides[current] || slides[0];
-
   return (
-    <div id="home" className="relative min-h-screen w-full overflow-hidden bg-black">
-
-      {/* Ambient brand glow orbs */}
-      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-[#EE8433]/15 rounded-full blur-[150px]"
-          animate={{ x: [0, 60, 0], y: [0, -40, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute bottom-1/3 right-1/4 w-[450px] h-[450px] bg-[#5A2DA8]/15 rounded-full blur-[140px]"
-          animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#3A3992]/10 rounded-full blur-[130px]"
-          animate={{ x: [0, 30, -30, 0], y: [0, -30, 30, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </div>
-
-      {/* Hero background image with subtle overlay */}
-      <div className="absolute inset-0 z-[1]">
+    <div id="home" className="relative min-h-[92vh] w-full overflow-hidden bg-[#0F0A3A] text-white">
+      <div className="absolute inset-0">
         <AnimatePresence mode="wait">
           <motion.img
-            key={current}
-            src={slide.image}
-            alt={slide.title}
-            initial={{ opacity: 0, scale: 1.08 }}
+            key={currentSlide}
+            src={heroImages[currentSlide]}
+            alt="Graduate"
+            className="h-full w-full object-cover absolute inset-0"
+            initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.02 }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="w-full h-full object-cover absolute inset-0 brightness-[1.15] contrast-[1.1]"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
           />
         </AnimatePresence>
-        {/* Subtle bottom vignette only — no color overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30" />
+        {hero.image && hero.image !== heroImages[currentSlide] && (
+          <img
+            src={hero.image}
+            alt={hero.title}
+            className="h-full w-full object-cover absolute inset-0 opacity-0 pointer-events-none"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0A3A]/95 via-[#1E1B4B]/78 to-[#3A3992]/55" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0F0A3A] to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-20 flex flex-col justify-center items-center h-screen w-full px-6">
-        <div className="max-w-5xl w-full text-center mx-auto">
-
-          {/* Animated logo icon */}
+      <div className="relative z-10 mx-auto flex min-h-[92vh] max-w-7xl flex-col justify-center px-6 py-28">
+        <div className="max-w-4xl">
           <motion.div
-            initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-8"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#3A3992] to-[#D95C4A] shadow-2xl shadow-[#3A3992]/40">
-              <GraduationCap size={32} className="text-white" />
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 backdrop-blur">
+              <GraduationCap size={16} className="text-[#FFD700]" />
+              <span className="text-[11px] font-black uppercase tracking-[0.24em] text-white/80">Course Enrollment Platform</span>
+            </div>
+
+            <h1 className="text-5xl font-black leading-[1.02] tracking-tight animate-hero-title sm:text-6xl lg:text-7xl">
+              {hero.title}{' '}
+              <span>works end to end.</span>
+            </h1>
+
+            <p className="mt-6 max-w-2xl text-base font-medium leading-8 text-white/78 sm:text-lg">
+              {hero.subtitle}
+            </p>
+
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link
+                to={hero.ctaLink}
+                className="inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-[#FFD700] via-[#FFC107] to-[#1E40AF] px-7 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-[#FFD700]/25 transition hover:brightness-110"
+              >
+                {hero.cta}
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </motion.div>
 
-          {/* Headline with staggered text animation */}
-          <motion.h1
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: {},
-              visible: { transition: { staggerChildren: 0.04 } }
-            }}
-            className="text-[clamp(2.8rem,7vw,5.5rem)] font-black tracking-tight leading-[1.05] mb-4"
-          >
-            {slide.title.split('').map((char, i) => (
-              <motion.span
+          <div className="mt-6 flex items-center gap-2">
+            {heroImages.map((_, i) => (
+              <button
                 key={i}
-                variants={{
-                  hidden: { opacity: 0, y: 60, rotateX: -90 },
-                  visible: { opacity: 1, y: 0, rotateX: 0 }
-                }}
-                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                className="inline-block text-white drop-shadow-lg"
-              >
-                {char === ' ' ? '\u00A0' : char}
-              </motion.span>
+                onClick={() => setCurrentSlide(i)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === currentSlide ? 'w-8 bg-[#EE8433]' : 'w-1.5 bg-white/30 hover:bg-white/50'
+                }`}
+              />
             ))}
-            {' '}
-            <span className="bg-gradient-to-r from-[#3A3992] via-[#D95C4A] to-[#5A2DA8] bg-clip-text text-transparent drop-shadow-lg inline-block">
-              {slide.highlight.split('').map((char, i) => (
-                <motion.span
-                  key={i}
-                  variants={{
-                    hidden: { opacity: 0, y: 60, rotateX: -90 },
-                    visible: { opacity: 1, y: 0, rotateX: 0 }
-                  }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block"
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </motion.span>
+          </div>
+
+          {stats.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+              className="mt-12 grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3"
+            >
+              {stats.map((item) => (
+                <div key={item.label} className="rounded-lg border border-white/14 bg-white/[0.09] p-5 backdrop-blur-md">
+                  <div className="text-3xl font-black text-white">{item.value}</div>
+                  <div className="mt-1 text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
+                    {item.label}
+                  </div>
+                </div>
               ))}
-            </span>
-          </motion.h1>
-
-          {/* Subtitle with fade + slide */}
-          <motion.p
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl font-medium leading-relaxed mb-10 text-white/90 drop-shadow-md"
-          >
-            {slide.subtitle}
-          </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
-            <Link
-              to={slide.ctaLink || '/register'}
-              className="flex items-center gap-3 text-white font-black text-sm tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group bg-gradient-to-r from-[#3A3992] to-[#D95C4A] px-8 py-4 rounded-full shadow-2xl shadow-[#3A3992]/40"
-            >
-              <GraduationCap size={22} className="text-white group-hover:scale-110 transition-transform" />
-              {slide.cta || 'Enroll Now'}
-            </Link>
-            <Link
-              to="/about"
-              className="flex items-center gap-3 text-white font-black text-sm tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group bg-white/10 backdrop-blur-xl border border-white/20 px-8 py-4 rounded-full shadow-xl"
-            >
-              Learn More
-              <ArrowRight size={18} className="group-hover:translate-x-1.5 transition-transform" />
-            </Link>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.2 }}
-            className="mt-16 flex flex-wrap items-center justify-center gap-8 sm:gap-12 text-white/80 text-xs font-bold uppercase tracking-widest"
-          >
-            <motion.span
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.4 }}
-              className="flex items-center gap-2 drop-shadow-md"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#3A3992]" /> Practical Learning
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.6 }}
-              className="flex items-center gap-2 drop-shadow-md"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#5A2DA8]" /> Expert Mentors
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.8 }}
-              className="flex items-center gap-2 drop-shadow-md"
-            >
-              <span className="w-2 h-2 rounded-full bg-[#D95C4A]" /> Career Ready
-            </motion.span>
-          </motion.div>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>

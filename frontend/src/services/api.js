@@ -7,6 +7,19 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' }
 });
 
+export function normalizeApiList(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.results)) return payload.results;
+  if (Array.isArray(payload?.data)) return payload.data;
+  if (Array.isArray(payload?.items)) return payload.items;
+  return [];
+}
+
+export function normalizeApiCount(payload) {
+  if (typeof payload?.count === 'number') return payload.count;
+  return normalizeApiList(payload).length;
+}
+
 // Request interceptor — attach JWT token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token') || localStorage.getItem('token');
