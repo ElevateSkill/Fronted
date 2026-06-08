@@ -68,19 +68,7 @@ export default function Navbar() {
     >
       <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
         
-        {/* LOGO */}
-        <Link to="/" className="relative z-[71] flex items-center gap-3 group">
-          <div className="relative">
-            <img 
-              src={logoJpg} 
-              className="h-12 sm:h-14 w-auto rounded-xl shadow-xl shadow-black/20  object-cover ring-2 ring-[#3A3992]/20 group-hover:ring-[#3A3992]/40 transition-all" 
-              alt='ELEVATE' 
-            />
-          </div>
-          <span className={`hidden sm:block text-lg font-black tracking-tight drop-shadow-lg transition-colors duration-300 ${isScrolled || activeMega || mobileMenu ? 'text-gray-900' : 'text-white'}`}>
-            Elevate<span className="text-[#3A3992]">Skill</span>
-          </span>
-        </Link>
+        {/* LOGO — removed per user request */}
 
         {/* DESKTOP NAV */}
         <div className="hidden lg:flex items-center gap-8">
