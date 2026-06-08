@@ -7,9 +7,23 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-aw#r2z^)dk9c73($r0c#%
 
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+def env_list(name, default='', strip_trailing_slash=False):
+    values = []
+    for item in os.environ.get(name, default).split(','):
+        item = item.strip()
+        if strip_trailing_slash:
+            item = item.rstrip('/')
+        if item:
+            values.append(item)
+    return values
 
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
+ALLOWED_HOSTS = env_list('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+
+CORS_ALLOWED_ORIGINS = env_list(
+    'CORS_ALLOWED_ORIGINS',
+    'http://localhost:3000',
+    strip_trailing_slash=True,
+)
 CORS_ALLOW_CREDENTIALS = True
 
 # Prevent browsers from MIME-sniffing
@@ -181,4 +195,3 @@ SPECTACULAR_SETTINGS = {
 
 # Prevent redirection loops/errors for POST requests lacking trailing slashes
 APPEND_SLASH = False
-

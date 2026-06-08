@@ -4,7 +4,7 @@ import os
 DEBUG = False
 
 # Ideally set specific allowed hosts in production, defaulting to all for now
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "*")
 
 DATABASES = {
     "default": {
@@ -17,6 +17,6 @@ DATABASES = {
     }
 }
 
-CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",") if os.environ.get("CORS_ALLOWED_ORIGINS") else []
+CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", strip_trailing_slash=True)
 if not CORS_ALLOWED_ORIGINS:
     CORS_ALLOW_ALL_ORIGINS = True  # Fallback if not specified
