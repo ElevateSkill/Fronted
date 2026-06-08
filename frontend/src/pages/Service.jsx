@@ -32,6 +32,7 @@ const mainServices = [
   {
     id: 1,
     title: "INSPIRATIONAL IDEAS",
+    color: "text-[#FFD700]",
     short: "Creative conceptualization for modern brands.",
     desc: "We dive deep into your brand's DNA to extract unique concepts that resonate with your target audience. Our brainstorming sessions are designed to break conventional boundaries.",
     icon: <Lightbulb size={32} />,
@@ -206,7 +207,7 @@ export default function Services() {
               </div>
 
               <div className="p-8">
-                <h3 className="text-2xl font-black mb-3 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] via-[#FFC107] via-[#F59E0B] to-[#1E40AF]">{service.title}</h3>
+                <h3 className={`text-2xl font-black mb-3 tracking-tight ${service.color || 'text-transparent bg-clip-text bg-gradient-to-r from-[#FFD700] via-[#FFC107] to-[#1E40AF]'}`}>{service.title}</h3>
                 <p className="text-slate-600 dark:text-slate-300 mb-8 text-sm leading-relaxed font-medium">
                   {service.short}
                 </p>
