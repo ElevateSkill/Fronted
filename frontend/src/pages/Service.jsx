@@ -32,7 +32,7 @@ const mainServices = [
   {
     id: 1,
     title: "INSPIRATIONAL IDEAS",
-    color: "text-[#FFD700]",
+    color: "text-[#f89f29]",
     short: "Creative conceptualization for modern brands.",
     desc: "We dive deep into your brand's DNA to extract unique concepts that resonate with your target audience. Our brainstorming sessions are designed to break conventional boundaries.",
     icon: <Lightbulb size={32} />,
