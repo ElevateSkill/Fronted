@@ -5,6 +5,12 @@ import {
   Users, Star, ArrowRight, CheckCircle2, Sparkles
 } from 'lucide-react';
 
+
+import mentorship from '../assets/service/mentorship.jpg'
+import online_class from '../assets/service/online-class.jpg'
+import elevate_training from '../assets/service/elevate-training.jpg'
+import charity from '../assets/service/charity.jpg'
+
 const partners = [
   {
     name: "Telebirr",
@@ -35,31 +41,31 @@ const mainServices = [
     short: "Creative conceptualization for modern brands.",
     desc: "We dive deep into your brand's DNA to extract unique concepts that resonate with your target audience. Our brainstorming sessions are designed to break conventional boundaries.",
     icon: <Lightbulb size={32} />,
-    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800",
+    image: mentorship,
   },
   {
     id: 2,
-    title: "HANDCRAFTED & SELFMADE",
+    title: "PREFECT ONLINE CLASS",
     short: "Bespoke digital assets built from scratch.",
     desc: "No templates. No shortcuts. Every line of code and every pixel is handcrafted by our elite team of developers and designers to ensure maximum performance and originality.",
     icon: <PenTool size={32} />,
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800",
+    image: online_class,
   },
   {
     id: 3,
-    title: "PERFECTION ON TIME",
+    title: "ELEVATE TRAINING & COACH",
     short: "Strict deadlines with uncompromising quality.",
     desc: "We value your time as much as our craft. Our agile workflow ensures that complex milestones are met with precision, delivering 'ready-to-market' products exactly when promised.",
     icon: <Target size={32} />,
-    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800",
+    image: elevate_training,
   },
   {
     id: 4,
-    title: "ONE TO ONE MENTORING",
+    title: "HELP FOR THE NEEDS",
     short: "Strict deadlines with uncompromising quality.",
     desc: "We value your time as much as our craft. Our agile workflow ensures that complex milestones are met with precision, delivering 'ready-to-market' products exactly when promised.",
     icon: <Target size={32} />,
-    image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800",
+    image: charity,
   }
 ];
 
@@ -90,7 +96,7 @@ export default function Services() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-16 md:mb-24 text-center lg:text-left"
         >
-          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white/95 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] backdrop-blur-3xl shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5 rounded-3xl">
+          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white/95 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] backdrop-blur-3xl shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5">
             <div className="flex-none max-w-xs">
               <div className="flex items-center gap-3 mb-2 justify-center lg:justify-start">
                 <span className="w-8 h-[2px] bg-[#fba613]" />
@@ -179,7 +185,7 @@ export default function Services() {
               <div className="h-52 w-full overflow-hidden relative">
                 <img
                   src={service.image}
-                  className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
+                  className="w-full h-full object-cover group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700"
                   alt={service.title}
                 />
                 {/* <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" /> */}
@@ -233,7 +239,7 @@ export default function Services() {
           viewport={{ once: true }}
           className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#f44c04] to-transparent rounded-[3rem]"
         >
-          <div className="bg-white dark:bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20 rounded-[2.9rem]">
+          <div className="bg-white dark:bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20">
             <div className="text-center lg:text-left">
               <p className="text-slate-600 dark:text-gray-300 text-lg max-w-md">JOIN 1000+ visionaries scaling their digital presence today.</p>
             </div>
