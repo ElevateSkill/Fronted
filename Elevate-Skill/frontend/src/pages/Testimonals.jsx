@@ -2,31 +2,69 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Quote, Star, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
 
+import dr_yadessa from '../assets/people/dr-yadessa.png'
+import elevate01 from '../assets/people/elevate-student01.jpg'
+import elevate02 from '../assets/people/elevate-graduate.jpg'
+
+import elevate_staff from '../assets/people/elevate-staff.jpg'
+import prof_melaku from '../assets/people/prof-melaku.jpg'
+import partnership from '../assets/people/partnership.jpg'
+
 const testimonials = [
 	{
-		name: 'Selamawit Bekele',
+		name: 'Amanuel Bekele',
 		role: 'UI/UX Designer',
 		company: 'Creative Flow Studio',
 		quote: 'The learning path felt practical from day one. I stopped collecting random tutorials and started building real portfolio work that changed how clients saw me.',
-		image: 'https://i.pravatar.cc/600?img=32',
+		image: elevate01,
 		score: 5,
 		outcome: 'Got hired within 6 weeks'
 	},
 	{
-		name: 'Amanuel Tesfaye',
-		role: 'Frontend Developer',
+		name: 'Hana Getachew',
+		role: 'Digital Marketing',
 		company: 'BrightStack Labs',
 		quote: 'The mentorship was the biggest difference. Every project was reviewed like a real product, and that made my code, design sense, and confidence level up fast.',
-		image: 'https://i.pravatar.cc/600?img=12',
+		image: elevate02,
 		score: 5,
 		outcome: 'Built 4 client projects'
 	},
 	{
-		name: 'Hana Getachew',
-		role: 'Digital Marketer',
-		company: 'North Star Media',
+		name: 'Mr. Bereket Matiwos',
+		role: 'Founder & CEO',
+		company: 'Alpha Technology Solution',
 		quote: 'This did not feel like a generic course. The structure, the feedback, and the results-oriented lessons made it easy to stay focused and actually finish strong.',
-		image: 'https://i.pravatar.cc/600?img=47',
+		image: partnership,
+		score: 5,
+		outcome: 'Raised income by 2x'
+	}
+];
+
+const testimonials2 = [
+	{
+		name: 'Alemshet Kebede',
+		role: 'Social Management',
+		company: 'Elevateve Skill',
+		quote: 'At first, I was skeptical about online learning, but the personalized feedback and real-world projects made all the difference. I landed a job within weeks of finishing the program. By help of Elevate Skill, I was able to transition into a new career and triple my income in less than a year.',
+		image: elevate_staff,
+		score: 5,
+		outcome: 'Got hired within 6 weeks'
+	},
+	{
+		name: 'Prof. Melaku Tadesse',
+		role: 'Academic Advisor',
+		company: 'ASTU University',
+		quote: 'Elevate Skill’s mentorship was the biggest difference. Every project was reviewed like a real product, and that made my code, design sense, and confidence level up fast.',
+		image: prof_melaku,
+		score: 5,
+		outcome: 'Built 4 client projects'
+	},
+	{
+		name: 'Dr Yadessa Melaku',
+		role: 'Vice President',
+		company: 'ASTU, Adama',
+		quote: 'This did not feel like a generic course. The structure, the feedback, and the results-oriented lessons made it easy to stay focused and actually finish strong.',
+		image: dr_yadessa,
 		score: 5,
 		outcome: 'Raised income by 2x'
 	}
@@ -149,7 +187,7 @@ export default function Testimonals() {
 						viewport={{ once: true }}
 						className="grid gap-6"
 					>
-						{testimonials.map((item, index) => (
+						{testimonials2.map((item, index) => (
 							<motion.article
 								key={item.name}
 								initial={{ opacity: 0, x: index % 2 === 0 ? -18 : 18 }}
