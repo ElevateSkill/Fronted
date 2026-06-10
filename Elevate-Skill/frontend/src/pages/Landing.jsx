@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, PlayCircle, ChevronLeft, ChevronRight, Mouse } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroMain from '../assets/elevat.jpg';
-import slide1 from '../assets/gr1.jpg';
 import slide2 from '../assets/gr3.jpg';
 import slide3 from '../assets/grad2.jpg';
 
@@ -38,6 +37,15 @@ const slides = [
 
 export default function Landing() {
   const [current, setCurrent] = useState(0);
+
+  const handleWatchNowClick = useCallback(() => {
+    const target = document.getElementById('courses');
+
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.history.replaceState(null, '', '#courses');
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -105,9 +113,13 @@ export default function Landing() {
       transition={{ delay: 0.6 }}
       className="flex justify-center"
     >
-      <button className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 hover:bg-[#ef430f] active:scale-95 transition-all group bg-[#f9a215] px-8 py-4 rounded-full shadow-2xl shadow-blue-500/20">
+      <button
+        type="button"
+        onClick={handleWatchNowClick}
+        className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 hover:bg-[#ef430f] active:scale-95 transition-all group bg-[#f9a215] px-8 py-4 rounded-full shadow-2xl shadow-blue-500/20"
+      >
         <PlayCircle size={24} className="text-white group-hover:rotate-12 transition-transform" />
-        WATCH NOW
+        VIEW PROGRAMS
       </button>
     </motion.div>
   </div>
