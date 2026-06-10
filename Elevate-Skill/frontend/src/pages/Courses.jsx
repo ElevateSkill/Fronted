@@ -183,7 +183,7 @@ export default function Courses() {
           viewport={{ once: true }}
           className="mt-14 text-center"
         >
-          <button className="px-10 py-4 bg-gradient-to-r from-[white] to-[white] text-black font-black text-xs hover:brightness-110 transition-all duration-300 uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl shadow-[#f89f29]/20 hover:shadow-[#15c8fb]/20">
+          <button className="px-10 py-4 bg-gradient-to-r from-[white] to-[white] text-black font-black text-xs hover:brightness-110 transition-all duration-300 uppercase tracking-wider flex items-center gap-3 mx-auto shadow-2xl shadow-[#f89f29]/20 hover:shadow-[#15c8fb]/20 hover:scale-105 active:scale-95 hover:bg-[red]">
             View All Programs <ArrowRight size={16} />
           </button>
         </motion.div>
