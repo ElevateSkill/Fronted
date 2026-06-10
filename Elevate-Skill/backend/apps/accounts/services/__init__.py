@@ -4,19 +4,15 @@ User = get_user_model()
 
 class UserService:
     @staticmethod
-    def register_user(username, email, password, full_name, role=User.STUDENT, phone_number=None):
+    def register_user(email, password, role=User.STUDENT, **kwargs):
         """
         Business logic for registering a new user.
         """
-        user = User(
-            username=username,
-            email=email,
-            full_name=full_name,
-            role=role,
-            phone_number=phone_number
-        )
-        user.set_password(password)
-        user.save()
+        user = User.objects.create_user(email=email, password=password, role=role, **kwargs)
+        if role == User.ADMIN:
+            user.is_staff = True
+            user.is_superuser = True
+            user.save()
         return user
 
     @staticmethod

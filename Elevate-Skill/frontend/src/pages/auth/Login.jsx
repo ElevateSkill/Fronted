@@ -44,7 +44,7 @@ const socialLogins = [
 
 export default function Login() {
   const [current, setCurrent] = useState(0);
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
@@ -68,7 +68,7 @@ export default function Login() {
     setSubmitting(true);
 
     try {
-      const user = await login({ username, password });
+      const user = await login({ email, password });
 
       // Success animation trigger (can be extended)
       if (user?.role?.toLowerCase() === 'admin') {
@@ -85,7 +85,7 @@ export default function Login() {
         const val = data[key];
         setError(Array.isArray(val) ? val[0] : val);
       } else {
-        setError('Invalid username or password. Please try again.');
+        setError('Invalid email or password. Please try again.');
       }
     } finally {
       setSubmitting(false);
@@ -386,15 +386,15 @@ export default function Login() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-white/70">Username / Email</label>
+                <label className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-white/70">Email</label>
                 <div className="relative group">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-white/30 group-focus-within:text-[#15c8fb] transition-all" />
                   <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
-                    autoComplete="username"
+                    autoComplete="email"
                     placeholder="your@domain.com"
                     className="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.12] rounded-2xl focus:border-[#15c8fb] focus:ring-2 focus:ring-[#15c8fb]/20 transition-all duration-300 text-base placeholder:text-gray-400 dark:placeholder:text-white/30 dark:text-white"
                   />

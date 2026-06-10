@@ -9,6 +9,12 @@ from apps.courses.models import Category, Course
 User = get_user_model()
 
 
+def get_results(resp):
+    if isinstance(resp.data, dict) and 'results' in resp.data:
+        return resp.data['results']
+    return resp.data
+
+
 class CoursesTests(APITestCase):
 	def setUp(self):
 		# URLs
@@ -65,7 +71,7 @@ class CoursesTests(APITestCase):
 	def test_public_list_returns_only_active_published(self):
 		resp = self.client.get(self.public_list_url)
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
-		ids = {c['id'] for c in resp.data}
+		ids = {c['id'] for c in get_results(resp)}
 		self.assertIn(self.published_course.id, ids)
 		self.assertNotIn(self.draft_course.id, ids)
 		self.assertNotIn(self.disabled_course.id, ids)
@@ -86,7 +92,7 @@ class CoursesTests(APITestCase):
 		self.auth_as(self.admin)
 		resp = self.client.get(self.admin_list_url)
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
-		ids = {c['id'] for c in resp.data}
+		ids = {c['id'] for c in get_results(resp)}
 		self.assertIn(self.published_course.id, ids)
 		self.assertIn(self.draft_course.id, ids)
 		self.assertIn(self.disabled_course.id, ids)
@@ -157,7 +163,7 @@ class CategoriesTests(APITestCase):
 	def test_public_category_list_and_detail(self):
 		resp = self.client.get(self.public_list_url)
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
-		self.assertTrue(any(c['id'] == self.cat.id for c in resp.data))
+		self.assertTrue(any(c['id'] == self.cat.id for c in get_results(resp)))
 
 		url = reverse('public-category-detail', kwargs={'pk': self.cat.id})
 		resp = self.client.get(url)
@@ -191,6 +197,6 @@ class CategoriesTests(APITestCase):
 		slug = self.cat.slug
 		resp = self.client.get(reverse('public-course-list') + f'?category__slug={slug}')
 		self.assertEqual(resp.status_code, status.HTTP_200_OK)
-		ids = [c['id'] for c in resp.data]
+		ids = [c['id'] for c in get_results(resp)]
 		self.assertIn(self.course.id, ids)
 

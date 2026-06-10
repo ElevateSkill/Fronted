@@ -31,6 +31,15 @@ class RegisterSerializer(serializers.ModelSerializer):
             "phone_number": {"required": False, "allow_null": True},
         }
 
+    def validate(self, attrs):
+        request = self.context.get("request")
+        role = attrs.get("role", User.STUDENT)
+        
+        if role == User.ADMIN:
+            if not request or not request.user.is_authenticated or request.user.role != User.ADMIN:
+                raise serializers.ValidationError({"role": "Only admins can create another admin account."})
+        return attrs
+
     def validate_email(self, value):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("A user with this email already exists.")

@@ -1,13 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, User, ArrowRight, ChevronRight } from 'lucide-react';
-import { loadData } from '../data/dataStore';
+import { api, unwrapResults, getMediaUrl } from '../services/api';
 
-const stored = loadData('posts');
-const posts = stored.filter(p => p.status === 'Published');
+const fallbackPosts = [
+  { id: 'p1', title: 'Why Full-Stack Development is the Future', author: 'Admin', date: '2026-05-20', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', excerpt: 'The tech industry is evolving rapidly. Full-stack developers who can handle both frontend and backend are becoming invaluable assets to modern teams.' },
+  { id: 'p2', title: 'UI/UX Trends for 2026', author: 'Admin', date: '2026-05-18', image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600', excerpt: 'Stay ahead of the curve with these emerging design trends that are shaping how users interact with digital products.' }
+];
 
 export default function Blog() {
-  if (posts.length === 0) return null;
+  const [posts, setPosts] = useState(null);
+
+  useEffect(() => {
+    api.get('/news/')
+      .then(res => {
+        const data = unwrapResults(res.data).filter(p => p.status === 'published');
+        if (data.length > 0) {
+          setPosts(data.map(p => ({
+            id: p.id,
+            title: p.title,
+            author: p.author?.full_name || p.author?.username || 'Admin',
+            date: p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
+            image: getMediaUrl(p.image) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
+            excerpt: p.excerpt || p.content?.substring(0, 120) || ''
+          })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const displayPosts = posts || fallbackPosts;
+
+  if (!displayPosts.length) return null;
 
   return (
     <div id="blog" className="relative w-full bg-gray-50 dark:bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
@@ -16,16 +40,6 @@ export default function Blog() {
 
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          {/* <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center justify-center gap-3 mb-4"
-          >
-            <span className="h-[2px] w-12 bg-[#f89f29]" />
-            <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs">Latest Posts</span>
-            <span className="h-[2px] w-12 bg-[#f89f29]" />
-          </motion.div> */}
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -47,7 +61,7 @@ export default function Blog() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post, i) => (
+          {displayPosts.map((post, i) => (
             <motion.div
               key={post.id}
               initial={{ opacity: 0, y: 30 }}

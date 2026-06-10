@@ -71,6 +71,7 @@ const mainServices = [
 ];
 
 export default function Services() {
+<<<<<<< HEAD
   const [activeService, setActiveService] = useState();
 
   // const toggleService = (id) => {
@@ -78,6 +79,9 @@ export default function Services() {
   // };
 
   const navigate = useNavigate();
+=======
+  const [activeService] = useState();
+>>>>>>> 39572e5cfd9c723878d50012348135fecd4cec68
 
   const users = [
     "https://i.pravatar.cc/150?u=1",

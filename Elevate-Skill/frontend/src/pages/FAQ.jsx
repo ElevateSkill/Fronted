@@ -25,8 +25,12 @@ const faqData = [
   }
 ];
 
-export default function FAQ() {
+export default function FAQ({ faqs = [] }) {
   const [activeIndex, setActiveIndex] = useState(null);
+
+  const displayFaqs = faqs.length > 0
+    ? faqs.map(f => ({ question: f.question, answer: f.answer, category: '' }))
+    : faqData;
 
   return (
     <div id="faq" className="relative w-full bg-gray-50 dark:bg-black md:py-24 transition-colors duration-500 overflow-hidden">
@@ -35,16 +39,6 @@ export default function FAQ() {
 
       <div className="mx-auto relative z-10">
         <div className="text-center mb-16">
-          {/* <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center justify-center gap-3 mb-4"
-          >
-            <span className="h-[2px] w-12 bg-[#f89f29]" />
-            <span className="text-[#f89f29] font-black uppercase tracking-[0.3em] text-xs">FAQ</span>
-            <span className="h-[2px] w-12 bg-[#f89f29]" />
-          </motion.div> */}
           <h2 className="text-4xl sm:text-5xl font-black tracking-tighter dark:text-white text-gray-900 mb-2">
             Got <span className="text-[#f89f29]">QUESTIONS?</span>
           </h2>
@@ -53,7 +47,7 @@ export default function FAQ() {
 
         {/* --- ACCORDION SECTION --- */}
         <div className="space-y-3">
-          {faqData.map((item, index) => (
+          {displayFaqs.map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}

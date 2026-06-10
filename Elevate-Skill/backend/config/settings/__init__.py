@@ -8,6 +8,6 @@ load_dotenv()
 ENV = os.environ.get("ENV", "development")
 
 if ENV == "production":
-    from .production import *
+    from .prod import *
 else:
-    from .development import *
+    from .dev import *

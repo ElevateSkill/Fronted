@@ -85,7 +85,7 @@ class AccountsTests(APITestCase):
         user = User.objects.create_user(**self.user_data)
         
         login_payload = {
-            "username": "teststudent",
+            "email": "student@test.com",
             "password": "password123"
         }
         response = self.client.post(self.login_url, login_payload)
@@ -101,7 +101,7 @@ class AccountsTests(APITestCase):
         User.objects.create_user(**self.user_data)
         
         login_payload = {
-            "username": "teststudent",
+            "email": "student@test.com",
             "password": "wrongpassword"
         }
         response = self.client.post(self.login_url, login_payload)

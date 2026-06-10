@@ -150,15 +150,23 @@ class EnrollmentsTests(APITestCase):
         self.auth_as(self.student1)
         resp1 = self.client.get(self.my_list_url)
         self.assertEqual(resp1.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp1.data), 1)
-        self.assertEqual(resp1.data[0]["course"]["id"], self.published_course.id)
+        
+        def get_results(resp):
+            if isinstance(resp.data, dict) and 'results' in resp.data:
+                return resp.data['results']
+            return resp.data
+            
+        results1 = get_results(resp1)
+        self.assertEqual(len(results1), 1)
+        self.assertEqual(results1[0]["course"]["id"], self.published_course.id)
 
         # student2 lists
         self.auth_as(self.student2)
         resp2 = self.client.get(self.my_list_url)
         self.assertEqual(resp2.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(resp2.data), 1)
-        self.assertEqual(resp2.data[0]["course"]["id"], another_course.id)
+        results2 = get_results(resp2)
+        self.assertEqual(len(results2), 1)
+        self.assertEqual(results2[0]["course"]["id"], another_course.id)
 
     def test_unauthenticated_access_blocked(self):
         """Test that unauthenticated requests receive 401 Unauthorized."""
@@ -169,6 +177,25 @@ class EnrollmentsTests(APITestCase):
         # List
         resp_list = self.client.get(self.my_list_url)
         self.assertEqual(resp_list.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_admin_access_blocked(self):
+        """Test that admin requests receive 403 Forbidden for student endpoints."""
+        admin_user = User.objects.create_user(
+            username="admin_test",
+            email="admin_test@test.com",
+            password="password123",
+            full_name="Admin User",
+            role=User.ADMIN,
+        )
+        self.auth_as(admin_user)
+        
+        # Try to enroll
+        resp_create = self.client.post(self.create_url, {"course": self.published_course.id})
+        self.assertEqual(resp_create.status_code, status.HTTP_403_FORBIDDEN)
+
+        # Try to list
+        resp_list = self.client.get(self.my_list_url)
+        self.assertEqual(resp_list.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_enrollment_service_status_update(self):
         """Test service method update_status transitions enrollment statuses correctly."""

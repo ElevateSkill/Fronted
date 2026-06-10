@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 
+from utils.sanitize import sanitize_dict
 from apps.enrollments.models import Enrollment
 from apps.enrollments.services import EnrollmentService
 from apps.payments.models import Payment
@@ -14,6 +15,8 @@ class PaymentService:
             raise ValidationError({"proof_file": "Proof file is required."})
 
         validate_proof_file(proof_file)
+
+        data = sanitize_dict(data, ['full_name', 'email', 'phone'])
 
         enrollment_id = data.get("enrollment_id")
         enrollment = get_object_or_404(

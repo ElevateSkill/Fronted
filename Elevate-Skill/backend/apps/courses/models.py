@@ -47,3 +47,8 @@ class Course(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['is_active', 'is_published']),
+            models.Index(fields=['category']),
+            models.Index(fields=['-created_at']),
+        ]

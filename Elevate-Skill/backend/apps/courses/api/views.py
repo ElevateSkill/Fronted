@@ -4,13 +4,18 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from drf_spectacular.utils import extend_schema
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from utils.cache import CACHE_COURSE_LIST
 from apps.courses.services import CourseService
 from apps.courses.permissions import IsAdmin
 from apps.courses.api.serializers import CourseListSerializer, CourseDetailSerializer
 from apps.courses.api.serializers import CategorySerializer
 from apps.courses.services import CategoryService
+from utils.pagination import StandardPagination
 
 
+@method_decorator(cache_page(CACHE_COURSE_LIST), name='dispatch')
 @extend_schema(tags=["Courses"])
 class PublicCourseListView(generics.ListAPIView):
     """GET /api/v1/courses/"""
@@ -19,6 +24,7 @@ class PublicCourseListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['title', 'short_description', 'category__name']
     filterset_fields = ['category', 'category__slug']
+    pagination_class = StandardPagination
 
     def get_queryset(self):
         return CourseService.get_published_courses()
@@ -83,6 +89,7 @@ class AdminCourseListCreateView(generics.ListCreateAPIView):
     """GET + POST /api/v1/admin/courses/"""
     permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = CourseDetailSerializer
+    pagination_class = StandardPagination
 
     def get_queryset(self):
         return CourseService.get_all_courses()

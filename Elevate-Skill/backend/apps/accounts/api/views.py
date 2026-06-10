@@ -16,6 +16,8 @@ from apps.accounts.api.serializers import (
     LoginResponseSerializer,
 )
 
+from utils.ratelimit import api_ratelimit
+
 User = get_user_model()
 
 @extend_schema(tags=["Account"])
@@ -28,8 +30,18 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = (permissions.AllowAny,)
 
+    @api_ratelimit(key='ip', rate='10/h')
     @extend_schema(responses={201: RegisterResponseSerializer}, tags=["Account"])
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
+        role = request.data.get("role")
+        if role == User.ADMIN:
+            if not request.user.is_authenticated or request.user.role != User.ADMIN:
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied("Only admins can create another admin account.")
+                
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -52,6 +64,10 @@ class LoginView(TokenObtainPairView):
     """
     serializer_class = CustomTokenObtainPairSerializer
     permission_classes = (permissions.AllowAny,)
+
+    @api_ratelimit(key='ip', rate='10/h')
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 @extend_schema(tags=["Account"])
 class LogoutView(APIView):

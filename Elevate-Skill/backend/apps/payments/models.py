@@ -39,5 +39,12 @@ class Payment(models.Model):
     submitted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['student', 'status']),
+            models.Index(fields=['status']),
+            models.Index(fields=['-submitted_at']),
+        ]
+
     def __str__(self):
         return f"Payment by {self.student.username} for {self.course.title} ({self.status})"
