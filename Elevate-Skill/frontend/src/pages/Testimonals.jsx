@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Quote, Star, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import dr_yadessa from '../assets/people/dr-yadessa.png'
 import elevate01 from '../assets/people/elevate-student01.jpg'
@@ -12,7 +13,7 @@ import partnership from '../assets/people/partnership.jpg'
 
 const testimonials = [
 	{
-		name: 'Amanuel Bekele',
+		name: 'Abenezer Bekele',
 		role: 'UI/UX Designer',
 		company: 'Creative Flow Studio',
 		quote: 'The learning path felt practical from day one. I stopped collecting random tutorials and started building real portfolio work that changed how clients saw me.',
@@ -78,6 +79,7 @@ const highlights = [
 ];
 
 export default function Testimonals() {
+	const navigate = useNavigate();
 	return (
 		<section id="testimonals" className="relative overflow-hidden bg-[#050816] py-20 md:py-28 text-white">
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(21,200,251,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(248,159,41,0.16),transparent_28%)]" />
@@ -231,10 +233,12 @@ export default function Testimonals() {
 							<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 								<div>
 									<p className="text-xs font-bold uppercase tracking-[0.28em] text-[#f89f29]">Next step</p>
-									<h3 className="mt-2 text-2xl font-black tracking-tight text-white">Replace mock images with real learner photos later.</h3>
+									<h3 className="mt-2 text-2xl font-black tracking-tight text-white">Be a partner of Elevate Skill hub and raise your voice to be heard.</h3>
 								</div>
-								<button className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[red] to-[#ff9d00] px-5 py-3 text-sm font-black text-white shadow-lg shadow-[#15c8fb]/20 transition-transform hover:scale-[1.02]">
-									Add real media
+								<button
+									onClick={() => navigate('/register')}
+									className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[red] to-[#ff9d00] px-5 py-3 text-sm font-black text-white shadow-lg shadow-[#15c8fb]/20 transition-transform hover:scale-[1.02]">
+									Want to Next?
 									<ArrowRight size={16} />
 								</button>
 							</div>
