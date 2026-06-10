@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: elevate-lms-api
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --workers 2 --threads 2 --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: elevate-lms-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: elevate-lms-api.onrender.com
+      - key: DEBUG
+        value: "False"
+      - key: CACHE_BACKEND
+        value: locmem
+      # Backblaze B2 — paste values manually in Render dashboard, never commit to git
+      - key: B2_KEY_ID
+        sync: false
+      - key: B2_APP_KEY
+        sync: false
+
+databases:
+  - name: elevate-lms-db
+    databaseName: elevate_lms
+    plan: free
