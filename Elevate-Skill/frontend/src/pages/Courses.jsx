@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Code2, Palette, BrainCircuit, Rocket, Users, Clock, Star, ArrowRight, ChevronRight, GraduationCap, Award, Loader, CheckCircle } from 'lucide-react';
+import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle } from 'lucide-react';
 import { loadData } from '../data/dataStore';
-import { api } from '../services/api';
+import { api, unwrapResults } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-const iconMap = [<Code2 size={28} />, <Palette size={28} />, <BrainCircuit size={28} />, <Rocket size={28} />];
 const colorMap = ['#15c8fb', '#f89f29', '#17c966', '#15c8fb'];
 const levelMap = ['Beginner to Advanced', 'All Levels', 'Intermediate', 'Intermediate'];
 
@@ -14,25 +13,25 @@ const defaultCourses = [
   {
     title: 'Modern Front-End Development with React & TypeScript', category: 'Development',
     desc: 'Master React, TypeScript, and modern front-end architectures. Build production-ready applications from scratch.',
-    icon: iconMap[0], image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
     students: 1245, duration: '16 weeks', lessons: 48, level: 'Beginner to Advanced', color: '#15c8fb', price: '500 ETB'
   },
   {
     title: 'UI/UX Design Mastery', category: 'Design',
     desc: 'Prototyping, user-centric systems, and design thinking. Create interfaces that users love.',
-    icon: iconMap[1], image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600',
+    image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600',
     students: 989, duration: '12 weeks', lessons: 36, level: 'All Levels', color: '#f89f29', price: '450 ETB'
   },
   {
     title: 'AI & Machine Learning', category: 'AI',
     desc: 'LLMs, Neural Networks, and practical AI. Build real-world intelligent systems.',
-    icon: iconMap[2], image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600',
+    image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600',
     students: 1312, duration: '20 weeks', lessons: 52, level: 'Intermediate', color: '#17c966', price: '600 ETB'
   },
   {
     title: 'Cloud & DevOps Engineering', category: 'Infrastructure',
     desc: 'Docker, Kubernetes, AWS, and CI/CD pipelines. Deploy and scale applications with confidence.',
-    icon: iconMap[3], image: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=600',
+    image: 'https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=600',
     students: 756, duration: '14 weeks', lessons: 40, level: 'Intermediate', color: '#15c8fb', price: '550 ETB'
   }
 ];
@@ -46,7 +45,7 @@ export default function Courses() {
 
   useEffect(() => {
     api.get('/courses/')
-      .then(res => setFetchedCourses(res.data))
+      .then(res => setFetchedCourses(unwrapResults(res.data)))
       .catch(() => {});
   }, []);
 
@@ -56,7 +55,6 @@ export default function Courses() {
     title: c.title,
     category: c.category?.name || c.category || '',
     desc: c.short_description || '',
-    icon: iconMap[i % iconMap.length],
     image: c.thumbnail || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
     students: 0,
     duration: c.duration || '',

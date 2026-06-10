@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles, PlayCircle, ChevronLeft, ChevronRight, Mouse } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import heroMain from '../assets/elevat.jpg';
-import slide1 from '../assets/gr1.jpg';
 import slide2 from '../assets/gr3.jpg';
 import slide3 from '../assets/grad2.jpg';
 
@@ -36,7 +35,7 @@ const slides = [
   }
 ];
 
-export default function Landing() {
+export default function Landing({ heroData }) {
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -75,15 +74,15 @@ export default function Landing() {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="text-[clamp(2.5rem,6vw,5rem)] font-black tracking-tight text-slate-900 dark:text-white leading-[1.05] mb-4"
+      className="text-[clamp(2.5rem,6vw,5rem)] font-black tracking-tight text-white leading-[1.05] mb-4"
     >
-      {/* {slides[current].title} <br /> */}
-      
+      {heroData?.title || slides[current].title}
+      <br />
       <motion.span
         key={current + "am"}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="block font-black text-slate-50 text-[#f89f29] mt-6 tracking-widest font-serif"
+        className="block font-black text-[#f89f29] mt-6 tracking-widest font-serif"
       >
         {slides[current].amharicTitle}
       </motion.span>
@@ -94,9 +93,9 @@ export default function Landing() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.4 }}
-      className="max-w-xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-10 text-slate-700 dark:text-slate-200"
+      className="max-w-xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-10 text-slate-200"
     >
-      {slides[current].subtitle}
+      {heroData?.subtitle || slides[current].subtitle}
     </motion.p>
 
     <motion.div
@@ -105,10 +104,13 @@ export default function Landing() {
       transition={{ delay: 0.6 }}
       className="flex justify-center"
     >
-      <button className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 hover:bg-[#ef430f] active:scale-95 transition-all group bg-[#f9a215] px-8 py-4 rounded-full shadow-2xl shadow-blue-500/20">
+      <a 
+        href={heroData?.cta_link || '#courses'} 
+        className="flex items-center gap-3 text-white font-black text-xs tracking-widest uppercase hover:scale-105 active:scale-95 transition-all group bg-gradient-to-r from-[#f89f29] to-[#e07d15] px-8 py-4 rounded-full shadow-2xl shadow-orange-500/30"
+      >
         <PlayCircle size={24} className="text-white group-hover:rotate-12 transition-transform" />
-        WATCH NOW
-      </button>
+        {heroData?.cta_text || 'EXPLORE COURSES'}
+      </a>
     </motion.div>
   </div>
 </div>

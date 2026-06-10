@@ -66,7 +66,9 @@ export function loadData(key) {
       const store = JSON.parse(raw);
       if (store[key] && store[key].length > 0) return store[key];
     }
-  } catch {}
+  } catch {
+    return defaults[key] || [];
+  }
   return defaults[key] || [];
 }
 
@@ -76,5 +78,7 @@ export function saveData(key, value) {
     const store = raw ? JSON.parse(raw) : {};
     store[key] = value;
     localStorage.setItem(STORE_KEY, JSON.stringify(store));
-  } catch {}
+  } catch {
+    return;
+  }
 }

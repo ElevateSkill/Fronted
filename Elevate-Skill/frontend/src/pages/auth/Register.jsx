@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../services/api';
+import { api, unwrapResults } from '../../services/api';
 import {
   Mail, Lock, User, IdCard, Phone,
   ArrowRight, TriangleAlert, Sparkles, Eye, EyeOff,
@@ -86,7 +86,7 @@ export default function Register() {
 
   useEffect(() => {
     api.get('/courses/')
-      .then(res => setCourses(res.data))
+      .then(res => setCourses(unwrapResults(res.data)))
       .catch(() => { });
   }, []);
 
@@ -115,8 +115,6 @@ export default function Register() {
       setStep('Creating your account...');
       const { confirm_password: _, ...payload } = form;
       const regResult = await registerUser(payload);
-      const userId = regResult?.user?.id || regResult?.user;
-
       setStep('Enrolling you in the course...');
       const enrollRes = await api.post('/enrollments/', { course: Number(selectedCourseId) });
       const enrollmentId = enrollRes.data?.id;
@@ -260,7 +258,7 @@ export default function Register() {
 
             {/* Progress Steps */}
             <div className="flex gap-2 mb-8">
-              {steps.map((s, i) => (
+              {steps.map((s) => (
                 <motion.div
                   key={s.id}
                   onClick={() => setCurrentStep(s.id)}
@@ -288,10 +286,10 @@ export default function Register() {
 
             <form onSubmit={onSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <InputField name="full_name" label="Full Name" Icon={IdCard} placeholder="John Doe" form={form} onChange={onChange} />
-                <InputField name="username" label="Username" Icon={User} placeholder="johndoe" form={form} onChange={onChange} />
+                <InputField name="full_name" label="Full Name" Icon={IdCard} placeholder="Abebe Kebede" form={form} onChange={onChange} />
+                <InputField name="username" label="Username" Icon={User} placeholder="abebekebede" form={form} onChange={onChange} />
                 <InputField name="phone_number" label="Phone Number" type="tel" Icon={Phone} placeholder="+251 9XX XXX XXX" form={form} onChange={onChange} />
-                <InputField name="email" label="Email Address" type="email" Icon={Mail} placeholder="you@example.com" span form={form} onChange={onChange} />
+                <InputField name="email" label="Email Address" type="email" Icon={Mail} placeholder="abebe@example.com" span form={form} onChange={onChange} />
                 <InputField name="password" label="Password" type="password" Icon={Lock} placeholder="••••••••" showToggle form={form} onChange={onChange} />
                 <InputField name="confirm_password" label="Confirm Password" type="password" Icon={Lock} placeholder="••••••••" showToggle form={form} onChange={onChange} />
               </div>
@@ -315,9 +313,9 @@ export default function Register() {
                       onChange={e => setSelectedCourseId(e.target.value)}
                       className="w-full pl-11 pr-4 py-4 bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/[0.12] rounded-2xl focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 text-base appearance-none dark:text-white"
                     >
-                      <option value="">Select a course...</option>
+                      <option value="" style={{ color: '#374151', background: '#fff' }}>Select a course...</option>
                       {courses.map(c => (
-                        <option key={c.id} value={c.id}>
+                        <option key={c.id} value={c.id} style={{ color: '#111827', background: '#fff' }}>
                           {c.title} {c.price ? `— ${c.price} ETB` : ''}
                         </option>
                       ))}
