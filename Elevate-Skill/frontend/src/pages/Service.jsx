@@ -4,6 +4,7 @@ import {
   ChevronDown, Lightbulb, PenTool, Target,
   Users, Star, ArrowRight, CheckCircle2, Sparkles
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 
 import mentorship from '../assets/service/mentorship.jpg'
@@ -72,9 +73,11 @@ const mainServices = [
 export default function Services() {
   const [activeService, setActiveService] = useState();
 
-  const toggleService = (id) => {
-    setActiveService(activeService === id ? null : id);
-  };
+  // const toggleService = (id) => {
+  //   setActiveService(activeService === id ? null : id);
+  // };
+
+  const navigate = useNavigate();
 
   const users = [
     "https://i.pravatar.cc/150?u=1",
@@ -155,11 +158,13 @@ export default function Services() {
                   />
                 ))}
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#2c2260] to-[#291850] border-4 border-white dark:border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
-                  24k+
+                  2k+
                 </div>
               </div>
             </div>
-            <button className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#f9a215] to-[#f15805] hover:brightness-110 text-white font-bold shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
+            <button 
+            onClick={() => navigate('/login')} // navigate to login
+            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-[#f9a215] to-[#f15805] hover:brightness-110 text-white font-bold shadow-lg shadow-[#15c8fb]/30 transition-all duration-300 flex items-center justify-center gap-3 group overflow-hidden relative">
               <span className="relative z-10">JOIN PLATFORM</span>
               <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform relative z-10" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
@@ -246,7 +251,7 @@ export default function Services() {
 
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
               <button  
-              // onClick={}
+              onClick={() => navigate('/register')} // navigate to register
               className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#f9a215] to-[#f15805] text-[white] font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
                 GET STARTED NOW
                 <ArrowRight className="group-hover:rotate-[-45deg] transition-transform" />
