@@ -77,7 +77,7 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-[#15c8fb] via-[#0e9ec9] to-[#f89f29] text-white text-xs"
+            className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-[#c16b08] via-[#e66808] to-[#f89f29] text-white text-xs"
           >
             <div className="flex items-center justify-center gap-2 px-4 py-1.5">
               <Megaphone size={14} className="shrink-0" />
@@ -126,7 +126,7 @@ export default function Navbar() {
                   className="relative py-2"
                   onMouseEnter={() => link.isMega ? setActiveMega(link.name) : setActiveMega(null)}
                 >
-                  <a href={link.href} className="flex items-center gap-1 text-[10px] font-black tracking-widest dark:text-white/80 text-slate-700 hover:text-[#15c8fb] transition-colors uppercase">
+                  <a href={link.href} className="flex items-center gap-1 text-[10px] font-black tracking-widest dark:text-white/80 text-slate-700 hover:text-[#f07000] transition-colors uppercase">
                     {link.name}
                     {link.isMega && <ChevronDown size={12} className={activeMega === link.name ? 'rotate-180' : ''} />}
                   </a>
@@ -139,7 +139,7 @@ export default function Navbar() {
                 <div className="flex items-center gap-3">
                   <Link 
                     to={user.role === 'admin' ? '/admin' : '/dashboard'}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#15c8fb]/10 to-[#f89f29]/10 text-[#0e9ec9] font-black text-[10px] tracking-widest rounded-md hover:from-[#15c8fb]/20 hover:to-[#f89f29]/20 transition-all uppercase"
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#15c8fb]/10 to-[#f89f29]/10 text-[#2a23b9] font-black text-[10px] tracking-widest rounded-md hover:from-[#15c8fb]/20 hover:to-[#f89f29]/20 transition-all uppercase"
                   >
                     {user.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
                     {user.full_name || user.username}
@@ -153,7 +153,7 @@ export default function Navbar() {
                 </div>
               ) : (
                 <>
-                  <Link to="/register" className="px-5 py-2 bg-gradient-to-r from-[#15c8fb] to-[#0e9ec9] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase shadow-lg shadow-[#15c8fb]/20">
+                  <Link to="/register" className="px-5 py-2 bg-gradient-to-r from-[#2a0765] to-[#1f1656] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase shadow-lg shadow-[#15c8fb]/20">
                     Portal
                   </Link>
                 </>
@@ -179,7 +179,7 @@ export default function Navbar() {
               <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
                 {navLinks.find(l => l.name === activeMega)?.subItems?.map((sub, i) => (
                   <div key={i} className="group cursor-pointer p-4 rounded-xl hover:bg-gradient-to-br hover:from-[#15c8fb]/5 hover:to-[#f89f29]/5 transition-all border border-transparent hover:border-[#15c8fb]/10">
-                    <h4 className="text-xs font-black dark:text-white text-slate-900 mb-2 uppercase tracking-widest group-hover:text-[#15c8fb]">{sub.title}</h4>
+                    <h4 className="text-xs font-black dark:text-white text-slate-900 mb-2 uppercase tracking-widest group-hover:text-[#f87b07]">{sub.title}</h4>
                     <p className="text-[11px] text-slate-500 dark:text-gray-300 leading-relaxed">{sub.desc}</p>
                   </div>
                 ))}
