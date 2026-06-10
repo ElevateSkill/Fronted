@@ -119,8 +119,8 @@ const About = () => {
             </p>
             
             <div className="flex flex-wrap gap-12 border-t border-gray-200 dark:border-white/10 pt-12">
-              <Stat count="50K+" label="Active Learners" />
-              <Stat count="450+" label="Master Mentors" />
+              <Stat count="1000+" label="Active Learners" />
+              <Stat count="10+" label="Master Mentors" />
               <Stat count="100%" label="Bespoke Curriculum" />
             </div>
           </div>
