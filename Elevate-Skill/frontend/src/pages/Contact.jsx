@@ -26,9 +26,9 @@ export default function Contact() {
 
             <div className="space-y-5">
               {[
-                { icon: <Mail size={20} />, title: 'Email', value: 'hello@elevate-skill.com' },
-                { icon: <Phone size={20} />, title: 'Phone', value: '+251 911 234 567' },
-                { icon: <MapPin size={20} />, title: 'Location', value: 'Adama, Ethiopia' }
+                { icon: <Mail size={20} />, title: 'Email', value: 'elevateskill369@gmail.com' },
+                { icon: <Phone size={20} />, title: 'Phone', value: '+251 981 80 70 55' },
+                { icon: <MapPin size={20} />, title: 'Location', value: 'Adama, Oromia, Ethiopia' }
               ].map((item, index) => (
                 <motion.div
                   key={index}
@@ -45,7 +45,7 @@ export default function Contact() {
                 </motion.div>
               ))}
             </div>
-
+{/* 
             <div className="flex items-center gap-4 p-4 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
               <div className="flex -space-x-2">
                 {[1, 2, 3].map(i => (
@@ -55,7 +55,7 @@ export default function Contact() {
               <p className="text-[10px] font-bold text-gray-500 dark:text-white/60">
                 Trusted by <span className="text-gray-900 dark:text-white">500+</span> companies worldwide
               </p>
-            </div>
+            </div> */}
           </div>
 
           <div className="lg:col-span-7">
