@@ -19,18 +19,25 @@ export default function Navbar() {
   const location = useLocation();
   const showBack = location.pathname !== '/';
 
-  // Fetch live announcements
+  // Fetch live announcements (try public endpoint first, fallback to admin)
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      api.get('/announcements/')
-        .then(res => {
-          const data = unwrapResults(res.data);
-          if (data.length > 0) setAnnouncements(data);
-        })
-        .catch(() => {});
-    }
-  }, [user]);
+    api.get('/announcements/')
+      .then(res => {
+        const data = unwrapResults(res.data);
+        if (data.length > 0) setAnnouncements(data);
+      })
+      .catch(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          api.get('/admin/announcements/')
+            .then(res => {
+              const data = unwrapResults(res.data);
+              if (data.length > 0) setAnnouncements(data.filter(a => a.is_published));
+            })
+            .catch(() => {});
+        }
+      });
+  }, []);
 
   // Scroll logic
   useEffect(() => {
