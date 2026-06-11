@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, Bell, Megaphone } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, Bell, Megaphone, ArrowLeft } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api, unwrapResults } from '../services/api';
 import logoJpg from '../assets/logo.jpg';
@@ -16,6 +16,8 @@ export default function Navbar() {
   const [showAnnBanner, setShowAnnBanner] = useState(true);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const showBack = location.pathname !== '/';
 
   // Fetch live announcements
   useEffect(() => {
@@ -70,23 +72,52 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ANNOUNCEMENT BANNER (compact top) */}
+      {/* ANNOUNCEMENT BANNER (animated top) */}
       <AnimatePresence>
         {showAnnBanner && announcements.length > 0 && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-[#c16b08] via-[#e66808] to-[#f89f29] text-white text-xs"
+            className="fixed top-0 left-0 right-0 z-[60] overflow-hidden"
           >
-            <div className="flex items-center justify-center gap-2 px-4 py-1.5">
-              <Megaphone size={14} className="shrink-0" />
-              <span className="animate-pulse font-bold uppercase tracking-wider">NEW:</span>
-              <span className="truncate max-w-[60vw]">{announcements[0]?.title}: {announcements[0]?.content}</span>
-              <button onClick={() => setShowAnnBanner(false)} className="ml-2 shrink-0 rounded-full p-0.5 hover:bg-white/20 transition-colors">
-                <X size={14} />
-              </button>
-            </div>
+            <motion.div
+              animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+              className="bg-gradient-to-r from-[#dc2626] via-[#f89f29] to-[#dc2626] bg-[length:200%_200%] text-white text-xs"
+            >
+              <div className="flex items-center justify-center gap-2 px-4 py-2">
+                <motion.div
+                  animate={{ rotate: [0, -10, 10, -10, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Megaphone size={14} className="shrink-0" />
+                </motion.div>
+                <motion.span
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="font-black uppercase tracking-wider text-[11px]"
+                >
+                  📢 {announcements[0]?.title}:
+                </motion.span>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0.7, 1, 0.7] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="truncate max-w-[50vw] sm:max-w-[60vw] font-medium"
+                >
+                  {announcements[0]?.content}
+                </motion.span>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowAnnBanner(false)}
+                  className="ml-2 shrink-0 rounded-full p-1 hover:bg-white/20 transition-colors"
+                >
+                  <X size={14} />
+                </motion.button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -106,6 +137,21 @@ export default function Navbar() {
       >
         <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
           
+          {/* BACK BUTTON */}
+          {showBack && (
+            <motion.button
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              onClick={() => navigate('/')}
+              className="relative z-[71] flex items-center justify-center h-8 w-8 rounded-lg bg-white/90 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-700 dark:text-white hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626] transition-all mr-2 shadow-sm"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Go home"
+            >
+              <ArrowLeft size={16} />
+            </motion.button>
+          )}
+
           {/* LOGO */}
           <Link to="/" className="relative z-[71] flex items-center gap-3 group">
             <div className="relative">

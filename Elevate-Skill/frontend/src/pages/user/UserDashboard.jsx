@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Bell, BookOpen, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
+  ArrowLeft, Bell, BookOpen, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
   Home, Loader, LogOut, Mail, Megaphone, Menu, MessageCircle, Phone,
   RefreshCw, Save, Send, Settings, Shield, Upload, User, X, AlertTriangle,
   Calendar, BarChart3, ExternalLink, Filter, Download
@@ -11,8 +11,8 @@ import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api
 import { useAuth } from '../../context/AuthContext';
 
 const accent = {
-  button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20 hover:shadow-xl hover:shadow-[#15c8fb]/30 active:scale-[0.97] transition-all duration-200',
-  panel: 'border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/8 via-white to-[#f89f29]/8',
+  button: 'bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white shadow-lg shadow-[#dc2626]/20 hover:shadow-xl hover:shadow-[#dc2626]/30 active:scale-[0.97] transition-all duration-200',
+  panel: 'border-[#dc2626]/20 bg-gradient-to-br from-[#dc2626]/8 via-white to-[#f89f29]/8',
 };
 
 const tabs = [
@@ -43,9 +43,9 @@ function Badge({ children }) {
   return <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold capitalize ${statusClass(children)}`}>{children || 'pending'}</span>;
 }
 
-function StatCard({ label, value, icon: Icon, tone = 'sky' }) {
+function StatCard({ label, value, icon: Icon, tone = 'red' }) {
   const tones = {
-    sky: { bg: 'bg-[#15c8fb]/10', text: 'text-[#15c8fb]', border: 'border-[#15c8fb]/20' },
+    red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
     orange: { bg: 'bg-[#f89f29]/10', text: 'text-[#f89f29]', border: 'border-[#f89f29]/20' },
     green: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
     rose: { bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-100' },
@@ -251,7 +251,7 @@ export default function UserDashboard() {
   const sidebarContent = (
     <>
       <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-white shadow-lg">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-white shadow-lg">
           <GraduationCap size={20} />
         </div>
         <div>
@@ -266,7 +266,7 @@ export default function UserDashboard() {
             onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
             className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-200 ${
               activeTab === id
-                ? 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20'
+                ? 'bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white shadow-lg shadow-[#dc2626]/20'
                 : 'text-gray-600 hover:bg-gray-100 hover:text-gray-950'
             }`}
           >
@@ -285,11 +285,11 @@ export default function UserDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-white to-[#f89f29]/5 p-6 shadow-sm"
+        className="rounded-xl border border-[#dc2626]/20 bg-gradient-to-br from-[#dc2626]/5 via-white to-[#f89f29]/5 p-6 shadow-sm"
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-2xl font-black text-white shadow-lg shadow-[#15c8fb]/20">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-2xl font-black text-white shadow-lg shadow-[#dc2626]/20">
               {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'S'}
             </div>
             <div>
@@ -304,7 +304,7 @@ export default function UserDashboard() {
           </div>
         </div>
         {latestAnnouncement && (
-          <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#15c8fb]/10 to-[#f89f29]/10 px-4 py-3 text-sm">
+          <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#dc2626]/10 to-[#f89f29]/10 px-4 py-3 text-sm">
             <Megaphone size={16} className="shrink-0 text-[#f89f29]" />
             <span className="font-semibold text-gray-900">{latestAnnouncement.title}:</span>
             <span className="text-gray-600 truncate">{latestAnnouncement.content}</span>
@@ -334,8 +334,8 @@ export default function UserDashboard() {
       >
         <h2 className="mb-4 text-lg font-black text-gray-950">Quick Actions</h2>
         <div className="grid gap-3 sm:grid-cols-3">
-          <button onClick={() => setActiveTab('courses')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5 transition-all">
-            <BookOpen size={22} className="mb-2 text-[#15c8fb] group-hover:scale-110 transition-transform" />
+          <button onClick={() => setActiveTab('courses')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5 transition-all">
+            <BookOpen size={22} className="mb-2 text-[#dc2626] group-hover:scale-110 transition-transform" />
             <p className="font-black text-gray-950">Browse Courses</p>
             <p className="mt-1 text-xs text-gray-500">{unpaidCourses.length} available to enroll</p>
           </button>
@@ -402,7 +402,7 @@ export default function UserDashboard() {
             )}
             {completedEnrollments.length > 0 && (
               <div 
-                className="bg-[#15c8fb] transition-all duration-500" 
+                className="bg-[#dc2626] transition-all duration-500" 
                 style={{ width: `${(completedEnrollments.length / enrollments.length) * 100}%` }}
                 title={`Completed: ${completedEnrollments.length}`}
               />
@@ -418,7 +418,7 @@ export default function UserDashboard() {
           <div className="mt-3 flex flex-wrap gap-4 text-xs">
             {activeEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Active ({activeEnrollments.length})</span>}
             {pendingEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Pending ({pendingEnrollments.length})</span>}
-            {completedEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#15c8fb]" /> Completed ({completedEnrollments.length})</span>}
+            {completedEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#dc2626]" /> Completed ({completedEnrollments.length})</span>}
             {cancelledEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-rose-400" /> Cancelled ({cancelledEnrollments.length})</span>}
           </div>
         </motion.section>
@@ -459,7 +459,7 @@ export default function UserDashboard() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                    <span className="rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#15c8fb] backdrop-blur">
+                    <span className="rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#dc2626] backdrop-blur">
                       {item.course?.category?.name || 'Course'}
                     </span>
                     <Badge>{item.status}</Badge>
@@ -535,7 +535,7 @@ export default function UserDashboard() {
                     <button
                       onClick={() => enrollInCourse(course.id)}
                       disabled={saving}
-                      className="rounded-lg bg-gradient-to-r from-[#15c8fb] to-[#0e9ec9] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#15c8fb]/20"
+                      className="rounded-lg bg-gradient-to-r from-[#dc2626] to-[#f89f29] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#dc2626]/20"
                     >
                       {saving ? <Loader size={13} className="animate-spin" /> : 'Enroll Now'}
                     </button>
@@ -558,7 +558,7 @@ export default function UserDashboard() {
       >
         <form onSubmit={submitPayment} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-            <Upload size={18} className="text-[#15c8fb]" /> Submit Proof
+            <Upload size={18} className="text-[#dc2626]" /> Submit Proof
           </h2>
           <div className="space-y-4">
             <div>
@@ -567,7 +567,7 @@ export default function UserDashboard() {
                 required
                 value={selectedEnrollment}
                 onChange={(e) => setSelectedEnrollment(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all"
+                className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all"
               >
                 <option value="">Choose a pending enrollment...</option>
                 {pendingEnrollments.map((item) => (
@@ -576,19 +576,19 @@ export default function UserDashboard() {
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
-              <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
-              <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
+              <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 transition-all" />
+              <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 transition-all" />
+              <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 transition-all" />
             </div>
-            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center hover:border-[#15c8fb]/40 hover:bg-[#15c8fb]/5 transition-all">
-              <FileText className="mb-2 text-[#15c8fb]" size={28} />
+            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center hover:border-[#dc2626]/40 hover:bg-[#dc2626]/5 transition-all">
+              <FileText className="mb-2 text-[#dc2626]" size={28} />
               <p className="text-sm font-medium text-gray-700">{proofFile ? proofFile.name : 'Upload receipt or screenshot'}</p>
               <p className="text-xs text-gray-400 mt-1">PDF, JPG or PNG · Max 5MB</p>
               <input type="file" accept="image/*,.pdf" onChange={(e) => setProofFile(e.target.files?.[0] || null)} className="hidden" />
             </label>
             <button
               disabled={saving || !pendingEnrollments.length}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#0e9ec9] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#dc2626] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg"
             >
               {saving ? <Loader className="animate-spin" size={16} /> : <Send size={16} />}
               Submit Payment Proof
@@ -609,7 +609,7 @@ export default function UserDashboard() {
                   }));
                   exportToCSV(data, 'my_payments.csv');
                 }}
-                className="rounded-lg border border-[#15c8fb]/30 px-3 py-1.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all"
+                className="rounded-lg border border-[#dc2626]/30 px-3 py-1.5 text-xs font-bold text-[#dc2626] hover:bg-[#dc2626]/10 transition-all"
               >
                 <Download size={12} className="inline mr-1" /> CSV
               </button>
@@ -645,7 +645,7 @@ export default function UserDashboard() {
                     <td className="px-4 py-3 text-gray-500 text-xs">{formatDate(payment.submitted_at)}</td>
                     <td className="px-4 py-3">
                       {payment.proof_file ? (
-                        <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#15c8fb]/10 px-3 py-1.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/20 transition-all">
+                        <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#dc2626]/10 px-3 py-1.5 text-xs font-bold text-[#dc2626] hover:bg-[#dc2626]/20 transition-all">
                           <FileText size={13} /> View
                         </a>
                       ) : <span className="text-gray-400 text-xs">No file</span>}
@@ -684,7 +684,7 @@ export default function UserDashboard() {
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb]/20 to-[#f89f29]/20">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626]/20 to-[#f89f29]/20">
                     <Megaphone size={16} className="text-[#f89f29]" />
                   </div>
                   <div>
@@ -721,11 +721,11 @@ export default function UserDashboard() {
       >
         <form onSubmit={saveProfile} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-            <User size={18} className="text-[#15c8fb]" /> Profile Settings
+            <User size={18} className="text-[#dc2626]" /> Profile Settings
           </h2>
           <div className="space-y-4">
             <div className="flex items-center gap-5 mb-4 pb-5 border-b border-gray-100">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-3xl font-black text-white shadow-lg shadow-[#15c8fb]/20">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-3xl font-black text-white shadow-lg shadow-[#dc2626]/20">
                 {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'S'}
               </div>
               <div>
@@ -738,11 +738,11 @@ export default function UserDashboard() {
               </div>
             </div>
             <div className="grid gap-4">
-              <input required value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
-              <input required type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
-              <input value={profile.phone_number} onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
+              <input required value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all" />
+              <input required type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all" />
+              <input value={profile.phone_number} onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all" />
             </div>
-            <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#0e9ec9] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#15c8fb]/20">
+            <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#dc2626] to-[#f89f29] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#dc2626]/20">
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
               Save Changes
             </button>
@@ -756,7 +756,7 @@ export default function UserDashboard() {
         className="space-y-4"
       >
         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-gray-950"><Download size={16} className="text-[#15c8fb]" /> Export My Data</h3>
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-gray-950"><Download size={16} className="text-[#dc2626]" /> Export My Data</h3>
           <p className="text-xs text-gray-500 mb-4">Download your records as CSV files.</p>
           <div className="space-y-2">
             <button
@@ -770,7 +770,7 @@ export default function UserDashboard() {
                 exportToCSV(data, 'my_enrollments.csv');
               }}
               disabled={!enrollments.length}
-              className="w-full rounded-lg border border-[#15c8fb]/30 px-3 py-2.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all disabled:opacity-40 flex items-center justify-between"
+              className="w-full rounded-lg border border-[#dc2626]/30 px-3 py-2.5 text-xs font-bold text-[#dc2626] hover:bg-[#dc2626]/10 transition-all disabled:opacity-40 flex items-center justify-between"
             >
               <span><FileText size={13} className="inline mr-1.5" />Enrollments</span>
               <span className="text-gray-400">{enrollments.length}</span>
@@ -847,6 +847,9 @@ export default function UserDashboard() {
         <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-lg lg:px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
+              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 transition-all hover:text-[#dc2626]" title="Go home">
+                <ArrowLeft size={20} />
+              </button>
               <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden">
                 <Menu size={20} />
               </button>

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  BarChart3, BookOpen, CheckCircle, Clock, CreditCard, Edit3, FileText,
+  ArrowLeft, BarChart3, BookOpen, CheckCircle, Clock, CreditCard, Edit3, FileText,
   GraduationCap, HelpCircle, Image, Loader, LogOut, Megaphone, Menu,
   Newspaper, Plus, RefreshCw, Save, Search, Settings, Star, Tags, Trash2,
   User, UserPlus, Users, X, XCircle, AlertTriangle
@@ -1616,6 +1616,9 @@ export default function AdminDashboard() {
         <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-lg lg:px-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
+              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 transition-all hover:text-[#dc2626]" title="Go home">
+                <ArrowLeft size={20} />
+              </button>
               <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden">
                 <Menu size={20} />
               </button>

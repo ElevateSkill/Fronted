@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { api, unwrapResults } from '../../services/api';
 import {
-  Mail, Lock, User, IdCard, Phone,
+  ArrowLeft, Mail, Lock, User, IdCard, Phone,
   ArrowRight, TriangleAlert, Sparkles, Eye, EyeOff,
   CheckCircle, BookOpen, Upload, Loader, Check,
   AlertTriangle, ShieldCheck
@@ -194,6 +194,9 @@ export default function Register() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#eef5fb] via-[#e5edf6] to-[#d8e2f0] text-slate-900 dark:from-[#07090d] dark:via-[#0a0e14] dark:to-[#111827] dark:text-white">
+      <button onClick={() => navigate('/')} className="absolute top-4 left-4 z-20 flex items-center justify-center h-9 w-9 rounded-xl bg-white/90 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-700 dark:text-white hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626] transition-all shadow-sm" title="Go home">
+        <ArrowLeft size={18} />
+      </button>
       <div className="absolute inset-0 pointer-events-none">
         <motion.div animate={{ rotate: 360 }} transition={{ duration: 140, repeat: Infinity, ease: 'linear' }} className="absolute -top-52 -left-52 h-[44rem] w-[44rem] border border-[red]/10" />
         <motion.div animate={{ rotate: -360 }} transition={{ duration: 160, repeat: Infinity, ease: 'linear' }} className="absolute -bottom-64 -right-64 h-[48rem] w-[48rem] border border-[#f89f29]/10" />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, ArrowRight, Lock, TriangleAlert, Eye, EyeOff, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowLeft, Mail, ArrowRight, Lock, TriangleAlert, Eye, EyeOff, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -46,6 +46,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[red] via-[yellow] to-[red] text-slate-900 dark:from-[#07090d] dark:via-[#0a0e14] dark:to-[#111827] dark:text-white">
+      <button onClick={() => navigate('/')} className="absolute top-4 left-4 z-20 flex items-center justify-center h-9 w-9 rounded-xl bg-white/90 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-700 dark:text-white hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626] transition-all shadow-sm" title="Go home">
+        <ArrowLeft size={18} />
+      </button>
       <div className="absolute inset-0 pointer-events-none">
         <motion.div
           animate={{ scale: [1, 1.05, 1], opacity: [0.28, 0.5, 0.28] }}
