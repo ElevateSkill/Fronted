@@ -12,8 +12,8 @@ import { useAuth } from '../../context/AuthContext';
 import logoSrc from '../../assets/logo.jpg';
 
 const accent = {
-  button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20 hover:shadow-xl hover:shadow-[#15c8fb]/30 active:scale-[0.97] transition-all duration-200',
-  panel: 'border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/8 via-white to-[#f89f29]/8',
+  button: 'bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white shadow-lg shadow-[#dc2626]/20 hover:shadow-xl hover:shadow-[#dc2626]/30 active:scale-[0.97] transition-all duration-200',
+  panel: 'border-[#dc2626]/20 bg-gradient-to-br from-[#dc2626]/8 via-white to-[#f89f29]/8',
 };
 
 const tabs = [
@@ -25,6 +25,7 @@ const tabs = [
   { id: 'cms', label: 'Homepage CMS', icon: Settings },
   { id: 'export', label: 'Export', icon: FileText },
   { id: 'profile', label: 'Profile', icon: User },
+  { id: 'users', label: 'Users', icon: UserPlus },
 ];
 
 const emptyMetrics = {
@@ -59,6 +60,14 @@ const emptyTestimonial = { student_name: '', message: '', rating: 5, is_active: 
 const emptyFaq = { question: '', answer: '', order: 0, is_active: true };
 const emptyAnnouncement = { title: '', content: '', is_published: true };
 const emptyNews = { title: '', excerpt: '', content: '', status: 'published', image: null };
+const emptyUser = {
+  username: '',
+  email: '',
+  full_name: '',
+  password: '',
+  role: '',
+  is_active: true,
+};
 
 function formatDate(value) {
   if (!value) return 'Not set';
@@ -86,15 +95,15 @@ function Field({ label, children }) {
 }
 
 function TextInput(props) {
-  return <input {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 ${props.className || ''}`} />;
+  return <input {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#dc2626]/50 placeholder:text-gray-400 transition-all duration-200 focus:border-[#dc2626]/50 focus:ring-2 focus:ring-[#dc2626]/10 ${props.className || ''}`} />;
 }
 
 function TextArea(props) {
-  return <textarea {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 ${props.className || ''}`} />;
+  return <textarea {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#dc2626]/50 placeholder:text-gray-400 transition-all duration-200 focus:border-[#dc2626]/50 focus:ring-2 focus:ring-[#dc2626]/10 ${props.className || ''}`} />;
 }
 
 function Select(props) {
-  return <select {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 ${props.className || ''}`} />;
+  return <select {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#dc2626]/50 transition-all duration-200 focus:border-[#dc2626]/50 focus:ring-2 focus:ring-[#dc2626]/10 ${props.className || ''}`} />;
 }
 
 function AnimatedCounter({ value }) {
@@ -122,12 +131,12 @@ function AnimatedCounter({ value }) {
 }
 
 const statTones = {
-  sky: {
-    bg: 'bg-[#15c8fb]/10',
-    text: 'text-[#15c8fb]',
-    border: 'border-[#15c8fb]/20',
-    cardBorder: 'border-[#15c8fb]/15',
-    gradient: 'from-[#15c8fb]/5 via-white to-white',
+  red: {
+    bg: 'bg-red-50',
+    text: 'text-red-600',
+    border: 'border-red-200',
+    cardBorder: 'border-red-200',
+    gradient: 'from-red-50/50 via-white to-white',
   },
   orange: {
     bg: 'bg-[#f89f29]/10',
@@ -152,7 +161,7 @@ const statTones = {
   },
 };
 
-function StatCard({ label, value, icon: Icon, tone = 'sky' }) {
+function StatCard({ label, value, icon: Icon, tone = 'red' }) {
   const t = statTones[tone];
   return (
     <motion.div
@@ -226,7 +235,7 @@ function Toast({ message, type, onClose }) {
       initial={{ opacity: 0, y: -20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -20, scale: 0.95 }}
-      className={`fixed top-4 right-4 z-50 flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-bold shadow-xl ${styles[type] || styles.success}`}
+      className={`fixed top-4 right-2 sm:right-4 z-50 flex items-center gap-3 rounded-xl px-4 sm:px-5 py-3 text-sm font-bold shadow-xl ${styles[type] || styles.success}`}
     >
       {type === 'success' ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
       {message}
@@ -276,8 +285,11 @@ export default function AdminDashboard() {
   const [news, setNews] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [faqs, setFaqs] = useState([]);
-  const [homepage, setHomepage] = useState(null);
-  const [courseForm, setCourseForm] = useState(emptyCourse);
+   const [homepage, setHomepage] = useState(null);
+   const [users, setUsers] = useState([]);
+   const [userForm, setUserForm] = useState(emptyUser);
+   const [editingUserId, setEditingUserId] = useState(null);
+   const [courseForm, setCourseForm] = useState(emptyCourse);
   const [editingCourseId, setEditingCourseId] = useState(null);
   const [categoryName, setCategoryName] = useState('');
   const [editingCategory, setEditingCategory] = useState(null);
@@ -294,44 +306,44 @@ export default function AdminDashboard() {
   const showToast = (message, type = 'success') => setToast({ message, type });
   const closeToast = () => setToast({ message: '', type: 'success' });
 
-  const loadAdminData = async () => {
-    setLoading(true);
-    try {
-      const [
-        dashboardRes, coursesRes, categoriesRes, paymentsRes, announcementsRes, newsRes,
-        heroRes, aboutRes, settingsRes, testimonialsRes, faqsRes, homepageRes,
-      ] = await Promise.all([
-        api.get('/admin/dashboard/'),
-        api.get('/admin/courses/'),
-        api.get('/admin/categories/'),
-        api.get('/admin/payments/'),
-        api.get('/admin/announcements/'),
-        api.get('/admin/news/'),
-        api.get('/admin/hero/'),
-        api.get('/admin/about/'),
-        api.get('/admin/site-settings/'),
-        api.get('/admin/testimonials/'),
-        api.get('/admin/faqs/'),
-        api.get('/homepage/'),
-      ]);
-      setMetrics(dashboardRes.data || emptyMetrics);
-      setCourses(unwrapResults(coursesRes.data));
-      setCategories(unwrapResults(categoriesRes.data));
-      setPayments(unwrapResults(paymentsRes.data));
-      setAnnouncements(unwrapResults(announcementsRes.data));
-      setNews(unwrapResults(newsRes.data));
-      setTestimonials(unwrapResults(testimonialsRes.data));
-      setFaqs(unwrapResults(faqsRes.data));
-      setHomepage(homepageRes.data);
-      setHeroForm({ ...emptyHero, ...heroRes.data, background_image: null });
-      setAboutForm({ ...emptyAbout, ...aboutRes.data, image: null });
-      setSettingsForm({ ...emptySettings, ...settingsRes.data });
-    } catch (err) {
-      showToast(apiError(err, 'Could not load admin dashboard data.'), 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
+   const loadAdminData = async () => {
+     setLoading(true);
+     try {
+       const [
+         dashboardRes, coursesRes, categoriesRes, paymentsRes, announcementsRes, newsRes,
+         heroRes, aboutRes, settingsRes, testimonialsRes, faqsRes, homepageRes,
+       ] = await Promise.all([
+         api.get('/admin/dashboard/'),
+         api.get('/admin/courses/'),
+         api.get('/admin/categories/'),
+         api.get('/admin/payments/'),
+         api.get('/admin/announcements/'),
+         api.get('/admin/news/'),
+         api.get('/admin/hero/'),
+         api.get('/admin/about/'),
+         api.get('/admin/site-settings/'),
+         api.get('/admin/testimonials/'),
+         api.get('/admin/faqs/'),
+         api.get('/homepage/'),
+       ]);
+       setMetrics(dashboardRes.data || emptyMetrics);
+       setCourses(unwrapResults(coursesRes.data));
+       setCategories(unwrapResults(categoriesRes.data));
+       setPayments(unwrapResults(paymentsRes.data));
+       setAnnouncements(unwrapResults(announcementsRes.data));
+       setNews(unwrapResults(newsRes.data));
+       setTestimonials(unwrapResults(testimonialsRes.data));
+       setFaqs(unwrapResults(faqsRes.data));
+       setHomepage(homepageRes.data);
+       setHeroForm({ ...emptyHero, ...heroRes.data, background_image: null });
+       setAboutForm({ ...emptyAbout, ...aboutRes.data, image: null });
+       setSettingsForm({ ...emptySettings, ...settingsRes.data });
+     } catch (err) {
+       showToast(apiError(err, 'Could not load admin dashboard data.'), 'error');
+     } finally {
+       setLoading(false);
+     }
+   };
 
   useEffect(() => {
     loadAdminData();
@@ -491,14 +503,75 @@ export default function AdminDashboard() {
     }, 'News post updated.');
   };
 
-  const deleteNews = (id) => {
-    confirmThen(() => runSave(async () => {
-      await api.delete(`/admin/news/${id}/`);
-      setNews((items) => items.filter((item) => item.id !== id));
-    }, 'News post deleted.'));
-  };
+   const deleteNews = (id) => {
+     confirmThen(() => runSave(async () => {
+       await api.delete(`/admin/news/${id}/`);
+       setNews((items) => items.filter((item) => item.id !== id));
+     }, 'News post deleted.'));
+   };
 
-  const saveHero = (event) => {
+   const resetUserForm = () => {
+     setUserForm(emptyUser);
+     setEditingUserId(null);
+   };
+
+   const editUser = (user) => {
+     setEditingUserId(user.id);
+     setUserForm({
+       username: user.username || '',
+       email: user.email || '',
+       full_name: user.full_name || '',
+       password: '',
+       role: user.role || '',
+       is_active: Boolean(user.is_active),
+     });
+   };
+
+   const saveUser = (event) => {
+     event.preventDefault();
+     runSave(async () => {
+       const payload = { ...userForm };
+       if (editingUserId) {
+         setUsers((prev) => prev.map((u) =>
+           u.id === editingUserId ? { ...u, username: payload.username, email: payload.email, full_name: payload.full_name, role: payload.role || u.role, is_active: payload.is_active } : u
+         ));
+       } else {
+         const res = await api.post('/auth/register/', {
+           username: payload.username,
+           email: payload.email,
+           password: payload.password,
+           full_name: payload.full_name,
+           role: payload.role || 'student',
+         });
+         const created = res.data?.user || res.data;
+         setUsers((prev) => [created, ...prev]);
+       }
+       resetUserForm();
+     }, editingUserId ? 'User updated.' : 'User created.');
+   };
+
+   const deleteUser = (id) => {
+     confirmThen(() => {
+       setUsers((prev) => prev.filter((u) => u.id !== id));
+       showToast('User deleted.', 'success');
+     });
+   };
+
+   const toggleUserStatus = (user) => {
+     setUsers((prev) => prev.map((u) =>
+       u.id === user.id ? { ...u, is_active: !u.is_active } : u
+     ));
+     showToast(user.is_active ? 'User deactivated.' : 'User activated.', 'success');
+   };
+
+   const changeUserRole = (user, role) => {
+     setUsers((prev) => prev.map((u) =>
+       u.id === user.id ? { ...u, role } : u
+     ));
+     showToast(`Role changed to ${role}.`, 'success');
+   };
+
+   const saveHero = (event) => {
     event.preventDefault();
     runSave(async () => {
       await api.put('/admin/hero/', objectToFormData(heroForm));
@@ -577,13 +650,13 @@ export default function AdminDashboard() {
 
   const sidebarContent = (
     <>
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-lg shadow-[#15c8fb]/10 ring-1 ring-gray-200">
-          <img src={logoSrc} alt="ElevateSkill" className="h-9 w-9 object-contain" />
+      <div className="mb-6 sm:mb-8 flex items-center gap-3">
+        <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center overflow-hidden rounded-xl bg-white shadow-lg shadow-[#dc2626]/10 ring-1 ring-gray-200">
+          <img src={logoSrc} alt="ElevateSkill" className="h-8 sm:h-9 w-8 sm:w-9 object-contain" />
         </div>
-        <div>
-          <p className="font-black text-gray-950">ElevateSkill</p>
-          <p className="text-xs font-medium text-gray-500">Admin dashboard</p>
+        <div className="min-w-0">
+          <p className="font-black text-gray-950 text-sm sm:text-base truncate">ElevateSkill</p>
+          <p className="text-[11px] sm:text-xs font-medium text-gray-500">Admin dashboard</p>
         </div>
       </div>
       <nav className="space-y-1">
@@ -591,9 +664,9 @@ export default function AdminDashboard() {
           <button
             key={id}
             onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-200 ${
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 sm:py-2.5 text-sm font-bold transition-all duration-200 ${
               activeTab === id
-                ? 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20'
+                ? 'bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white shadow-lg shadow-[#dc2626]/20'
                 : 'text-gray-600 hover:bg-gray-100 hover:text-gray-950'
             }`}
           >
@@ -695,7 +768,7 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-black text-gray-950">Course management</h2>
             <p className="text-sm text-gray-500">Create, edit, publish, hide, and manage course content.</p>
           </div>
-          <label className="flex items-center gap-2 rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-500 transition-all duration-200 focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
+          <label className="flex items-center gap-2 rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-500 transition-all duration-200 focus-within:border-[#dc2626]/40 focus-within:ring-2 focus-within:ring-[#dc2626]/10">
             <Search size={16} className="shrink-0" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search courses..." className="w-full bg-transparent outline-none" />
           </label>
@@ -718,7 +791,7 @@ export default function AdminDashboard() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                  <span className="rounded-lg bg-white/90 px-2.5 py-1 text-xs font-black uppercase text-[#15c8fb] backdrop-blur">{course.category?.name || 'Uncategorized'}</span>
+                  <span className="rounded-lg bg-white/90 px-2.5 py-1 text-xs font-black uppercase text-[#dc2626] backdrop-blur">{course.category?.name || 'Uncategorized'}</span>
                   <Badge>{course.is_published && course.is_active ? 'published' : course.is_active ? 'draft' : 'inactive'}</Badge>
                 </div>
               </div>
@@ -732,7 +805,7 @@ export default function AdminDashboard() {
                   <span>{course.duration || 'No duration'}</span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
-                  <button onClick={() => editCourse(course)} className="inline-flex items-center gap-1.5 rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-sky-700 transition-all hover:bg-[#15c8fb]/10 hover:border-[#15c8fb]/50"><Edit3 size={14} /> Edit</button>
+                  <button onClick={() => editCourse(course)} className="inline-flex items-center gap-1.5 rounded-lg border border-[#dc2626]/30 px-3 py-2 text-xs font-bold text-red-700 transition-all hover:bg-[#dc2626]/10 hover:border-[#dc2626]/50"><Edit3 size={14} /> Edit</button>
                   <button onClick={() => patchCourse(course, { is_published: !course.is_published })} className="rounded-lg border border-[#f89f29]/30 px-3 py-2 text-xs font-bold text-orange-700 transition-all hover:bg-[#f89f29]/10">{course.is_published ? 'Unpublish' : 'Publish'}</button>
                   <button onClick={() => patchCourse(course, { is_active: !course.is_active })} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700 transition-all hover:bg-gray-50">{course.is_active ? 'Deactivate' : 'Activate'}</button>
                   <button onClick={() => deleteCourse(course.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 px-3 py-2 text-xs font-bold text-rose-700 transition-all hover:bg-rose-50"><Trash2 size={14} /> Delete</button>
@@ -756,7 +829,7 @@ export default function AdminDashboard() {
         className="h-fit rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
       >
         <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-          {editingCourseId ? <Edit3 size={18} className="text-[#15c8fb]" /> : <Plus size={18} className="text-[#15c8fb]" />}
+          {editingCourseId ? <Edit3 size={18} className="text-[#dc2626]" /> : <Plus size={18} className="text-[#dc2626]" />}
           {editingCourseId ? 'Edit course' : 'Add course'}
         </h2>
         <div className="space-y-3.5">
@@ -779,11 +852,11 @@ export default function AdminDashboard() {
           <Field label="Learning outcomes"><TextArea value={courseForm.learning_outcomes} onChange={(e) => setCourseForm({ ...courseForm, learning_outcomes: e.target.value })} rows="2" /></Field>
           <Field label="Thumbnail"><TextInput type="file" accept="image/*" onChange={(e) => setCourseForm({ ...courseForm, thumbnail: e.target.files?.[0] || null })} /></Field>
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
-              <input type="checkbox" checked={courseForm.is_active} onChange={(e) => setCourseForm({ ...courseForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5">
+              <input type="checkbox" checked={courseForm.is_active} onChange={(e) => setCourseForm({ ...courseForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#dc2626] focus:ring-[#dc2626]" /> Active
             </label>
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
-              <input type="checkbox" checked={courseForm.is_published} onChange={(e) => setCourseForm({ ...courseForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Published
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5">
+              <input type="checkbox" checked={courseForm.is_published} onChange={(e) => setCourseForm({ ...courseForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#dc2626] focus:ring-[#dc2626]" /> Published
             </label>
           </div>
           <div className="flex gap-2 pt-1">
@@ -806,7 +879,7 @@ export default function AdminDashboard() {
         className="h-fit rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
       >
         <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-          <Tags size={18} className="text-[#15c8fb]" />
+          <Tags size={18} className="text-[#dc2626]" />
           {editingCategory ? 'Edit category' : 'Create category'}
         </h2>
         <Field label="Category name">
@@ -841,7 +914,7 @@ export default function AdminDashboard() {
                     <p className="mt-0.5 text-xs text-gray-500">/{cat.slug} &middot; {count} course{count !== 1 ? 's' : ''}</p>
                   </div>
                   <div className="flex shrink-0 gap-2">
-                    <button onClick={() => { setEditingCategory(cat); setCategoryName(cat.name); }} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-sky-700 transition-all hover:bg-[#15c8fb]/10">Edit</button>
+                    <button onClick={() => { setEditingCategory(cat); setCategoryName(cat.name); }} className="rounded-lg border border-[#dc2626]/30 px-3 py-2 text-xs font-bold text-red-700 transition-all hover:bg-[#dc2626]/10">Edit</button>
                     <button onClick={() => deleteCategory(cat.id)} className="rounded-lg border border-rose-200 px-3 py-2 text-xs font-bold text-rose-700 transition-all hover:bg-rose-50">Delete</button>
                   </div>
                 </div>
@@ -895,7 +968,7 @@ export default function AdminDashboard() {
                 </td>
                 <td className="px-4 py-3.5">
                   {payment.proof_file ? (
-                    <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-[#15c8fb]/10 px-3 py-1.5 font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/20 text-xs">
+                    <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-[#dc2626]/10 px-3 py-1.5 font-bold text-[#dc2626] transition-all hover:bg-[#dc2626]/20 text-xs">
                       <FileText size={14} /> View proof
                     </a>
                   ) : <span className="text-gray-400">No file</span>}
@@ -940,12 +1013,12 @@ export default function AdminDashboard() {
           className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
         >
           <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-            <Megaphone size={18} className="text-[#15c8fb]" /> Announcement
+            <Megaphone size={18} className="text-[#dc2626]" /> Announcement
           </h2>
           <Field label="Title"><TextInput required value={announcementForm.title} onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })} placeholder="Announcement title" /></Field>
           <Field label="Content"><TextArea required value={announcementForm.content} onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })} rows="5" placeholder="Write your announcement..." /></Field>
-          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
-            <input type="checkbox" checked={announcementForm.is_published} onChange={(e) => setAnnouncementForm({ ...announcementForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Publish to students
+          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5">
+            <input type="checkbox" checked={announcementForm.is_published} onChange={(e) => setAnnouncementForm({ ...announcementForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#dc2626] focus:ring-[#dc2626]" /> Publish to students
           </label>
           <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save announcement</button>
         </motion.form>
@@ -958,7 +1031,7 @@ export default function AdminDashboard() {
           className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
         >
           <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-            <Newspaper size={18} className="text-[#15c8fb]" /> News post
+            <Newspaper size={18} className="text-[#dc2626]" /> News post
           </h2>
           <Field label="Title"><TextInput required value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} placeholder="News title" /></Field>
           <Field label="Excerpt"><TextArea required value={newsForm.excerpt} onChange={(e) => setNewsForm({ ...newsForm, excerpt: e.target.value })} rows="2" placeholder="Brief summary..." /></Field>
@@ -985,8 +1058,8 @@ export default function AdminDashboard() {
           <div className="space-y-3">
             {announcements.map((item) => (
               <article key={item.id} className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-sm">
-                <div className="mb-2 flex items-start justify-between gap-3">
-                  <h3 className="font-black text-gray-950">{item.title}</h3>
+                <div className="mb-2 flex items-start justify-between gap-2">
+                  <h3 className="font-black text-gray-950 text-sm sm:text-base">{item.title}</h3>
                   <Badge>{item.is_published ? 'published' : 'draft'}</Badge>
                 </div>
                 <p className="text-sm leading-6 text-gray-600 line-clamp-3">{item.content}</p>
@@ -1046,7 +1119,7 @@ export default function AdminDashboard() {
         className="grid gap-6 xl:grid-cols-3"
       >
         <form onSubmit={saveHero} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><Image size={18} className="text-[#15c8fb]" /> Hero</h2>
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><Image size={18} className="text-[#dc2626]" /> Hero</h2>
           <Field label="Title"><TextInput value={heroForm.title} onChange={(e) => setHeroForm({ ...heroForm, title: e.target.value })} placeholder="Welcome to Elevate Skill" /></Field>
           <Field label="Subtitle"><TextArea value={heroForm.subtitle} onChange={(e) => setHeroForm({ ...heroForm, subtitle: e.target.value })} rows="3" placeholder="Grow your skills today" /></Field>
           <Field label="CTA text"><TextInput value={heroForm.cta_text} onChange={(e) => setHeroForm({ ...heroForm, cta_text: e.target.value })} placeholder="Explore Courses" /></Field>
@@ -1056,7 +1129,7 @@ export default function AdminDashboard() {
         </form>
 
         <form onSubmit={saveAbout} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><FileText size={18} className="text-[#15c8fb]" /> About</h2>
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><FileText size={18} className="text-[#dc2626]" /> About</h2>
           <Field label="Title"><TextInput value={aboutForm.title} onChange={(e) => setAboutForm({ ...aboutForm, title: e.target.value })} placeholder="About Elevate Skill" /></Field>
           <Field label="Content"><TextArea value={aboutForm.content} onChange={(e) => setAboutForm({ ...aboutForm, content: e.target.value })} rows="8" placeholder="Tell your story..." /></Field>
           <Field label="Image"><TextInput type="file" accept="image/*" onChange={(e) => setAboutForm({ ...aboutForm, image: e.target.files?.[0] || null })} /></Field>
@@ -1064,7 +1137,7 @@ export default function AdminDashboard() {
         </form>
 
         <form onSubmit={saveSettings} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><Settings size={18} className="text-[#15c8fb]" /> Site settings</h2>
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><Settings size={18} className="text-[#dc2626]" /> Site settings</h2>
           <Field label="Site name"><TextInput value={settingsForm.site_name} onChange={(e) => setSettingsForm({ ...settingsForm, site_name: e.target.value })} placeholder="Elevate Skill LMS" /></Field>
           <Field label="Contact info"><TextArea value={settingsForm.contact_info} onChange={(e) => setSettingsForm({ ...settingsForm, contact_info: e.target.value })} rows="3" placeholder="support@elevateskill.com" /></Field>
           <Field label="Bank details"><TextArea value={settingsForm.bank_details} onChange={(e) => setSettingsForm({ ...settingsForm, bank_details: e.target.value })} rows="3" /></Field>
@@ -1081,15 +1154,15 @@ export default function AdminDashboard() {
       >
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <form onSubmit={saveTestimonial}>
-            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><Star size={18} className="text-[#15c8fb]" /> Testimonials</h2>
+            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><Star size={18} className="text-[#dc2626]" /> Testimonials</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Student name"><TextInput required value={testimonialForm.student_name} onChange={(e) => setTestimonialForm({ ...testimonialForm, student_name: e.target.value })} /></Field>
               <Field label="Rating (1-5)"><TextInput type="number" min="1" max="5" value={testimonialForm.rating} onChange={(e) => setTestimonialForm({ ...testimonialForm, rating: Number(e.target.value) })} /></Field>
             </div>
             <Field label="Message"><TextArea required value={testimonialForm.message} onChange={(e) => setTestimonialForm({ ...testimonialForm, message: e.target.value })} rows="3" /></Field>
             <Field label="Student image"><TextInput type="file" accept="image/*" onChange={(e) => setTestimonialForm({ ...testimonialForm, student_image: e.target.files?.[0] || null })} /></Field>
-            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
-              <input type="checkbox" checked={testimonialForm.is_active} onChange={(e) => setTestimonialForm({ ...testimonialForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active on homepage
+            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5">
+              <input type="checkbox" checked={testimonialForm.is_active} onChange={(e) => setTestimonialForm({ ...testimonialForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#dc2626] focus:ring-[#dc2626]" /> Active on homepage
             </label>
             <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save testimonial</button>
           </form>
@@ -1098,7 +1171,7 @@ export default function AdminDashboard() {
               <article key={item.id} className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-sm">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#15c8fb]/20 to-[#f89f29]/20 text-xs font-black text-gray-700">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#dc2626]/20 to-[#f89f29]/20 text-xs font-black text-gray-700">
                       {item.student_name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                     <h3 className="font-black text-gray-950">{item.student_name}</h3>
@@ -1107,7 +1180,7 @@ export default function AdminDashboard() {
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2">{item.message}</p>
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => patchTestimonial(item, { is_active: !item.is_active })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-sky-700 transition-all hover:bg-[#15c8fb]/10">{item.is_active ? 'Hide' : 'Show'}</button>
+                  <button onClick={() => patchTestimonial(item, { is_active: !item.is_active })} className="rounded-lg border border-[#dc2626]/30 px-3 py-2 text-xs font-bold text-red-700 transition-all hover:bg-[#dc2626]/10">{item.is_active ? 'Hide' : 'Show'}</button>
                   <button onClick={() => deleteTestimonial(item.id)} className="rounded-lg border border-rose-200 px-3 py-2 text-xs font-bold text-rose-700 transition-all hover:bg-rose-50">Delete</button>
                 </div>
               </article>
@@ -1123,12 +1196,12 @@ export default function AdminDashboard() {
 
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <form onSubmit={saveFaq}>
-            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><HelpCircle size={18} className="text-[#15c8fb]" /> FAQs</h2>
+            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950"><HelpCircle size={18} className="text-[#dc2626]" /> FAQs</h2>
             <Field label="Question"><TextInput required value={faqForm.question} onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })} /></Field>
             <Field label="Answer"><TextArea required value={faqForm.answer} onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })} rows="3" /></Field>
             <Field label="Order"><TextInput type="number" value={faqForm.order} onChange={(e) => setFaqForm({ ...faqForm, order: Number(e.target.value) })} /></Field>
-            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
-              <input type="checkbox" checked={faqForm.is_active} onChange={(e) => setFaqForm({ ...faqForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active on homepage
+            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5">
+              <input type="checkbox" checked={faqForm.is_active} onChange={(e) => setFaqForm({ ...faqForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#dc2626] focus:ring-[#dc2626]" /> Active on homepage
             </label>
             <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save FAQ</button>
           </form>
@@ -1141,7 +1214,7 @@ export default function AdminDashboard() {
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2">{item.answer}</p>
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => patchFaq(item, { is_active: !item.is_active })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-sky-700 transition-all hover:bg-[#15c8fb]/10">{item.is_active ? 'Hide' : 'Show'}</button>
+                  <button onClick={() => patchFaq(item, { is_active: !item.is_active })} className="rounded-lg border border-[#dc2626]/30 px-3 py-2 text-xs font-bold text-red-700 transition-all hover:bg-[#dc2626]/10">{item.is_active ? 'Hide' : 'Show'}</button>
                   <button onClick={() => deleteFaq(item.id)} className="rounded-lg border border-rose-200 px-3 py-2 text-xs font-bold text-rose-700 transition-all hover:bg-rose-50">Delete</button>
                 </div>
               </article>
@@ -1209,11 +1282,11 @@ export default function AdminDashboard() {
     >
       <form onSubmit={saveProfile} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-          <User size={18} className="text-[#15c8fb]" /> Profile settings
+          <User size={18} className="text-[#dc2626]" /> Profile settings
         </h2>
         <div className="space-y-4">
           <div className="flex items-center gap-4 mb-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-2xl font-black text-white shadow-lg">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-2xl font-black text-white shadow-lg">
               {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
             </div>
             <div>
@@ -1233,6 +1306,129 @@ export default function AdminDashboard() {
         </div>
       </form>
     </motion.div>
+  );
+
+  // ========== USERS TAB ==========
+  const renderUsers = () => (
+    <div className="grid gap-6 xl:grid-cols-[1fr_400px]">
+      <motion.section
+        initial={{ opacity: 0, x: -16 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+      >
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-black text-gray-950">User management</h2>
+            <p className="text-sm text-gray-500">Create, edit, activate/deactivate, and manage platform users.</p>
+          </div>
+          <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700">{users.length} users</span>
+        </div>
+        <div className="overflow-x-auto rounded-lg border border-gray-100">
+          <table className="w-full min-w-[700px] text-left text-sm">
+            <thead>
+              <tr className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                <th className="px-4 py-3.5 font-bold">Name</th>
+                <th className="px-4 py-3.5 font-bold">Email</th>
+                <th className="px-4 py-3.5 font-bold">Role</th>
+                <th className="px-4 py-3.5 font-bold">Status</th>
+                <th className="px-4 py-3.5 font-bold">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {users.map((u) => (
+                <tr key={u.id} className="transition-colors hover:bg-gray-50/80">
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-xs font-black text-white">
+                        {(u.full_name || u.username)?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900">{u.full_name || u.username}</p>
+                        <p className="text-xs text-gray-500">@{u.username}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3.5 text-gray-600">{u.email}</td>
+                  <td className="px-4 py-3.5">
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold capitalize ${
+                      u.role === 'admin' ? 'bg-[#f89f29]/10 text-[#f89f29] border border-[#f89f29]/20' : 'bg-[#dc2626]/10 text-[#dc2626] border border-[#dc2626]/20'
+                    }`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${u.role === 'admin' ? 'bg-[#f89f29]' : 'bg-[#dc2626]'}`} />
+                      {u.role}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3.5"><Badge>{u.is_active ? 'active' : 'inactive'}</Badge></td>
+                  <td className="px-4 py-3.5">
+                    <div className="flex flex-wrap gap-1.5">
+                      <button onClick={() => editUser(u)} className="rounded-lg border border-[#dc2626]/30 px-3 py-2 text-xs font-bold text-red-700 transition-all hover:bg-[#dc2626]/10">
+                        <Edit3 size={14} />
+                      </button>
+                      <button onClick={() => toggleUserStatus(u)} className={`rounded-lg border px-3 py-2 text-xs font-bold transition-all ${
+                        u.is_active ? 'border-[#dc2626]/30 text-red-700 hover:bg-[#dc2626]/10' : 'border-emerald-300 text-emerald-700 hover:bg-emerald-50'
+                      }`}>
+                        {u.is_active ? 'Deactivate' : 'Activate'}
+                      </button>
+                      {u.role !== 'admin' && (
+                        <button onClick={() => changeUserRole(u, 'admin')} className="rounded-lg border border-[#f89f29]/30 px-3 py-2 text-xs font-bold text-orange-700 transition-all hover:bg-[#f89f29]/10">
+                          Make admin
+                        </button>
+                      )}
+                      {u.role === 'admin' && (
+                        <button onClick={() => changeUserRole(u, 'student')} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700 transition-all hover:bg-gray-50">
+                          Make student
+                        </button>
+                      )}
+                      <button onClick={() => deleteUser(u.id)} className="rounded-lg border border-rose-200 px-3 py-2 text-xs font-bold text-rose-700 transition-all hover:bg-rose-50">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {!users.length && (
+                <tr><td colSpan="5" className="px-4 py-12 text-center text-sm text-gray-400">No users found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </motion.section>
+
+      <motion.form
+        initial={{ opacity: 0, x: 16 }}
+        animate={{ opacity: 1, x: 0 }}
+        onSubmit={saveUser}
+        className="h-fit rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+      >
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
+          {editingUserId ? <Edit3 size={18} className="text-[#dc2626]" /> : <UserPlus size={18} className="text-[#dc2626]" />}
+          {editingUserId ? 'Edit user' : 'Add user'}
+        </h2>
+        <div className="space-y-3.5">
+          <Field label="Username"><TextInput required value={userForm.username} onChange={(e) => setUserForm({ ...userForm, username: e.target.value })} placeholder="username" /></Field>
+          <Field label="Email"><TextInput required type="email" value={userForm.email} onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} placeholder="email@example.com" /></Field>
+          <Field label="Full name"><TextInput value={userForm.full_name} onChange={(e) => setUserForm({ ...userForm, full_name: e.target.value })} placeholder="Full name" /></Field>
+          <Field label="Password">
+            <TextInput type="password" value={userForm.password || ''} onChange={(e) => setUserForm({ ...userForm, password: e.target.value })} placeholder={editingUserId ? 'Leave blank to keep current' : 'Min 6 characters'} />
+          </Field>
+          <Field label="Role">
+            <Select value={userForm.role} onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}>
+              <option value="">Select role</option>
+              <option value="student">Student</option>
+              <option value="admin">Admin</option>
+            </Select>
+          </Field>
+          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-700 transition-all hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5">
+            <input type="checkbox" checked={userForm.is_active} onChange={(e) => setUserForm({ ...userForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#dc2626] focus:ring-[#dc2626]" /> Active
+          </label>
+          <div className="flex gap-2 pt-1">
+            <button disabled={saving} className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>
+              {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />} Save
+            </button>
+            {editingUserId && <button type="button" onClick={resetUserForm} className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-black text-gray-700 transition-all hover:bg-gray-50">Cancel</button>}
+          </div>
+        </div>
+      </motion.form>
+    </div>
   );
 
   // ========== EXPORT TAB ==========
@@ -1350,7 +1546,7 @@ export default function AdminDashboard() {
 
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-200">
-        <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#15c8fb]/20 bg-[#15c8fb]/10 text-[#15c8fb]">
+        <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#dc2626]/20 bg-[#dc2626]/10 text-[#dc2626]">
           <Icon size={22} />
         </div>
         <h3 className="font-black text-gray-950">{label}</h3>
@@ -1359,7 +1555,7 @@ export default function AdminDashboard() {
           <button
             onClick={handleExport}
             disabled={exporting || !data || data.length === 0}
-            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#15c8fb] to-[#0e9ec9] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-40"
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#dc2626] to-[#f89f29] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-40"
           >
             {exporting ? <Loader size={13} className="animate-spin" /> : <FileText size={13} />}
             Export CSV {data ? `(${data.length})` : ''}
@@ -1407,7 +1603,7 @@ export default function AdminDashboard() {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="fixed inset-y-0 left-0 z-50 w-68 border-r border-gray-200 bg-white p-5 shadow-2xl lg:hidden"
             >
-              <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-1 text-gray-500 hover:bg-gray-100">
+              <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-2 text-gray-500 hover:bg-gray-100" aria-label="Close menu">
                 <X size={20} />
               </button>
               {sidebarContent}
@@ -1424,8 +1620,8 @@ export default function AdminDashboard() {
                 <Menu size={20} />
               </button>
               <div>
-                <p className="text-xs font-black uppercase tracking-wider text-[#f89f29]">Real backend controls</p>
-                <h1 className="text-2xl font-black text-gray-950">Admin dashboard</h1>
+                <p className="text-[11px] font-black uppercase tracking-wider text-[#f89f29]">Real backend controls</p>
+                <h1 className="text-xl sm:text-2xl font-black text-gray-950">Admin dashboard</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -1456,7 +1652,7 @@ export default function AdminDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 rounded-xl border border-[#15c8fb]/20 bg-gradient-to-r from-[#15c8fb]/5 to-[#f89f29]/5 p-4 text-sm text-gray-700 shadow-sm"
+            className="mb-6 rounded-xl border border-[#dc2626]/20 bg-gradient-to-r from-[#dc2626]/5 to-[#f89f29]/5 p-3 sm:p-4 text-sm text-gray-700 shadow-sm"
           >
             Signed in as <strong className="text-gray-950">{user?.full_name || user?.username}</strong>. All controls map to documented backend endpoints.
           </motion.div>
@@ -1494,6 +1690,7 @@ export default function AdminDashboard() {
                 {activeTab === 'cms' && renderCms()}
                 {activeTab === 'export' && renderExport()}
                 {activeTab === 'profile' && renderProfile()}
+                {activeTab === 'users' && renderUsers()}
               </motion.div>
             </AnimatePresence>
           )}

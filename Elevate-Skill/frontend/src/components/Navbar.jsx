@@ -100,7 +100,7 @@ export default function Navbar() {
           showAnnBanner && announcements.length > 0 ? 'mt-8' : 'mt-0'
         } ${
           isScrolled || activeMega || mobileMenu
-            ? 'bg-white/95 dark:bg-black/95 backdrop-blur-lg border-b border-[#15c8fb]/10 dark:border-[#f89f29]/10 py-3' 
+            ? 'bg-white/95 dark:bg-black/95 backdrop-blur-lg border-b border-[#dc2626]/10 dark:border-[#f89f29]/10 py-3' 
             : 'bg-transparent py-5'
         }`}
       >
@@ -178,7 +178,7 @@ export default function Navbar() {
             >
               <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
                 {navLinks.find(l => l.name === activeMega)?.subItems?.map((sub, i) => (
-                  <div key={i} className="group cursor-pointer p-4 rounded-xl hover:bg-gradient-to-br hover:from-[#15c8fb]/5 hover:to-[#f89f29]/5 transition-all border border-transparent hover:border-[#15c8fb]/10">
+                  <div key={i} className="group cursor-pointer p-4 rounded-xl hover:bg-gradient-to-br hover:from-[#dc2626]/5 hover:to-[#f89f29]/5 transition-all border border-transparent hover:border-[#15c8fb]/10">
                     <h4 className="text-xs font-black dark:text-white text-slate-900 mb-2 uppercase tracking-widest group-hover:text-[#f87b07]">{sub.title}</h4>
                     <p className="text-[11px] text-slate-500 dark:text-gray-300 leading-relaxed">{sub.desc}</p>
                   </div>
@@ -202,7 +202,7 @@ export default function Navbar() {
                     <a 
                       href={link.href} 
                       onClick={() => setMobileMenu(false)}
-                      className="text-3xl font-black dark:text-white text-slate-900 uppercase tracking-tighter hover:text-[#15c8fb] transition-colors"
+                      className="text-3xl font-black dark:text-white text-slate-900 uppercase tracking-tighter hover:text-[#dc2626] transition-colors"
                     >
                       {link.name}
                     </a>
@@ -213,7 +213,7 @@ export default function Navbar() {
                     <Link 
                       to={user.role === 'admin' ? '/admin' : '/dashboard'}
                       onClick={() => setMobileMenu(false)}
-                      className="mt-4 w-full py-4 bg-gradient-to-r from-[#15c8fb] to-[#0e9ec9] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
+                      className="mt-4 w-full py-4 bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
                     >
                       Dashboard
                     </Link>
@@ -229,7 +229,7 @@ export default function Navbar() {
                     <Link 
                       to="/register" 
                       onClick={() => setMobileMenu(false)}
-                      className="w-full py-4 bg-gradient-to-r from-[#15c8fb] to-[#0e9ec9] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
+                      className="w-full py-4 bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
                     >
                       Portal
                     </Link>

@@ -43,7 +43,7 @@ export default function Footer() {
             <p className="text-xs text-white/60 max-w-xs">Project-based learning platform designed for the modern engineer. Build real systems, not just tutorials.</p>
             <div className="flex items-center gap-2 mt-2">
               {[Instagram,  Mail, Phone].map((Icon, i) => (
-                <a key={i} href="#" className="p-2 rounded-md bg-white/3 hover:bg-cyan-primary/10 transition-colors text-white/70">
+                <a key={i} href="#" className="p-2 rounded-md bg-white/3 hover:bg-[#dc2626]/10 transition-colors text-white/70">
                   <Icon size={14} />
                 </a>
               ))}
