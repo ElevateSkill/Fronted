@@ -300,8 +300,9 @@ export default function AdminDashboard() {
   const [faqForm, setFaqForm] = useState(emptyFaq);
   const [announcementForm, setAnnouncementForm] = useState(emptyAnnouncement);
   const [newsForm, setNewsForm] = useState(emptyNews);
-  const [confirmDelete, setConfirmDelete] = useState({ open: false, action: null });
-  const [mobileSidebar, setMobileSidebar] = useState(false);
+   const [confirmDelete, setConfirmDelete] = useState({ open: false, action: null });
+   const [mobileSidebar, setMobileSidebar] = useState(false);
+   const [userRoleFilter, setUserRoleFilter] = useState('student');
 
   const showToast = (message, type = 'success') => setToast({ message, type });
   const closeToast = () => setToast({ message: '', type: 'success' });
@@ -338,11 +339,49 @@ export default function AdminDashboard() {
        setHeroForm({ ...emptyHero, ...heroRes.data, background_image: null });
        setAboutForm({ ...emptyAbout, ...aboutRes.data, image: null });
        setSettingsForm({ ...emptySettings, ...settingsRes.data });
+       buildUserList(dashboardRes.data, unwrapResults(paymentsRes.data));
      } catch (err) {
        showToast(apiError(err, 'Could not load admin dashboard data.'), 'error');
      } finally {
        setLoading(false);
      }
+   };
+
+   const buildUserList = (dashboard, payments) => {
+     const map = new Map();
+     payments.forEach((p) => {
+       const key = p.email || p.student_username;
+       if (key && !map.has(key)) {
+         map.set(key, {
+           id: `student_${p.id}`,
+           username: p.student_username || '',
+           email: p.email || '',
+           full_name: p.full_name || '',
+           role: 'student',
+           phone_number: p.phone || '',
+           is_active: true,
+           created_at: p.submitted_at || '',
+         });
+       }
+     });
+     (dashboard?.recent_enrollments || []).forEach((e) => {
+       const key = e.student_username;
+       if (key && !map.has(key)) {
+         map.set(key, {
+           id: `enrolled_${e.id}`,
+           username: e.student_username || '',
+           email: '',
+           full_name: e.student_full_name || '',
+           role: 'student',
+           phone_number: '',
+           is_active: true,
+           created_at: e.enrolled_at || '',
+         });
+       }
+     });
+     const apiUsers = Array.from(map.values());
+     const localUsers = (users || []).filter((u) => String(u.id).startsWith('local_'));
+     setUsers([...apiUsers, ...localUsers]);
    };
 
   useEffect(() => {
@@ -544,7 +583,7 @@ export default function AdminDashboard() {
            role: payload.role || 'student',
          });
          const created = res.data?.user || res.data;
-         setUsers((prev) => [created, ...prev]);
+         setUsers((prev) => [{ ...created, id: `local_${created.id || Date.now()}` }, ...prev]);
        }
        resetUserForm();
      }, editingUserId ? 'User updated.' : 'User created.');
@@ -1309,33 +1348,49 @@ export default function AdminDashboard() {
   );
 
   // ========== USERS TAB ==========
-  const renderUsers = () => (
-    <div className="grid gap-6 xl:grid-cols-[1fr_400px]">
-      <motion.section
-        initial={{ opacity: 0, x: -16 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
-      >
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-lg font-black text-gray-950">User management</h2>
-            <p className="text-sm text-gray-500">Create, edit, activate/deactivate, and manage platform users.</p>
-          </div>
-          <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-bold text-red-700">{users.length} users</span>
-        </div>
-        <div className="overflow-x-auto rounded-lg border border-gray-100">
-          <table className="w-full min-w-[700px] text-left text-sm">
-            <thead>
-              <tr className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-                <th className="px-4 py-3.5 font-bold">Name</th>
-                <th className="px-4 py-3.5 font-bold">Email</th>
-                <th className="px-4 py-3.5 font-bold">Role</th>
-                <th className="px-4 py-3.5 font-bold">Status</th>
-                <th className="px-4 py-3.5 font-bold">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {users.map((u) => (
+   const renderUsers = () => {
+     const students = users.filter((u) => u.role === 'student');
+     const admins = users.filter((u) => u.role === 'admin');
+     const filtered = userRoleFilter === 'all' ? users : users.filter((u) => u.role === userRoleFilter);
+     return (
+     <div className="grid gap-6 xl:grid-cols-[1fr_400px]">
+       <motion.section
+         initial={{ opacity: 0, x: -16 }}
+         animate={{ opacity: 1, x: 0 }}
+         className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+       >
+         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+           <div>
+             <h2 className="text-lg font-black text-gray-950">User management</h2>
+             <p className="text-sm text-gray-500">Manage students and admins across the platform.</p>
+           </div>
+           <div className="flex gap-2">
+             <span className="rounded-full bg-[#dc2626]/10 px-3 py-1 text-xs font-bold text-[#dc2626]">{students.length} students</span>
+             <span className="rounded-full bg-[#f89f29]/10 px-3 py-1 text-xs font-bold text-[#f89f29]">{admins.length} admins</span>
+           </div>
+         </div>
+         <div className="mb-4 flex gap-2 border-b border-gray-100 pb-3">
+           {['student', 'admin', 'all'].map((role) => (
+             <button key={role} onClick={() => setUserRoleFilter(role)} className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
+               userRoleFilter === role ? 'bg-[#dc2626] text-white shadow-sm' : 'text-gray-500 hover:text-gray-950 hover:bg-gray-100'
+             }`}>
+               {role === 'all' ? `All (${users.length})` : `${role}s (${role === 'student' ? students.length : admins.length})`}
+             </button>
+           ))}
+         </div>
+         <div className="overflow-x-auto rounded-lg border border-gray-100">
+           <table className="w-full min-w-[700px] text-left text-sm">
+             <thead>
+               <tr className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+                 <th className="px-4 py-3.5 font-bold">Name</th>
+                 <th className="px-4 py-3.5 font-bold">Email</th>
+                 <th className="px-4 py-3.5 font-bold">Role</th>
+                 <th className="px-4 py-3.5 font-bold">Status</th>
+                 <th className="px-4 py-3.5 font-bold">Actions</th>
+               </tr>
+             </thead>
+             <tbody className="divide-y divide-gray-100">
+               {filtered.map((u) => (
                 <tr key={u.id} className="transition-colors hover:bg-gray-50/80">
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-3">
@@ -1430,6 +1485,7 @@ export default function AdminDashboard() {
       </motion.form>
     </div>
   );
+  };
 
   // ========== EXPORT TAB ==========
   const renderExport = () => (
