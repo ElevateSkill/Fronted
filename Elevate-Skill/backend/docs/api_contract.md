@@ -225,7 +225,7 @@ Detailed endpoint descriptions, request/response examples and behaviour
 
 - Method: POST
 - URL: `/api/v1/auth/login/`
-- Body: `{ "username": "...", "password": "..." }`
+- Body: `{ "Email": "...", "password": "..." }`
 - Response 200: `{ "access": "...", "refresh": "...", "user": {...} }`
 - Errors: 401 for invalid credentials.
 - **Rate limit**: 10 requests / hour per IP. Exceeding returns `429`.

@@ -21,7 +21,7 @@ export default function Login() {
     setSubmitting(true);
 
     try {
-      const user = await login({ email, password });
+      const user = await login({ username: email, password });
 
       if (user?.role?.toLowerCase() === 'admin') {
         navigate('/admin');
@@ -164,7 +164,7 @@ export default function Login() {
                 whileTap={{ scale: 0.985 }}
                 type="submit"
                 disabled={submitting}
-                className="flex w-full items-center justify-center gap-3 bg-gradient-to-r from-[yellow] via-[red] to-[] px-4 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(21,200,251,0.28)] transition disabled:cursor-not-allowed disabled:opacity-70"
+                className="flex w-full items-center justify-center gap-3 bg-gradient-to-r from-[#f89f29] via-[#dc2626] to-[#f89f29] px-4 py-4 text-base font-semibold text-white shadow-[0_18px_40px_rgba(21,200,251,0.28)] transition disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {submitting ? (
                   <>

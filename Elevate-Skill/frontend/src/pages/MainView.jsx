@@ -14,15 +14,22 @@ export default function MainView() {
   const [liveHomepage, setLiveHomepage] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      api.get('/announcements/')
-        .then(res => {
-          const data = unwrapResults(res.data);
-          if (data.length > 0) setAnnouncements(data);
-        })
-        .catch(() => {});
-    }
+    api.get('/announcements/')
+      .then(res => {
+        const data = unwrapResults(res.data);
+        if (data.length > 0) setAnnouncements(data);
+      })
+      .catch(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+          api.get('/admin/announcements/')
+            .then(res => {
+              const data = unwrapResults(res.data);
+              if (data.length > 0) setAnnouncements(data.filter(a => a.is_published));
+            })
+            .catch(() => {});
+        }
+      });
 
     api.get('/homepage/')
       .then(res => setLiveHomepage(res.data))

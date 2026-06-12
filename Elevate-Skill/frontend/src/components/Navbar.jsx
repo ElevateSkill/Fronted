@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, Bell, Megaphone, ArrowLeft } from 'lucide-react';
+import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { api, unwrapResults } from '../services/api';
 import logoJpg from '../assets/logo.jpg';
 
 export default function Navbar() {
@@ -12,32 +11,10 @@ export default function Navbar() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [activeMega, setActiveMega] = useState(null);
-  const [announcements, setAnnouncements] = useState([]);
-  const [showAnnBanner, setShowAnnBanner] = useState(true);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const showBack = location.pathname !== '/';
-
-  // Fetch live announcements (try public endpoint first, fallback to admin)
-  useEffect(() => {
-    api.get('/announcements/')
-      .then(res => {
-        const data = unwrapResults(res.data);
-        if (data.length > 0) setAnnouncements(data);
-      })
-      .catch(() => {
-        const token = localStorage.getItem('access_token');
-        if (token) {
-          api.get('/admin/announcements/')
-            .then(res => {
-              const data = unwrapResults(res.data);
-              if (data.length > 0) setAnnouncements(data.filter(a => a.is_published));
-            })
-            .catch(() => {});
-        }
-      });
-  }, []);
 
   // Scroll logic
   useEffect(() => {
@@ -79,64 +56,12 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ANNOUNCEMENT BANNER (animated top) */}
-      <AnimatePresence>
-        {showAnnBanner && announcements.length > 0 && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="fixed top-0 left-0 right-0 z-[60] overflow-hidden"
-          >
-            <motion.div
-              animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-              transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-              className="bg-gradient-to-r from-[#dc2626] via-[#f89f29] to-[#dc2626] bg-[length:200%_200%] text-white text-xs"
-            >
-              <div className="flex items-center justify-center gap-2 px-4 py-2">
-                <motion.div
-                  animate={{ rotate: [0, -10, 10, -10, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <Megaphone size={14} className="shrink-0" />
-                </motion.div>
-                <motion.span
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="font-black uppercase tracking-wider text-[11px]"
-                >
-                  📢 {announcements[0]?.title}:
-                </motion.span>
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0.7, 1, 0.7] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="truncate max-w-[50vw] sm:max-w-[60vw] font-medium"
-                >
-                  {announcements[0]?.content}
-                </motion.span>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setShowAnnBanner(false)}
-                  className="ml-2 shrink-0 rounded-full p-1 hover:bg-white/20 transition-colors"
-                >
-                  <X size={14} />
-                </motion.button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <motion.nav 
         initial={{ y: 0 }}
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3 }}
         onMouseLeave={() => setActiveMega(null)}
         className={`fixed top-0 w-full z-50 transition-all duration-300 px-4 sm:px-10 ${
-          showAnnBanner && announcements.length > 0 ? 'mt-8' : 'mt-0'
-        } ${
           isScrolled || activeMega || mobileMenu
             ? 'bg-white/95 dark:bg-black/95 backdrop-blur-lg border-b border-[#dc2626]/10 dark:border-[#f89f29]/10 py-3' 
             : 'bg-transparent py-5'
