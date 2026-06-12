@@ -21,7 +21,7 @@ export default function Login() {
     setSubmitting(true);
 
     try {
-      const user = await login({ username: email, password });
+      const user = await login({ email, password });
 
       if (user?.role?.toLowerCase() === 'admin') {
         navigate('/admin');
