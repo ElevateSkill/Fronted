@@ -688,7 +688,7 @@ export default function AdminDashboard() {
   };
 
   const sidebarContent = (
-    <>
+    <div className="flex h-full flex-col">
       <div className="mb-6 sm:mb-8 flex items-center gap-3">
         <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center overflow-hidden rounded-xl bg-surface shadow-lg shadow-[#dc2626]/10 ring-1 ring-white/10">
           <img src={logoSrc} alt="ElevateSkill" className="h-8 sm:h-9 w-8 sm:w-9 object-contain" />
@@ -698,23 +698,51 @@ export default function AdminDashboard() {
           <p className="text-[11px] sm:text-xs font-medium text-gray-400">Admin dashboard</p>
         </div>
       </div>
-      <nav className="space-y-1">
+      <nav className="flex-1 space-y-1">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button
             key={id}
             onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 sm:py-2.5 text-sm font-bold transition-all duration-200 ${
+            className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 sm:py-2.5 text-sm font-bold transition-all duration-200 ${
               activeTab === id
-                ? 'bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white shadow-lg shadow-[#dc2626]/20'
-                : 'text-white/70 hover:bg-white/10 hover:text-white'
+                ? 'bg-white/10 text-white'
+                : 'text-white/60 hover:bg-white/5 hover:text-white'
             }`}
           >
-            <Icon size={17} />
-            {label}
+            {activeTab === id && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-gradient-to-b from-[#15c8fb] to-[#f89f29]" />
+            )}
+            <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${
+              activeTab === id ? 'bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-white shadow-sm' : ''
+            }`}>
+              <Icon size={16} />
+            </span>
+            <span className="flex-1 text-left">{label}</span>
+            {id === 'payments' && pendingPayments.length > 0 && (
+              <span className="rounded-full bg-[#f89f29] px-2 py-0.5 text-[10px] font-black text-white shadow-sm">{pendingPayments.length}</span>
+            )}
           </button>
         ))}
       </nav>
-    </>
+      <div className="mt-4 border-t border-white/10 pt-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white shadow-sm">
+            {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-white">{user?.full_name || user?.username || 'Admin'}</p>
+            <p className="truncate text-[11px] font-medium text-gray-400 capitalize">{user?.role || 'admin'}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-all"
+            title="Logout"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 
   const renderOverview = () => (
@@ -1638,7 +1666,7 @@ export default function AdminDashboard() {
         />
       </AnimatePresence>
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-white/10 bg-surface p-5 overflow-y-auto lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-white/10 bg-surface p-5 overflow-y-auto flex flex-col lg:block">
         {sidebarContent}
       </aside>
 
@@ -1657,7 +1685,7 @@ export default function AdminDashboard() {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 w-68 border-r border-white/10 bg-surface p-5 shadow-2xl overflow-y-auto lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-68 border-r border-white/10 bg-surface p-5 shadow-2xl overflow-y-auto flex flex-col lg:hidden"
             >
               <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-2 text-gray-400 hover:bg-white/5" aria-label="Close menu">
                 <X size={20} />
