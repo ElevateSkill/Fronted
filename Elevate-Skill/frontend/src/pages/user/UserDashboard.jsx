@@ -11,8 +11,8 @@ import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api
 import { useAuth } from '../../context/AuthContext';
 
 const accent = {
-  button: 'bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white shadow-lg shadow-[#dc2626]/20 hover:shadow-xl hover:shadow-[#dc2626]/30 active:scale-[0.97] transition-all duration-200',
-  panel: 'border-[#dc2626]/20 bg-gradient-to-br from-[#dc2626]/8 via-white to-[#f89f29]/8',
+  button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20 hover:shadow-xl hover:shadow-[#15c8fb]/30 active:scale-[0.97] transition-all duration-200',
+  panel: 'border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-white to-[#f89f29]/5',
 };
 
 const tabs = [
@@ -34,9 +34,9 @@ function formatDate(value) {
 
 function statusClass(status) {
   const key = String(status || '').toLowerCase();
-  if (key === 'approved' || key === 'active' || key === 'completed') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-  if (key === 'rejected' || key === 'cancelled') return 'bg-rose-50 text-rose-700 border-rose-200';
-  return 'bg-amber-50 text-amber-700 border-amber-200';
+  if (key === 'approved' || key === 'active' || key === 'completed') return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+  if (key === 'rejected' || key === 'cancelled') return 'bg-rose-100 text-rose-700 border-rose-200';
+  return 'bg-amber-100 text-amber-700 border-amber-200';
 }
 
 function Badge({ children }) {
@@ -45,23 +45,23 @@ function Badge({ children }) {
 
 function StatCard({ label, value, icon: Icon, tone = 'red' }) {
   const tones = {
-    red: { bg: 'bg-red-50', text: 'text-red-600', border: 'border-red-200' },
+    red: { bg: 'bg-[#15c8fb]/10', text: 'text-[#15c8fb]', border: 'border-[#15c8fb]/20' },
     orange: { bg: 'bg-[#f89f29]/10', text: 'text-[#f89f29]', border: 'border-[#f89f29]/20' },
-    green: { bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
-    rose: { bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-100' },
+    green: { bg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-200' },
+    rose: { bg: 'bg-rose-100', text: 'text-rose-600', border: 'border-rose-200' },
   };
-  const t = tones[tone] || tones.sky;
+  const t = tones[tone] || tones.red;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -3 }}
-      className={`rounded-xl border ${t.border} bg-gradient-to-br ${t.bg}/5 p-5 shadow-sm hover:shadow-md transition-all duration-300`}
+      className={`rounded-xl border ${t.border} bg-white p-5 shadow-sm hover:shadow-md transition-all duration-300`}
     >
       <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border ${t.border} ${t.bg}`}>
         <Icon size={20} className={t.text} />
       </div>
-      <p className="text-2xl font-black text-gray-950">{value}</p>
+      <p className="text-2xl font-black text-gray-900">{value}</p>
       <p className="mt-0.5 text-sm font-medium text-gray-500">{label}</p>
     </motion.div>
   );
@@ -85,7 +85,7 @@ function Toast({ message, type, onClose }) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={`fixed top-4 right-4 z-50 flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-bold shadow-xl ${styles[type] || styles.success}`}
+      className={`fixed top-4 right-2 sm:right-4 z-50 flex items-center gap-3 rounded-xl px-4 sm:px-5 py-3 text-sm font-bold shadow-xl ${styles[type] || styles.success}`}
     >
       {type === 'success' ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
       {message}
@@ -146,8 +146,6 @@ export default function UserDashboard() {
   };
 
   useEffect(() => {
-    document.documentElement.classList.remove('dark');
-    localStorage.setItem('user-theme', 'light');
     loadStudentData();
   }, []);
 
@@ -250,13 +248,13 @@ export default function UserDashboard() {
 
   const sidebarContent = (
     <>
-      <div className="mb-8 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-white shadow-lg">
+      <div className="mb-6 sm:mb-8 flex items-center gap-3">
+        <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-white shadow-lg">
           <GraduationCap size={20} />
         </div>
-        <div>
-          <p className="font-black text-gray-950">ElevateSkill</p>
-          <p className="text-xs font-medium text-gray-500">Student dashboard</p>
+        <div className="min-w-0">
+          <p className="font-black text-white text-sm sm:text-base truncate">ElevateSkill</p>
+          <p className="text-[11px] sm:text-xs font-medium text-gray-400">Student dashboard</p>
         </div>
       </div>
       <nav className="space-y-1">
@@ -264,10 +262,10 @@ export default function UserDashboard() {
           <button
             key={id}
             onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold transition-all duration-200 ${
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 sm:py-2.5 text-sm font-bold transition-all duration-200 ${
               activeTab === id
                 ? 'bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white shadow-lg shadow-[#dc2626]/20'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-950'
+                : 'text-gray-300 hover:bg-white/10 hover:text-white'
             }`}
           >
             <Icon size={17} />
@@ -285,26 +283,26 @@ export default function UserDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-[#dc2626]/20 bg-gradient-to-br from-[#dc2626]/5 via-white to-[#f89f29]/5 p-6 shadow-sm"
+        className="rounded-xl border border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-white to-[#f89f29]/5 p-6 shadow-sm"
       >
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-2xl font-black text-white shadow-lg shadow-[#dc2626]/20">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-2xl font-black text-white shadow-lg shadow-[#15c8fb]/20">
               {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'S'}
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-wider text-[#f89f29]">Student Portal</p>
-              <h1 className="text-2xl font-black text-gray-950">Welcome back, {user?.full_name || user?.username || 'Student'}!</h1>
+              <h1 className="text-2xl font-black text-gray-900">Welcome back, {user?.full_name || user?.username || 'Student'}!</h1>
               <p className="mt-1 text-sm text-gray-500">{user?.email} · {enrollments.length} enrollments</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={loadStudentData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all"><RefreshCw size={16} /> Refresh</button>
-            <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl bg-gray-950 px-3.5 py-2.5 text-sm font-bold text-white"><LogOut size={16} /> Logout</button>
+            <button onClick={loadStudentData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all"><RefreshCw size={16} /> Refresh</button>
+            <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-3.5 py-2.5 text-sm font-bold text-white"><LogOut size={16} /> Logout</button>
           </div>
         </div>
         {latestAnnouncement && (
-          <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#dc2626]/10 to-[#f89f29]/10 px-4 py-3 text-sm">
+          <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#15c8fb]/10 to-[#f89f29]/10 px-4 py-3 text-sm">
             <Megaphone size={16} className="shrink-0 text-[#f89f29]" />
             <span className="font-semibold text-gray-900">{latestAnnouncement.title}:</span>
             <span className="text-gray-600 truncate">{latestAnnouncement.content}</span>
@@ -332,21 +330,21 @@ export default function UserDashboard() {
         transition={{ delay: 0.1 }}
         className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
       >
-        <h2 className="mb-4 text-lg font-black text-gray-950">Quick Actions</h2>
+        <h2 className="mb-4 text-lg font-black text-gray-900">Quick Actions</h2>
         <div className="grid gap-3 sm:grid-cols-3">
-          <button onClick={() => setActiveTab('courses')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-[#dc2626]/30 hover:bg-[#dc2626]/5 transition-all">
-            <BookOpen size={22} className="mb-2 text-[#dc2626] group-hover:scale-110 transition-transform" />
-            <p className="font-black text-gray-950">Browse Courses</p>
+          <button onClick={() => setActiveTab('courses')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5 transition-all">
+            <BookOpen size={22} className="mb-2 text-[#15c8fb] group-hover:scale-110 transition-transform" />
+            <p className="font-black text-gray-900">Browse Courses</p>
             <p className="mt-1 text-xs text-gray-500">{unpaidCourses.length} available to enroll</p>
           </button>
           <button onClick={() => setActiveTab('payments')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-[#f89f29]/30 hover:bg-[#f89f29]/5 transition-all">
             <Upload size={22} className="mb-2 text-[#f89f29] group-hover:scale-110 transition-transform" />
-            <p className="font-black text-gray-950">Upload Proof</p>
+            <p className="font-black text-gray-900">Upload Proof</p>
             <p className="mt-1 text-xs text-gray-500">{pendingEnrollments.length} pending payments</p>
           </button>
-          <button onClick={() => setActiveTab('announcements')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-emerald-500/30 hover:bg-emerald-50/50 transition-all">
+          <button onClick={() => setActiveTab('announcements')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-emerald-500/30 hover:bg-emerald-50 transition-all">
             <Bell size={22} className="mb-2 text-emerald-600 group-hover:scale-110 transition-transform" />
-            <p className="font-black text-gray-950">View Updates</p>
+            <p className="font-black text-gray-900">View Updates</p>
             <p className="mt-1 text-xs text-gray-500">{announcements.length} new announcements</p>
           </button>
         </div>
@@ -359,7 +357,7 @@ export default function UserDashboard() {
         transition={{ delay: 0.15 }}
         className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
       >
-        <h2 className="mb-4 text-lg font-black text-gray-950">Payment Summary</h2>
+        <h2 className="mb-4 text-lg font-black text-gray-900">Payment Summary</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl bg-amber-50 border border-amber-200 p-4">
             <p className="text-2xl font-black text-amber-700">{pendingPaymentCount}</p>
@@ -384,7 +382,7 @@ export default function UserDashboard() {
           transition={{ delay: 0.2 }}
           className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
         >
-          <h2 className="mb-3 text-lg font-black text-gray-950">Enrollment Breakdown</h2>
+          <h2 className="mb-3 text-lg font-black text-gray-900">Enrollment Breakdown</h2>
           <div className="flex h-4 rounded-full overflow-hidden bg-gray-100">
             {activeEnrollments.length > 0 && (
               <div 
@@ -402,7 +400,7 @@ export default function UserDashboard() {
             )}
             {completedEnrollments.length > 0 && (
               <div 
-                className="bg-[#dc2626] transition-all duration-500" 
+                className="bg-[#15c8fb] transition-all duration-500" 
                 style={{ width: `${(completedEnrollments.length / enrollments.length) * 100}%` }}
                 title={`Completed: ${completedEnrollments.length}`}
               />
@@ -415,10 +413,10 @@ export default function UserDashboard() {
               />
             )}
           </div>
-          <div className="mt-3 flex flex-wrap gap-4 text-xs">
+          <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-600">
             {activeEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Active ({activeEnrollments.length})</span>}
             {pendingEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Pending ({pendingEnrollments.length})</span>}
-            {completedEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#dc2626]" /> Completed ({completedEnrollments.length})</span>}
+            {completedEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#15c8fb]" /> Completed ({completedEnrollments.length})</span>}
             {cancelledEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-rose-400" /> Cancelled ({cancelledEnrollments.length})</span>}
           </div>
         </motion.section>
@@ -436,7 +434,7 @@ export default function UserDashboard() {
       >
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black text-gray-950">My Enrollments</h2>
+            <h2 className="text-lg font-black text-gray-900">My Enrollments</h2>
             <p className="text-sm text-gray-500">{enrollments.length} total · {activeEnrollments.length} active</p>
           </div>
         </div>
@@ -459,17 +457,17 @@ export default function UserDashboard() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                    <span className="rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#dc2626] backdrop-blur">
+                    <span className="rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#15c8fb] backdrop-blur">
                       {item.course?.category?.name || 'Course'}
                     </span>
                     <Badge>{item.status}</Badge>
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-black text-gray-950">{item.course?.title}</h3>
+                  <h3 className="font-black text-gray-900">{item.course?.title}</h3>
                   <p className="mt-1 line-clamp-2 text-xs text-gray-500">{item.course?.short_description}</p>
                   <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-                    <span className="text-xs text-gray-400 flex items-center gap-1">
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
                       <Calendar size={12} /> {formatDate(item.created_at)}
                     </span>
                     {item.course?.price && (
@@ -495,7 +493,7 @@ export default function UserDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
         >
-          <h2 className="mb-5 text-lg font-black text-gray-950">
+          <h2 className="mb-5 text-lg font-black text-gray-900">
             Available Courses <span className="text-sm font-medium text-gray-500">({unpaidCourses.length})</span>
           </h2>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -521,7 +519,7 @@ export default function UserDashboard() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-black text-gray-950">{course.title}</h3>
+                  <h3 className="font-black text-gray-900">{course.title}</h3>
                   <p className="mt-1 line-clamp-2 text-xs text-gray-500">{course.short_description}</p>
                   <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-gray-500">
                     <span>{course.lessons || 0} lessons</span>
@@ -531,11 +529,11 @@ export default function UserDashboard() {
                     <span>{course.duration || 'Self-paced'}</span>
                   </div>
                   <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-                    <span className="font-black text-gray-950">{course.price || 'Free'} ETB</span>
+                    <span className="font-black text-gray-900">{course.price || 'Free'} ETB</span>
                     <button
                       onClick={() => enrollInCourse(course.id)}
                       disabled={saving}
-                      className="rounded-lg bg-gradient-to-r from-[#dc2626] to-[#f89f29] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#dc2626]/20"
+                      className="rounded-lg bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#15c8fb]/20"
                     >
                       {saving ? <Loader size={13} className="animate-spin" /> : 'Enroll Now'}
                     </button>
@@ -557,8 +555,8 @@ export default function UserDashboard() {
         animate={{ opacity: 1, x: 0 }}
       >
         <form onSubmit={submitPayment} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-            <Upload size={18} className="text-[#dc2626]" /> Submit Proof
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+            <Upload size={18} className="text-[#15c8fb]" /> Submit Proof
           </h2>
           <div className="space-y-4">
             <div>
@@ -567,7 +565,7 @@ export default function UserDashboard() {
                 required
                 value={selectedEnrollment}
                 onChange={(e) => setSelectedEnrollment(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 px-3 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all"
+                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all"
               >
                 <option value="">Choose a pending enrollment...</option>
                 {pendingEnrollments.map((item) => (
@@ -576,19 +574,19 @@ export default function UserDashboard() {
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 transition-all" />
-              <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 transition-all" />
-              <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 transition-all" />
+              <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
+              <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
+              <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
             </div>
-            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center hover:border-[#dc2626]/40 hover:bg-[#dc2626]/5 transition-all">
-              <FileText className="mb-2 text-[#dc2626]" size={28} />
-              <p className="text-sm font-medium text-gray-700">{proofFile ? proofFile.name : 'Upload receipt or screenshot'}</p>
-              <p className="text-xs text-gray-400 mt-1">PDF, JPG or PNG · Max 5MB</p>
+            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white px-4 py-6 text-center hover:border-[#15c8fb]/40 hover:bg-[#15c8fb]/5 transition-all">
+              <FileText className="mb-2 text-[#15c8fb]" size={28} />
+              <p className="text-sm font-medium text-gray-600">{proofFile ? proofFile.name : 'Upload receipt or screenshot'}</p>
+              <p className="text-xs text-gray-500 mt-1">PDF, JPG or PNG · Max 5MB</p>
               <input type="file" accept="image/*,.pdf" onChange={(e) => setProofFile(e.target.files?.[0] || null)} className="hidden" />
             </label>
             <button
               disabled={saving || !pendingEnrollments.length}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#dc2626] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg shadow-[#15c8fb]/20"
             >
               {saving ? <Loader className="animate-spin" size={16} /> : <Send size={16} />}
               Submit Payment Proof
@@ -599,7 +597,7 @@ export default function UserDashboard() {
         {payments.length > 0 && (
           <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-black text-gray-950">Export Data</h3>
+              <h3 className="text-sm font-black text-gray-900">Export Data</h3>
               <button
                 onClick={() => {
                   const data = payments.map(p => ({
@@ -609,7 +607,7 @@ export default function UserDashboard() {
                   }));
                   exportToCSV(data, 'my_payments.csv');
                 }}
-                className="rounded-lg border border-[#dc2626]/30 px-3 py-1.5 text-xs font-bold text-[#dc2626] hover:bg-[#dc2626]/10 transition-all"
+                className="rounded-lg border border-[#15c8fb]/30 px-3 py-1.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all"
               >
                 <Download size={12} className="inline mr-1" /> CSV
               </button>
@@ -624,7 +622,7 @@ export default function UserDashboard() {
         className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
       >
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-black text-gray-950">Payment History</h2>
+          <h2 className="text-lg font-black text-gray-900">Payment History</h2>
           <Badge>{payments.length} total</Badge>
         </div>
         {payments.length > 0 ? (
@@ -640,15 +638,15 @@ export default function UserDashboard() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-gray-50/80 transition-colors">
+                  <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 font-semibold text-gray-900">{payment.course_title}</td>
                     <td className="px-4 py-3 text-gray-500 text-xs">{formatDate(payment.submitted_at)}</td>
                     <td className="px-4 py-3">
                       {payment.proof_file ? (
-                        <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#dc2626]/10 px-3 py-1.5 text-xs font-bold text-[#dc2626] hover:bg-[#dc2626]/20 transition-all">
+                        <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#15c8fb]/10 px-3 py-1.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/20 transition-all">
                           <FileText size={13} /> View
                         </a>
-                      ) : <span className="text-gray-400 text-xs">No file</span>}
+                      ) : <span className="text-gray-500 text-xs">No file</span>}
                     </td>
                     <td className="px-4 py-3"><Badge>{payment.status}</Badge></td>
                   </tr>
@@ -684,18 +682,18 @@ export default function UserDashboard() {
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#dc2626]/20 to-[#f89f29]/20">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb]/20 to-[#f89f29]/20">
                     <Megaphone size={16} className="text-[#f89f29]" />
                   </div>
                   <div>
-                    <h2 className="font-black text-gray-950">{item.title}</h2>
-                    <p className="text-xs text-gray-400">{formatDate(item.created_at || item.date)}</p>
+                    <h2 className="font-black text-gray-900">{item.title}</h2>
+                    <p className="text-xs text-gray-500">{formatDate(item.created_at || item.date)}</p>
                   </div>
                 </div>
               </div>
               <p className="text-sm leading-relaxed text-gray-600">{item.content}</p>
               {item.created_by && (
-                <p className="mt-3 text-xs text-gray-400 border-t border-gray-100 pt-3">
+                <p className="mt-3 text-xs text-gray-500 border-t border-gray-100 pt-3">
                   Posted by {item.created_by?.full_name || item.created_by?.username || 'Admin'}
                 </p>
               )}
@@ -704,7 +702,7 @@ export default function UserDashboard() {
         </div>
       ) : (
         <div className="rounded-xl border border-gray-200 bg-white p-10 text-center">
-          <Megaphone size={48} className="mx-auto mb-3 text-gray-300" />
+          <Megaphone size={48} className="mx-auto mb-3 text-gray-400" />
           <p className="font-medium text-gray-500">No announcements yet</p>
           <p className="text-sm text-gray-400 mt-1">Check back later for updates from your instructors.</p>
         </div>
@@ -720,16 +718,16 @@ export default function UserDashboard() {
         animate={{ opacity: 1, x: 0 }}
       >
         <form onSubmit={saveProfile} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-950">
-            <User size={18} className="text-[#dc2626]" /> Profile Settings
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+            <User size={18} className="text-[#15c8fb]" /> Profile Settings
           </h2>
           <div className="space-y-4">
-            <div className="flex items-center gap-5 mb-4 pb-5 border-b border-gray-100">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#dc2626] to-[#f89f29] text-3xl font-black text-white shadow-lg shadow-[#dc2626]/20">
+              <div className="flex items-center gap-5 mb-4 pb-5 border-b border-gray-100">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-3xl font-black text-white shadow-lg shadow-[#15c8fb]/20">
                 {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'S'}
               </div>
               <div>
-                <p className="text-xl font-black text-gray-950">{user?.full_name || user?.username}</p>
+                <p className="text-xl font-black text-gray-900">{user?.full_name || user?.username}</p>
                 <div className="mt-1.5 space-y-1">
                   <p className="text-sm text-gray-500 flex items-center gap-2"><Mail size={14} /> {user?.email}</p>
                   <p className="text-sm text-gray-500 flex items-center gap-2"><Shield size={14} /> {user?.role}</p>
@@ -738,11 +736,11 @@ export default function UserDashboard() {
               </div>
             </div>
             <div className="grid gap-4">
-              <input required value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all" />
-              <input required type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all" />
-              <input value={profile.phone_number} onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-[#dc2626]/50 focus:border-[#dc2626]/40 focus:ring-2 focus:ring-[#dc2626]/10 transition-all" />
+              <input required value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
+              <input required type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
+              <input value={profile.phone_number} onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
             </div>
-            <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#dc2626] to-[#f89f29] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#dc2626]/20">
+            <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#15c8fb]/20">
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
               Save Changes
             </button>
@@ -756,7 +754,7 @@ export default function UserDashboard() {
         className="space-y-4"
       >
         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-gray-950"><Download size={16} className="text-[#dc2626]" /> Export My Data</h3>
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-gray-900"><Download size={16} className="text-[#15c8fb]" /> Export My Data</h3>
           <p className="text-xs text-gray-500 mb-4">Download your records as CSV files.</p>
           <div className="space-y-2">
             <button
@@ -770,10 +768,10 @@ export default function UserDashboard() {
                 exportToCSV(data, 'my_enrollments.csv');
               }}
               disabled={!enrollments.length}
-              className="w-full rounded-lg border border-[#dc2626]/30 px-3 py-2.5 text-xs font-bold text-[#dc2626] hover:bg-[#dc2626]/10 transition-all disabled:opacity-40 flex items-center justify-between"
+              className="w-full rounded-lg border border-[#15c8fb]/30 px-3 py-2.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all disabled:opacity-40 flex items-center justify-between"
             >
               <span><FileText size={13} className="inline mr-1.5" />Enrollments</span>
-              <span className="text-gray-400">{enrollments.length}</span>
+              <span className="text-gray-500">{enrollments.length}</span>
             </button>
             <button
               onClick={() => {
@@ -785,15 +783,15 @@ export default function UserDashboard() {
                 exportToCSV(data, 'my_payments.csv');
               }}
               disabled={!payments.length}
-              className="w-full rounded-lg border border-[#f89f29]/30 px-3 py-2.5 text-xs font-bold text-orange-700 hover:bg-[#f89f29]/10 transition-all disabled:opacity-40 flex items-center justify-between"
+              className="w-full rounded-lg border border-[#f89f29]/30 px-3 py-2.5 text-xs font-bold text-orange-400 hover:bg-[#f89f29]/10 transition-all disabled:opacity-40 flex items-center justify-between"
             >
               <span><FileText size={13} className="inline mr-1.5" />Payments</span>
-              <span className="text-gray-400">{payments.length}</span>
+              <span className="text-gray-500">{payments.length}</span>
             </button>
           </div>
         </div>
         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-black text-gray-950">Account Info</h3>
+          <h3 className="text-sm font-black text-gray-900">Account Info</h3>
           <div className="mt-3 space-y-2 text-xs text-gray-500">
             <div className="flex justify-between"><span>Username</span><span className="font-medium text-gray-900">{user?.username || '-'}</span></div>
             <div className="flex justify-between"><span>Role</span><span className="font-medium text-gray-900 capitalize">{user?.role || '-'}</span></div>
@@ -805,7 +803,7 @@ export default function UserDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-gray-950">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <AnimatePresence>
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       </AnimatePresence>
@@ -826,9 +824,9 @@ export default function UserDashboard() {
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 w-68 border-r border-gray-200 bg-white p-5 shadow-2xl lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-68 border-r border-white/10 bg-surface p-5 shadow-2xl overflow-y-auto lg:hidden"
             >
-              <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-1 text-gray-500 hover:bg-gray-100">
+              <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-2 text-gray-400 hover:bg-white/10">
                 <X size={20} />
               </button>
               {sidebarContent}
@@ -838,31 +836,31 @@ export default function UserDashboard() {
       </AnimatePresence>
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-gray-200 bg-white p-5 lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-white/10 bg-surface p-5 overflow-y-auto lg:block">
         {sidebarContent}
       </aside>
 
       <main className="lg:pl-68">
         {/* Header */}
         <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-lg lg:px-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 transition-all hover:text-[#dc2626]" title="Go home">
+              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 transition-all hover:text-[#15c8fb]" title="Go home">
                 <ArrowLeft size={20} />
               </button>
-              <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden">
+              <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden">
                 <Menu size={20} />
               </button>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-[#f89f29]">Backend Integrated</p>
-                <h1 className="text-xl font-black text-gray-950">Student Dashboard</h1>
+                <h1 className="text-xl sm:text-2xl font-black text-gray-900">Student Dashboard</h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={loadStudentData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-all">
+              <button onClick={loadStudentData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">
                 <RefreshCw size={16} /> Refresh
               </button>
-              <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl bg-gray-950 px-3.5 py-2.5 text-sm font-bold text-white hover:bg-gray-800 transition-all">
+              <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-3.5 py-2.5 text-sm font-bold text-white hover:brightness-110 transition-all">
                 <LogOut size={16} /> Logout
               </button>
             </div>
