@@ -6,57 +6,56 @@
   --color-cyan-primary: #15c8fb;
   --color-green-accent: #17c966;
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
+
 html {
   scroll-behavior: smooth;
 }
-/* Base transitions so the background swap is smooth, not jerky */
+
 @layer base {
-  html {
-    transition: background-color 0.5s ease;
-  }
-  
-  /* When the 'dark' class is NOT present (Light Mode) */
   body {
-    @apply bg-white text-slate-900;
+    @apply text-white;
+    background-color: #0a0a0a;
   }
 
-  /* When the 'dark' class IS present (Dark Mode) */
-  .dark body {
-    @apply bg-charcoal text-white;
+  html:not(.dark) body {
+    background-color: #f9fafb;
+    color: #111827;
   }
 
-  /* Paragraphs: Not bold, slightly gray for elegance, and extra line spacing */
   p {
     @apply font-normal text-[15px] leading-[1.8] mb-5;
-    /* tracking-wide makes English/Amharic feel less 'crowded' */
-    letter-spacing: 0.01em; 
+    letter-spacing: 0.01em;
   }
 
-  /* Spans: Keep them light and crisp */
   span {
     @apply font-light;
   }
 
-  /* Form Inputs/Buttons: These often look boring; let's make them clean */
   button, input {
     @apply font-medium tracking-wide;
   }
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* index.css or App.css */
 body, html, #root {
   margin: 0;
   padding: 0;
-  /* Inter is for English, Noto Sans Ethiopic handles Amharic automatically */
   font-family: 'Inter', 'Noto Sans Ethiopic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Optional: Make headings slightly bolder for a professional look */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
-  color: #333;
+  color: #e5e5e5;
+}
+
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h3,
+html:not(.dark) h4,
+html:not(.dark) h5,
+html:not(.dark) h6 {
+  color: #111827;
 }

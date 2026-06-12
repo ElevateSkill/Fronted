@@ -5,10 +5,11 @@ import {
   ArrowLeft, BarChart3, BookOpen, CheckCircle, Clock, CreditCard, Edit3, FileText,
   GraduationCap, HelpCircle, Image, Loader, LogOut, Megaphone, Menu,
   Newspaper, Plus, RefreshCw, Save, Search, Settings, Star, Tags, Trash2,
-  User, UserPlus, Users, X, XCircle, AlertTriangle
+  User, UserPlus, Users, X, XCircle, AlertTriangle, Sun, Moon
 } from 'lucide-react';
 import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import logoSrc from '../../assets/logo.jpg';
 
 const accent = {
@@ -271,6 +272,7 @@ function apiError(err, fallback) {
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const { darkMode, toggleDark } = useTheme();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
@@ -1712,6 +1714,13 @@ export default function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={toggleDark}
+                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-50 shadow-sm"
+                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
               <button onClick={loadAdminData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-50 hover:shadow-sm">
                 <RefreshCw size={16} /> Refresh
               </button>

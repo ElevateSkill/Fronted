@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, ArrowLeft } from 'lucide-react';
+import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, ArrowLeft, Sun, Moon } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import logoJpg from '../assets/logo.jpg';
 
 export default function Navbar() {
@@ -12,6 +13,7 @@ export default function Navbar() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [activeMega, setActiveMega] = useState(null);
   const { user, logout } = useAuth();
+  const { darkMode, toggleDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const showBack = location.pathname !== '/';
@@ -63,7 +65,7 @@ export default function Navbar() {
         onMouseLeave={() => setActiveMega(null)}
         className={`fixed top-0 w-full z-50 transition-all duration-300 px-4 sm:px-10 ${
           isScrolled || activeMega || mobileMenu
-            ? 'bg-white/95 dark:bg-black/95 backdrop-blur-lg border-b border-[#dc2626]/10 dark:border-[#f89f29]/10 py-3' 
+            ? 'bg-black/95 backdrop-blur-lg border-b border-[#dc2626]/10 py-3' 
             : 'bg-transparent py-5'
         }`}
       >
@@ -75,7 +77,7 @@ export default function Navbar() {
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               onClick={() => navigate('/')}
-              className="relative z-[71] flex items-center justify-center h-8 w-8 rounded-lg bg-white/90 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-700 dark:text-white hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626] transition-all mr-2 shadow-sm"
+              className="relative z-[71] flex items-center justify-center h-8 w-8 rounded-lg bg-white/10 border border-white/20 text-white hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626] transition-all mr-2 shadow-sm"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               title="Go home"
@@ -89,7 +91,7 @@ export default function Navbar() {
             <div className="relative">
               <img 
                 src={logoJpg} 
-                className="h-10 sm:h-12 w-auto rounded-xl shadow-lg shadow-black/10 dark:shadow-white/5 object-cover" 
+                className="h-10 sm:h-12 w-auto rounded-xl shadow-lg shadow-black/10 object-cover" 
                 alt='ELEVATE'
               />
             </div>
@@ -97,6 +99,13 @@ export default function Navbar() {
 
           {/* DESKTOP NAV */}
           <div className="hidden lg:flex items-center gap-8">
+            <button
+              onClick={toggleDark}
+              className="p-2 rounded-lg transition-all hover:bg-white/10"
+              title={darkMode ? 'Light mode' : 'Dark mode'}
+            >
+              {darkMode ? <Sun size={18} className="text-[#f89f29]" /> : <Moon size={18} className="text-gray-400" />}
+            </button>
             <div className="flex gap-8">
               {navLinks.map((link) => (
                 <div 
@@ -104,7 +113,7 @@ export default function Navbar() {
                   className="relative py-2"
                   onMouseEnter={() => link.isMega ? setActiveMega(link.name) : setActiveMega(null)}
                 >
-                  <a href={link.href} className="flex items-center gap-1 text-[13px] font-black tracking-widest dark:text-white/80 text-slate-700 hover:text-[#f07000] transition-colors uppercase">
+                  <a href={link.href} className="flex items-center gap-1 text-[13px] font-black tracking-widest text-white/80 hover:text-[#f07000] transition-colors uppercase">
                     {link.name}
                     {link.isMega && <ChevronDown size={12} className={activeMega === link.name ? 'rotate-180' : ''} />}
                   </a>
@@ -112,7 +121,7 @@ export default function Navbar() {
               ))}
             </div>
 
-            <div className="flex items-center gap-4 border-l dark:border-white/10 border-slate-200 pl-6">
+            <div className="flex items-center gap-4 border-l border-white/10 pl-6">
               {user ? (
                 <div className="flex items-center gap-3">
                   <Link 
@@ -141,7 +150,7 @@ export default function Navbar() {
 
           {/* MOBILE CONTROLS */}
           <div className="lg:hidden flex items-center gap-3">
-            <button onClick={() => setMobileMenu(!mobileMenu)} className="p-2 rounded-lg dark:text-white text-slate-900 bg-slate-100 dark:bg-white/10 relative z-[71]">
+            <button onClick={() => setMobileMenu(!mobileMenu)} className="p-2 rounded-lg text-white bg-white/10 relative z-[71]">
               {mobileMenu ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -152,13 +161,13 @@ export default function Navbar() {
           {activeMega && (
             <motion.div
               initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-              className="absolute top-full left-0 w-full bg-white dark:bg-black border-b dark:border-white/10 shadow-2xl py-10 px-10 hidden lg:block"
+              className="absolute top-full left-0 w-full bg-black border-b border-white/10 shadow-2xl py-10 px-10 hidden lg:block"
             >
               <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
                 {navLinks.find(l => l.name === activeMega)?.subItems?.map((sub, i) => (
                   <div key={i} className="group cursor-pointer p-4 rounded-xl hover:bg-gradient-to-br hover:from-[#dc2626]/5 hover:to-[#f89f29]/5 transition-all border border-transparent hover:border-[#15c8fb]/10">
-                    <h4 className="text-xs font-black dark:text-white text-slate-900 mb-2 uppercase tracking-widest group-hover:text-[#f87b07]">{sub.title}</h4>
-                    <p className="text-[11px] text-slate-500 dark:text-gray-300 leading-relaxed">{sub.desc}</p>
+                    <h4 className="text-xs font-black text-white mb-2 uppercase tracking-widest group-hover:text-[#f87b07]">{sub.title}</h4>
+                    <p className="text-[11px] text-gray-300 leading-relaxed">{sub.desc}</p>
                   </div>
                 ))}
               </div>
@@ -172,15 +181,15 @@ export default function Navbar() {
             <motion.div 
               initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.4 }}
-              className="fixed inset-0 h-screen w-screen dark:bg-black bg-white z-[70] p-8 pt-24 flex flex-col"
+              className="fixed inset-0 h-screen w-screen bg-black z-[70] p-8 pt-24 flex flex-col"
             >
               <div className="flex flex-col gap-6 overflow-y-auto">
                 {navLinks.map((link) => (
-                  <div key={link.name} className="border-b dark:border-white/10 border-gray-200 pb-4">
+                  <div key={link.name} className="border-b border-white/10 pb-4">
                     <a 
                       href={link.href} 
                       onClick={() => setMobileMenu(false)}
-                      className="text-3xl font-black dark:text-white text-slate-900 uppercase tracking-tighter hover:text-[#dc2626] transition-colors"
+                      className="text-3xl font-black text-white uppercase tracking-tighter hover:text-[#dc2626] transition-colors"
                     >
                       {link.name}
                     </a>

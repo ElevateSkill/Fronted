@@ -5,10 +5,11 @@ import {
   ArrowLeft, Bell, BookOpen, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
   Home, Loader, LogOut, Mail, Megaphone, Menu, MessageCircle, Phone,
   RefreshCw, Save, Send, Settings, Shield, Upload, User, X, AlertTriangle,
-  Calendar, BarChart3, ExternalLink, Filter, Download
+  Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff, Sun, Moon
 } from 'lucide-react';
 import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const accent = {
   button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20 hover:shadow-xl hover:shadow-[#15c8fb]/30 active:scale-[0.97] transition-all duration-200',
@@ -102,6 +103,7 @@ const pageVariants = {
 
 export default function UserDashboard() {
   const { user, logout, setUser } = useAuth();
+  const { darkMode, toggleDark } = useTheme();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [loading, setLoading] = useState(true);
@@ -117,7 +119,8 @@ export default function UserDashboard() {
   const [selectedEnrollment, setSelectedEnrollment] = useState('');
   const [proofFile, setProofFile] = useState(null);
   const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '' });
-  const [profile, setProfile] = useState({ full_name: '', email: '', phone_number: '' });
+  const [profile, setProfile] = useState({ full_name: '', email: '', phone_number: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
   const showToast = (msg, type = 'success') => setToast({ message: msg, type });
   const closeToast = () => setToast({ message: '', type: 'success' });
@@ -160,6 +163,7 @@ export default function UserDashboard() {
       full_name: user?.full_name || '',
       email: user?.email || '',
       phone_number: user?.phone_number || '',
+      password: '',
     };
     setProfile(nextProfile);
     setPaymentForm({
@@ -231,8 +235,12 @@ export default function UserDashboard() {
     setSaving(true);
     setError('');
     try {
-      const res = await api.put('/profile/', profile);
+      const payload = { ...profile };
+      if (!payload.password) delete payload.password;
+      const res = await api.put('/profile/', payload);
       setUser(res.data);
+      setProfile((prev) => ({ ...prev, password: '' }));
+      setShowPassword(false);
       showToast('Profile updated successfully.', 'success');
     } catch (err) {
       showToast(err?.response?.data?.detail || 'Could not update profile.', 'error');
@@ -767,6 +775,22 @@ export default function UserDashboard() {
               <input required value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
               <input required type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
               <input value={profile.phone_number} onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={profile.password}
+                  onChange={(e) => setProfile({ ...profile, password: e.target.value })}
+                  placeholder="New password (leave blank to keep current)"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-12 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#15c8fb] transition-colors"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#15c8fb]/20">
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
@@ -885,6 +909,13 @@ export default function UserDashboard() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={toggleDark}
+                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-50 shadow-sm"
+                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
               <button onClick={loadStudentData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">
                 <RefreshCw size={16} /> Refresh
               </button>
