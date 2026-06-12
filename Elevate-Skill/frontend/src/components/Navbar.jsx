@@ -104,7 +104,7 @@ export default function Navbar() {
                   className="relative py-2"
                   onMouseEnter={() => link.isMega ? setActiveMega(link.name) : setActiveMega(null)}
                 >
-                  <a href={link.href} className="flex items-center gap-1 text-[10px] font-black tracking-widest dark:text-white/80 text-slate-700 hover:text-[#f07000] transition-colors uppercase">
+                  <a href={link.href} className="flex items-center gap-1 text-[13px] font-black tracking-widest dark:text-white text-slate-900 hover:text-[#f07000] transition-colors uppercase">
                     {link.name}
                     {link.isMega && <ChevronDown size={12} className={activeMega === link.name ? 'rotate-180' : ''} />}
                   </a>
