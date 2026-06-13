@@ -1,16 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ChevronDown, Lightbulb, PenTool, Target,
   Users, Star, ArrowRight, CheckCircle2, Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
+import { api, unwrapResults } from '../services/api';
 
 import mentorship from '../assets/service/mentorship.jpg'
 import online_class from '../assets/service/online-class.jpg'
 import elevate_training from '../assets/service/elevate-training.jpg'
 import charity from '../assets/service/charity.jpg'
+import student01 from '../assets/people/elevate-student01.jpg'
+import graduate from '../assets/people/elevate-graduate.jpg'
+import staff from '../assets/people/elevate-staff.jpg'
+import prof from '../assets/people/prof-melaku.jpg'
 
 const partners = [
   {
@@ -73,18 +77,21 @@ const mainServices = [
 export default function Services() {
 
   const [activeService] = useState();
+  const [courseCount, setCourseCount] = useState(null);
 
-  // const toggleService = (id) => {
-  //   setActiveService(activeService === id ? null : id);
-  // };
+  useEffect(() => {
+    api.get('/courses/')
+      .then(res => {
+        const data = unwrapResults(res.data);
+        setCourseCount(data.length);
+      })
+      .catch(() => setCourseCount(0));
+  }, []);
 
   const navigate = useNavigate();
 
   const users = [
-    "https://i.pravatar.cc/150?u=1",
-    "https://i.pravatar.cc/150?u=2",
-    "https://i.pravatar.cc/150?u=3",
-    "https://i.pravatar.cc/150?u=4"
+    student01, graduate, staff, prof
   ];
 
   return (
@@ -159,7 +166,7 @@ export default function Services() {
                   />
                 ))}
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#2c2260] to-[#291850] border-4 border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
-                  2k+
+                  {courseCount ?? '...'}+
                 </div>
               </div>
             </div>
@@ -247,7 +254,7 @@ export default function Services() {
         >
           <div className="bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-slate-900/20">
             <div className="text-center lg:text-left">
-              <p className="text-gray-300 text-lg max-w-md">JOIN 1000+ visionaries scaling their digital presence today.</p>
+              <p className="text-gray-300 text-lg max-w-md">JOIN {courseCount ?? '...'}+ programs designed to scale your digital presence.</p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">

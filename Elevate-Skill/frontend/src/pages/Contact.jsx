@@ -1,8 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, ArrowRight, ShieldCheck, CheckCircle } from 'lucide-react';
 
 export default function Contact() {
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!form.name || !form.email || !form.message) return;
+    setSending(true);
+    setTimeout(() => {
+      const existing = JSON.parse(localStorage.getItem('elevateskill_contact_messages') || '[]');
+      existing.push({ ...form, timestamp: new Date().toISOString() });
+      localStorage.setItem('elevateskill_contact_messages', JSON.stringify(existing));
+      setSent(true);
+      setSending(false);
+      setForm({ name: '', email: '', subject: '', message: '' });
+      setTimeout(() => setSent(false), 4000);
+    }, 800);
+  };
   return (
     <div id="contact" className="relative w-full bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
       <div className="absolute top-1/3 left-0 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
@@ -65,38 +85,43 @@ export default function Contact() {
               viewport={{ once: true }}
               className="bg-white/5 border border-white/10 p-8 md:p-12 shadow-2xl shadow-white/5"
             >
-              <form className="space-y-6" onSubmit={e => e.preventDefault()}>
+              <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Full Name</label>
-                    <input type="text" placeholder="John Doe" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
+                    <input name="name" value={form.name} onChange={handleChange} required type="text" placeholder="John Doe" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
                   </div>
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Email</label>
-                    <input type="email" placeholder="hello@example.com" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
+                    <input name="email" value={form.email} onChange={handleChange} required type="email" placeholder="hello@example.com" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
                   </div>
                 </div>
 
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Subject</label>
-                  <input type="text" placeholder="How can we help?" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
+                  <input name="subject" value={form.subject} onChange={handleChange} type="text" placeholder="How can we help?" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
                 </div>
 
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Message</label>
-                  <textarea rows={4} placeholder="Tell us more about your project..." className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20 resize-none" />
+                  <textarea name="message" value={form.message} onChange={handleChange} required rows={4} placeholder="Tell us more about your project..." className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20 resize-none" />
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                   <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                    Encrypted & Secure
+                    {sent ? (
+                      <span className="flex items-center gap-1.5 text-green-400"><CheckCircle size={12} /> Message saved</span>
+                    ) : (
+                      <><ShieldCheck size={12} /> Encrypted & Secure</>
+                    )}
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#f89f29] to-[#fb7d15] text-white font-black text-xs hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-3 shadow-xl"
+                    disabled={sending}
+                    className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#f89f29] to-[#fb7d15] text-white font-black text-xs hover:brightness-110 transition-all uppercase tracking-wider flex items-center justify-center gap-3 shadow-xl disabled:opacity-50"
                   >
-                    Send Message <ArrowRight size={14} />
+                    {sending ? 'Sending...' : 'Send Message'} <ArrowRight size={14} />
                   </motion.button>
                 </div>
               </form>

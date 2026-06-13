@@ -51,7 +51,7 @@ export default function MainView() {
       <section id="services"><Services /></section>
       <section id="courses"><Courses /></section>
       <Testimonals testimonials={liveHomepage?.testimonials} />
-      {liveHomepage?.faqs && liveHomepage.faqs.length > 0 && <FAQ faqs={liveHomepage.faqs} />}
+      <FAQ faqs={liveHomepage?.faqs || []} />
       <section id="blog"><Blog /></section>
       <section id="contact"><Contact /></section>
     </>
