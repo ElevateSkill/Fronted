@@ -97,15 +97,15 @@ function Field({ label, children }) {
 }
 
 function TextInput(props) {
-  return <input {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
+  return <input {...props} className={`w-full rounded-xl border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function TextArea(props) {
-  return <textarea {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
+  return <textarea {...props} className={`w-full rounded-xl border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function Select(props) {
-  return <select {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
+  return <select {...props} className={`w-full rounded-xl border border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function AnimatedCounter({ value }) {
@@ -1040,7 +1040,7 @@ export default function AdminDashboard() {
           <Field label="Requirements"><TextArea value={courseForm.requirements} onChange={(e) => setCourseForm({ ...courseForm, requirements: e.target.value })} rows="2" /></Field>
           <Field label="Learning outcomes"><TextArea value={courseForm.learning_outcomes} onChange={(e) => setCourseForm({ ...courseForm, learning_outcomes: e.target.value })} rows="2" /></Field>
           <Field label="Thumbnail">
-            <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/[0.03] px-4 py-4 text-sm text-gray-500 dark:text-gray-400 transition-all hover:border-[#15c8fb]/50 hover:bg-[#15c8fb]/5">
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-white/30 bg-gray-50 dark:bg-gray-900 px-4 py-4 text-sm text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/50 hover:bg-[#15c8fb]/5">
               <Upload size={18} className="text-gray-400" />
               <span>{courseForm.thumbnail?.name || 'Click to upload thumbnail'}</span>
               <input type="file" accept="image/*" onChange={(e) => setCourseForm({ ...courseForm, thumbnail: e.target.files?.[0] || null })} className="hidden" />
@@ -1467,21 +1467,21 @@ export default function AdminDashboard() {
                 }} className="space-y-4">
                   <div>
                     <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Student Name</label>
-                    <input required value={manualPayment.student_name} onChange={(e) => setManualPayment({...manualPayment, student_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Full name" />
+                    <input required value={manualPayment.student_name} onChange={(e) => setManualPayment({...manualPayment, student_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Full name" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Email</label>
-                      <input required type="email" value={manualPayment.email} onChange={(e) => setManualPayment({...manualPayment, email: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Email" />
+                      <input required type="email" value={manualPayment.email} onChange={(e) => setManualPayment({...manualPayment, email: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Email" />
                     </div>
                     <div>
                       <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Phone</label>
-                      <input value={manualPayment.phone} onChange={(e) => setManualPayment({...manualPayment, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Phone" />
+                      <input value={manualPayment.phone} onChange={(e) => setManualPayment({...manualPayment, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Phone" />
                     </div>
                   </div>
                   <div>
                     <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Course</label>
-                    <input required value={manualPayment.course_title} onChange={(e) => setManualPayment({...manualPayment, course_title: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Course name" />
+                    <input required value={manualPayment.course_title} onChange={(e) => setManualPayment({...manualPayment, course_title: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Course name" />
                   </div>
                   <div className="flex gap-3 pt-2">
                     <button type="submit" className="flex-1 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all">
@@ -1537,7 +1537,7 @@ export default function AdminDashboard() {
               </div>
               <div className="mb-3">
                 <p className="text-[9px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1">Account Number</p>
-                <div className="rounded-lg bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 px-3 py-2 font-mono text-sm font-bold text-gray-900 dark:text-white">
+                <div className="rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 px-3 py-2 font-mono text-sm font-bold text-gray-900 dark:text-white">
                   {account.account_number}
                 </div>
               </div>
@@ -1610,15 +1610,15 @@ export default function AdminDashboard() {
                 <form onSubmit={(e) => { saveBank(e); setShowBankModal(false); }} className="space-y-4">
                   <div>
                     <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Bank Name</label>
-                    <input required value={bankForm.bank_name} onChange={(e) => setBankForm({...bankForm, bank_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="e.g. Commercial Bank of Ethiopia" />
+                    <input required value={bankForm.bank_name} onChange={(e) => setBankForm({...bankForm, bank_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="e.g. Commercial Bank of Ethiopia" />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Account Holder</label>
-                    <input required value={bankForm.account_holder_name} onChange={(e) => setBankForm({...bankForm, account_holder_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="e.g. Amanuel Abraham" />
+                    <input required value={bankForm.account_holder_name} onChange={(e) => setBankForm({...bankForm, account_holder_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="e.g. Amanuel Abraham" />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Account Number</label>
-                    <input required value={bankForm.account_number} onChange={(e) => setBankForm({...bankForm, account_number: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Account number" />
+                    <input required value={bankForm.account_number} onChange={(e) => setBankForm({...bankForm, account_number: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Account number" />
                   </div>
                   <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-bold text-gray-900 dark:text-white hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
                     <input type="checkbox" checked={bankForm.is_active} onChange={(e) => setBankForm({...bankForm, is_active: e.target.checked})} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" />
@@ -1655,7 +1655,7 @@ export default function AdminDashboard() {
           </h2>
           <Field label="Title"><TextInput required value={announcementForm.title} onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })} placeholder="Announcement title" /></Field>
           <Field label="Content"><TextArea required value={announcementForm.content} onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })} rows="5" placeholder="Write your announcement..." /></Field>
-          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/20 px-3.5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900/20 px-3.5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
             <input type="checkbox" checked={announcementForm.is_published} onChange={(e) => setAnnouncementForm({ ...announcementForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 dark:border-white/20 text-[#15c8fb] focus:ring-[#15c8fb]" /> Publish to students
           </label>
           <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save announcement</button>
@@ -1695,7 +1695,7 @@ export default function AdminDashboard() {
           <h2 className="mb-5 text-lg font-black text-gray-900 dark:text-white">Announcements</h2>
           <div className="space-y-3">
             {announcements.map((item) => (
-              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/30 p-4 transition-all hover:shadow-md">
+              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900/30 p-4 transition-all hover:shadow-md">
                 <div className="mb-2 flex items-start justify-between gap-2">
                   <h3 className="font-black text-gray-900 dark:text-white text-sm sm:text-base">{item.title}</h3>
                   <Badge>{item.is_published ? 'published' : 'draft'}</Badge>
@@ -1725,7 +1725,7 @@ export default function AdminDashboard() {
           <h2 className="mb-5 text-lg font-black text-gray-900 dark:text-white">News posts</h2>
           <div className="space-y-3">
             {news.map((item) => (
-              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/30 p-4 transition-all hover:shadow-md">
+              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-gray-900/30 p-4 transition-all hover:shadow-md">
                 <div className="mb-2 flex items-start justify-between gap-3">
                   <h3 className="font-black text-gray-900 dark:text-white">{item.title}</h3>
                   <Badge>{item.status}</Badge>
