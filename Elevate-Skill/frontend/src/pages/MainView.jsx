@@ -7,9 +7,11 @@ import FAQ from "./FAQ";
 import Contact from "./Contact";
 import Courses from "./Courses";
 import Blog from "./Blog";
+import LatestNewsSection from "../components/LatestNewsSection";
 
 export default function MainView() {
   const [liveHomepage, setLiveHomepage] = useState(null);
+  const [latestNews, setLatestNews] = useState([]);
 
   useEffect(() => {
     const fetchAndCacheAnnouncements = async () => {
@@ -37,8 +39,20 @@ export default function MainView() {
         console.error("Announcements fetch error:", err);
       }
     };
+    const fetchLatestNews = async () => {
+      try {
+        const res = await api.get('/news/');
+        const data = unwrapResults(res.data)
+          .filter((item) => item.status === 'published')
+          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        setLatestNews(data);
+      } catch (err) {
+        console.error('News fetch error:', err);
+      }
+    };
 
     fetchAndCacheAnnouncements();
+    fetchLatestNews();
 
     api.get('/homepage/')
       .then(res => setLiveHomepage(res.data))
@@ -48,6 +62,7 @@ export default function MainView() {
   return (
     <>
       <section id="home"><Landing heroData={liveHomepage?.hero} /></section>
+      <LatestNewsSection items={latestNews} />
       <section id="services"><Services /></section>
       <section id="courses"><Courses /></section>
       <Testimonals testimonials={liveHomepage?.testimonials} />

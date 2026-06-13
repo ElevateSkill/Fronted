@@ -86,3 +86,17 @@ html:not(.dark) h6 {
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
 }
+
+@keyframes announcement-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.announcement-marquee {
+  animation: announcement-marquee var(--announcement-duration, 24s) linear infinite;
+  will-change: transform;
+}
+
+.announcement-marquee:hover {
+  animation-play-state: paused;
+}

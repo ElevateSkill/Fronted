@@ -49,7 +49,9 @@ export default function Blog() {
   useEffect(() => {
     api.get('/news/')
       .then(res => {
-        const data = unwrapResults(res.data).filter(p => p.status === 'published');
+        const data = unwrapResults(res.data)
+          .filter((p) => p.status === 'published')
+          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
         if (data.length > 0) {
           setPosts(data.map(p => ({
             id: p.id,
@@ -60,6 +62,8 @@ export default function Blog() {
             excerpt: p.excerpt || p.content?.substring(0, 120) || '',
             content: p.content || p.excerpt || ''
           })));
+        } else {
+          setPosts([]);
         }
       })
       .catch(() => {});

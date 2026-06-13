@@ -9,7 +9,21 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 
 // dashboards
-import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLayout from "./pages/admin/AdminLayout";
+import OverviewSection from "./pages/admin/sections/OverviewSection";
+import CoursesSection from "./pages/admin/sections/CoursesSection";
+import CategoriesSection from "./pages/admin/sections/CategoriesSection";
+import PaymentsSection from "./pages/admin/sections/PaymentsSection";
+import AnnouncementsSection from "./pages/admin/sections/AnnouncementsSection";
+import CmsSection from "./pages/admin/sections/CmsSection";
+import HeroContentSection from "./pages/admin/sections/cms/HeroContentSection";
+import AboutSection from "./pages/admin/sections/cms/AboutSection";
+import SettingsSection from "./pages/admin/sections/cms/SettingsSection";
+import TestimonialsSection from "./pages/admin/sections/cms/TestimonialsSection";
+import FaqsSection from "./pages/admin/sections/cms/FaqsSection";
+import ExportSection from "./pages/admin/sections/ExportSection";
+import ProfileSection from "./pages/admin/sections/ProfileSection";
+import UsersSection from "./pages/admin/sections/UsersSection";
 import UserDashboard from "./pages/user/UserDashboard";
 
 // scroll to top on route change
@@ -54,8 +68,25 @@ export default function App() {
         <Routes>
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-          <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
           <Route path="/dashboard" element={<ProtectedRoute role="student"><UserDashboard /></ProtectedRoute>} />
+
+          {/* Admin with nested routes for each CMS section */}
+          <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout /></ProtectedRoute>}>
+            <Route index element={<OverviewSection />} />
+            <Route path="courses" element={<CoursesSection />} />
+            <Route path="categories" element={<CategoriesSection />} />
+            <Route path="payments" element={<PaymentsSection />} />
+            <Route path="announcements" element={<AnnouncementsSection />} />
+            <Route path="cms" element={<CmsSection />} />
+            <Route path="cms/hero" element={<HeroContentSection />} />
+            <Route path="cms/about" element={<AboutSection />} />
+            <Route path="cms/settings" element={<SettingsSection />} />
+            <Route path="cms/testimonials" element={<TestimonialsSection />} />
+            <Route path="cms/faqs" element={<FaqsSection />} />
+            <Route path="export" element={<ExportSection />} />
+            <Route path="profile" element={<ProfileSection />} />
+            <Route path="users" element={<UsersSection />} />
+          </Route>
 
           <Route path="/" element={<Layout />}>
             <Route index element={<MainView />} />

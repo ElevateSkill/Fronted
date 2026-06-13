@@ -5,7 +5,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logoJpg from '../assets/logo.jpg';
 
-export default function Navbar() {
+export default function Navbar({ hasAnnouncements = false }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -55,7 +55,9 @@ export default function Navbar() {
         animate={{ y: isVisible ? 0 : -120 }}
         transition={{ duration: 0.3 }}
         onMouseLeave={() => setActiveMega(null)}
-        className={`fixed top-[40px] w-full z-50 transition-all duration-300 ${
+        className={`fixed w-full z-50 transition-all duration-300 ${
+          hasAnnouncements ? 'top-[40px]' : 'top-0'
+        } ${
           isScrolled || activeMega || mobileMenu
             ? 'bg-black/95 backdrop-blur-lg border-b border-[#dc2626]/10'
             : 'bg-transparent'

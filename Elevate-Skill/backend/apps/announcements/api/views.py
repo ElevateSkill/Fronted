@@ -13,9 +13,9 @@ from apps.announcements.models import Announcement, NewsPost
 @extend_schema(tags=["Announcements"])
 class StudentAnnouncementListView(generics.ListAPIView):
     """
-    GET /api/v1/announcements/ - List published announcements (student feed, requires JWT).
+    GET /api/v1/announcements/ - List published announcements (public feed, no auth required).
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = AnnouncementSerializer
 
     def get_queryset(self):
