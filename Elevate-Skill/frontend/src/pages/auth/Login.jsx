@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Mail, ArrowRight, Lock, TriangleAlert, Eye, EyeOff, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowLeft, Mail, ArrowRight, Lock, TriangleAlert, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -10,8 +10,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -119,9 +117,6 @@ export default function Login() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-[10px] font-bold uppercase tracking-[0.28em] text-gray-400">Password</label>
-                  <Link to="/forgot-password" className="text-xs font-semibold text-[#ff9d00] transition hover:text-[#ff9d02] text-[red]">
-                    Forgot?
-                  </Link>
                 </div>
                 <div className="relative group">
                   <Lock size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-colors group-focus-within:text-[#ff9d00]" />
@@ -145,15 +140,6 @@ export default function Login() {
               </div>
 
               <div className="flex items-center justify-between gap-4 text-sm">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 border-slate-300 text-[#241552] accent-[#f78a04]"
-                  />
-                  <span className="text-gray-300">Keep me signed in</span>
-                </label>
                 <Link to="/register" className="text-xs font-semibold text-[#f89f29] transition hover:text-[#e07f12]">
                   New account
                 </Link>

@@ -5,15 +5,16 @@ import { useAuth } from '../../context/AuthContext';
 import { api, unwrapResults } from '../../services/api';
 import {
   ArrowLeft, Mail, Lock, User, IdCard, Phone,
-  ArrowRight, TriangleAlert, Sparkles, Eye, EyeOff,
+  ArrowRight, TriangleAlert, Eye, EyeOff,
   CheckCircle, BookOpen, Upload, Loader, Check,
-  AlertTriangle, ShieldCheck
+  AlertTriangle, ShieldCheck, Building2, RefreshCw
 } from 'lucide-react';
 
 const steps = [
   { id: 1, label: 'Profile', note: 'Who you are' },
   { id: 2, label: 'Security', note: 'Set your password' },
-  { id: 3, label: 'Enroll', note: 'Choose course and upload proof' }
+  { id: 3, label: 'Enroll', note: 'Choose course' },
+  { id: 4, label: 'Payment', note: 'Choose payment method' }
 ];
 
 function InputField({ name, label, type = 'text', Icon, placeholder, span = false, showToggle = false, form, onChange }) {
@@ -66,6 +67,10 @@ export default function Register() {
   const [courses, setCourses] = useState([]);
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [proofFile, setProofFile] = useState(null);
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [bankAccountsLoading, setBankAccountsLoading] = useState(true);
+  const [selectedBankId, setSelectedBankId] = useState('');
+  const [userAccountNumber, setUserAccountNumber] = useState('');
 
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
@@ -80,6 +85,17 @@ export default function Register() {
     api.get('/courses/')
       .then((res) => setCourses(unwrapResults(res.data)))
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    setBankAccountsLoading(true);
+    api.get('/bank-accounts/')
+      .then((res) => setBankAccounts(unwrapResults(res.data)))
+      .catch((err) => {
+        console.error('Failed to fetch payment accounts:', err);
+        setBankAccounts([]);
+      })
+      .finally(() => setBankAccountsLoading(false));
   }, []);
 
   const selectedCourse = useMemo(
@@ -115,6 +131,21 @@ export default function Register() {
         setMsg({ type: 'error', text: 'Please select a course.' });
         return false;
       }
+    }
+
+    if (targetStep === 4) {
+      if (!bankAccountsLoading && !bankAccounts.length) {
+        setMsg({ type: 'error', text: 'No payment accounts available. Contact admin or try again later.' });
+        return false;
+      }
+      if (!selectedBankId) {
+        setMsg({ type: 'error', text: 'Please select a payment account.' });
+        return false;
+      }
+      if (!userAccountNumber.trim()) {
+        setMsg({ type: 'error', text: 'Please enter your account number.' });
+        return false;
+      }
       if (!proofFile) {
         setMsg({ type: 'error', text: 'Please upload payment proof.' });
         return false;
@@ -127,7 +158,7 @@ export default function Register() {
   const handleNext = () => {
     setMsg(null);
     if (!validateStep(currentStep)) return;
-    setCurrentStep((value) => Math.min(3, value + 1));
+    setCurrentStep((value) => Math.min(4, value + 1));
   };
 
   const handleBack = () => {
@@ -135,11 +166,16 @@ export default function Register() {
     setCurrentStep((value) => Math.max(1, value - 1));
   };
 
+  const selectedBank = useMemo(
+    () => bankAccounts.find((b) => String(b.id) === String(selectedBankId)),
+    [bankAccounts, selectedBankId]
+  );
+
   const onSubmit = async (e) => {
     e.preventDefault();
     setMsg(null);
 
-    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
       return;
     }
 
@@ -150,28 +186,40 @@ export default function Register() {
       const { confirm_password: _, ...payload } = form;
       const regResult = await registerUser(payload);
 
-      setStepMessage('Enrolling you in the course...');
-      const enrollRes = await api.post('/enrollments/', { course: Number(selectedCourseId) });
-      const enrollmentId = enrollRes.data?.id;
+      const role = regResult?.user?.role || 'student';
+      const isAdmin = role.toLowerCase() === 'admin';
 
-      setStepMessage('Uploading payment proof...');
-      const formData = new FormData();
-      formData.append('enrollment_id', enrollmentId);
-      formData.append('proof_file', proofFile);
-      formData.append('full_name', form.full_name);
-      formData.append('email', form.email);
-      formData.append('phone', form.phone_number);
+      setMsg({ type: 'success', text: 'Account created! Redirecting...' });
 
-      await api.post('/payments/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      if (isAdmin) {
+        setTimeout(() => navigate('/admin'), 800);
+        return;
+      }
 
-      setMsg({ type: 'success', text: 'Registration successful! Welcome aboard.' });
+      try {
+        setStepMessage('Enrolling you in the course...');
+        const enrollRes = await api.post('/enrollments/', { course: Number(selectedCourseId) });
+        const enrollmentId = enrollRes.data?.id;
 
-      setTimeout(() => {
-        const role = regResult?.user?.role || 'student';
-        navigate(role.toLowerCase() === 'admin' ? '/admin' : '/dashboard');
-      }, 1800);
+        setStepMessage('Uploading payment proof...');
+        const formData = new FormData();
+        formData.append('enrollment_id', enrollmentId);
+        formData.append('proof_file', proofFile);
+        formData.append('full_name', form.full_name);
+        formData.append('email', form.email);
+        formData.append('phone', form.phone_number);
+        formData.append('bank_account_id', selectedBankId);
+        formData.append('user_account_number', userAccountNumber.trim());
+
+        await api.post('/payments/', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } catch (enrollErr) {
+        // Registration succeeded; enrollment/payment failure is secondary
+        console.error('Enrollment/payment error:', enrollErr);
+      }
+
+      setTimeout(() => navigate('/dashboard'), 800);
     } catch (err) {
       const errorData = err?.response?.data;
       let errorMessage = 'Something went wrong. Please try again.';
@@ -190,7 +238,7 @@ export default function Register() {
     }
   };
 
-  const canSubmit = currentStep === 3;
+  const canSubmit = currentStep === 4;
 
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#07090d] via-[#0a0e14] to-[#111827] text-white">
@@ -226,7 +274,7 @@ export default function Register() {
               </div>
             </div>
 
-            <div className="mb-8 grid gap-3 md:grid-cols-3">
+            <div className="mb-8 grid gap-3 md:grid-cols-4">
               {steps.map((step) => {
                 const active = currentStep === step.id;
                 const completed = currentStep > step.id;
@@ -276,8 +324,8 @@ export default function Register() {
                 >
                   {msg.type === 'success' ? <CheckCircle size={20} className="mt-0.5 shrink-0" /> : <AlertTriangle size={20} className="mt-0.5 shrink-0" />}
                   <span>{msg.text}</span>
-                </motion.div>
-              )}
+                  </motion.div>
+                )}
             </AnimatePresence>
 
             <form onSubmit={onSubmit} className="space-y-6">
@@ -324,24 +372,9 @@ export default function Register() {
                           </select>
                         </div>
                       </div>
-
-                      <label className={`group flex items-center gap-4 border-2 border-dashed p-5 transition hover:border-[#f89f29] md:col-span-2 ${proofFile ? 'border-green-400 bg-green-500/5' : 'border-white/10 bg-white/[0.03]'}`}>
-                        <Upload size={28} className="text-slate-400 transition-colors group-hover:text-[#f89f29]" />
-                        <div className="flex-1">
-                          <p className="font-medium text-white">{proofFile ? proofFile.name : 'Upload payment proof'}</p>
-                          <p className="text-xs text-slate-500">JPG, PNG or PDF • Max 5MB</p>
-                        </div>
-                        {proofFile && <CheckCircle size={24} className="text-green-500" />}
-                        <input
-                          type="file"
-                          accept="image/*,.pdf"
-                          className="hidden"
-                          onChange={(e) => e.target.files?.[0] && setProofFile(e.target.files[0])}
-                        />
-                      </label>
                     </div>
 
-                    <div className="grid gap-4 md:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2">
                       <div className="border border-white/10 bg-white/[0.03] p-4">
                         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Name</p>
                         <p className="mt-2 font-semibold text-white">{form.full_name || 'Not set'}</p>
@@ -350,13 +383,138 @@ export default function Register() {
                         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Course</p>
                         <p className="mt-2 font-semibold text-white">{selectedCourse?.title || 'Not selected'}</p>
                       </div>
-                      <div className="border border-white/10 bg-white/[0.03] p-4">
+                    </div>
+                  </motion.div>
+                )}
+
+                {currentStep === 4 && (
+                  <motion.div key="step-4" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} className="space-y-5">
+                    <div>
+                      <label className="mb-3 block text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Select Payment Account</label>
+                      <p className="mb-4 text-sm text-slate-400">Choose the bank account you will transfer to.</p>
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        {bankAccountsLoading ? (
+                          <div className="col-span-full flex items-center justify-center py-8">
+                            <Loader size={24} className="animate-spin text-[#f89f29]" />
+                            <span className="ml-3 text-sm text-slate-400">Loading payment accounts...</span>
+                          </div>
+                        ) : bankAccounts.length ? (
+                          bankAccounts.map((account) => {
+                            const isSelected = String(account.id) === String(selectedBankId);
+                            return (
+                              <button
+                                type="button"
+                                key={account.id}
+                                onClick={() => { setSelectedBankId(account.id); setUserAccountNumber(''); }}
+                                className={`relative overflow-hidden rounded-xl border p-4 text-left transition-all ${
+                                  isSelected
+                                    ? 'border-[#f89f29] bg-[#f89f29]/10 shadow-[0_0_20px_rgba(248,159,41,0.15)]'
+                                    : 'border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]'
+                                }`}
+                              >
+                                {isSelected && (
+                                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-[#f89f29]">
+                                    <Check size={12} className="text-white" />
+                                  </span>
+                                )}
+                                <div className="flex items-center gap-3 mb-3">
+                                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#f89f29]/10 text-[#f89f29]">
+                                    <Building2 size={18} />
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-white text-sm">{account.bank_name}</p>
+                                    <p className="text-[11px] text-slate-400">{account.account_holder_name}</p>
+                                  </div>
+                                </div>
+                                <div className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 font-mono text-sm font-bold text-white">
+                                  {account.account_number}
+                                </div>
+                                <div className="mt-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-2.5 py-1.5">
+                                  <p className="text-[10px] text-amber-400/80">
+                                    Transfer to this account and upload receipt as proof.
+                                  </p>
+                                </div>
+                              </button>
+                            );
+                          })
+                        ) : (
+                          <div className="col-span-full flex flex-col items-center justify-center py-10 text-slate-500">
+                            <Building2 size={36} className="mb-2 text-slate-600" />
+                            <p className="text-sm">No payment accounts are configured yet.</p>
+                            <p className="mt-1 text-xs text-slate-500">Contact the admin or check back later.</p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBankAccountsLoading(true);
+                                api.get('/bank-accounts/')
+                                  .then((res) => setBankAccounts(unwrapResults(res.data)))
+                                  .catch((err) => { console.error(err); setBankAccounts([]); })
+                                  .finally(() => setBankAccountsLoading(false));
+                              }}
+                              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-slate-300 hover:border-white/20 hover:bg-white/[0.08] transition-all"
+                            >
+                              <RefreshCw size={14} /> Retry
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {selectedBankId && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="rounded-xl border border-[#f89f29]/20 bg-[#f89f29]/5 p-4"
+                      >
+                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Your Account Number</label>
+                        <p className="mb-2 text-xs text-slate-400">
+                          Enter your own <span className="font-semibold text-[#f89f29]">{selectedBank?.bank_name}</span> account number for reference.
+                        </p>
+                        <input
+                          value={userAccountNumber}
+                          onChange={(e) => setUserAccountNumber(e.target.value)}
+                          placeholder="e.g. 1000 123456 789"
+                          className="w-full border border-white/10 bg-white/[0.04] py-3 px-4 text-base text-white outline-none transition focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 placeholder:text-slate-500"
+                        />
+                      </motion.div>
+                    )}
+
+                    <label className={`group flex cursor-pointer items-center gap-4 border-2 border-dashed p-5 transition hover:border-[#f89f29] ${proofFile ? 'border-green-400 bg-green-500/5' : 'border-white/10 bg-white/[0.03]'}`}>
+                      <Upload size={28} className="text-slate-400 transition-colors group-hover:text-[#f89f29]" />
+                      <div className="flex-1">
+                        <p className="font-medium text-white">{proofFile ? proofFile.name : 'Upload payment proof'}</p>
+                        <p className="text-xs text-slate-500">JPG, PNG or PDF • Max 5MB</p>
+                      </div>
+                      {proofFile && <CheckCircle size={24} className="text-green-500" />}
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        className="hidden"
+                        onChange={(e) => e.target.files?.[0] && setProofFile(e.target.files[0])}
+                      />
+                    </label>
+
+                    <div className="grid gap-4 md:grid-cols-4">
+                      <div className="border border-white/10 bg-white/[0.03] p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Name</p>
+                        <p className="mt-1 text-sm font-semibold text-white truncate">{form.full_name || '—'}</p>
+                      </div>
+                      <div className="border border-white/10 bg-white/[0.03] p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Course</p>
+                        <p className="mt-1 text-sm font-semibold text-white truncate">{selectedCourse?.title || '—'}</p>
+                      </div>
+                      <div className="border border-white/10 bg-white/[0.03] p-3">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Bank</p>
+                        <p className="mt-1 text-sm font-semibold text-white truncate">{selectedBank?.bank_name || '—'}</p>
+                      </div>
+                      <div className="border border-white/10 bg-white/[0.03] p-3">
                         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Proof</p>
-                        <p className="mt-2 font-semibold text-white">{proofFile ? 'Ready' : 'Missing'}</p>
+                        <p className="mt-1 text-sm font-semibold text-white">{proofFile ? 'Ready' : 'Missing'}</p>
                       </div>
                     </div>
                   </motion.div>
                 )}
+
               </AnimatePresence>
 
               <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">

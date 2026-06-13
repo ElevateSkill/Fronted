@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, BarChart3, BookOpen, CheckCircle, Clock, CreditCard, Edit3, FileText,
+  ArrowLeft, BarChart3, BookOpen, Building2, CheckCircle, Clock, CreditCard, Edit3, FileText,
   GraduationCap, HelpCircle, Image, Loader, LogOut, Megaphone, Menu,
   Newspaper, Plus, RefreshCw, Save, Search, Settings, Star, Tags, Trash2,
   User, UserPlus, Users, X, XCircle, AlertTriangle, Shield
@@ -65,6 +65,7 @@ const emptyUser = {
   username: '',
   email: '',
   full_name: '',
+  phone_number: '',
   password: '',
   role: '',
   is_active: true,
@@ -89,18 +90,18 @@ function Badge({ children }) {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">{label}</span>
+      <span className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">{label}</span>
       {children}
     </label>
   );
 }
 
 function TextInput(props) {
-  return <input {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
+  return <input {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function TextArea(props) {
-  return <textarea {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
+  return <textarea {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-500 dark:placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function Select(props) {
@@ -168,16 +169,21 @@ function StatCard({ label, value, icon: Icon, tone = 'red' }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className={`rounded-xl border ${t.cardBorder} bg-gradient-to-br ${t.gradient} p-5 shadow-sm hover:shadow-md transition-all duration-300`}
+      whileHover={{ y: -3, transition: { duration: 0.2 } }}
+      className={`group relative overflow-hidden rounded-xl border ${t.cardBorder} bg-white dark:bg-surface p-5 shadow-sm hover:shadow-md transition-all duration-300`}
     >
-      <div className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border ${t.border} ${t.bg}`}>
-        <Icon size={22} className={t.text} />
+      <div className={`absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r ${t.gradient.replace('from-', 'from-').replace(' via-surface to-surface', '')}`} />
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-3xl font-black text-gray-900 dark:text-white">
+            <AnimatedCounter value={value} />
+          </p>
+          <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">{label}</p>
+        </div>
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${t.bg} ${t.border}`}>
+          <Icon size={20} className={t.text} />
+        </div>
       </div>
-      <p className="text-3xl font-black text-gray-900 dark:text-white">
-        <AnimatedCounter value={value} />
-      </p>
-      <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">{label}</p>
     </motion.div>
   );
 }
@@ -304,6 +310,16 @@ export default function AdminDashboard() {
    const [confirmDelete, setConfirmDelete] = useState({ open: false, action: null });
    const [mobileSidebar, setMobileSidebar] = useState(false);
    const [userRoleFilter, setUserRoleFilter] = useState('student');
+   const [paymentStatusFilter, setPaymentStatusFilter] = useState('all');
+   const [paymentSearch, setPaymentSearch] = useState('');
+   const [selectedPayment, setSelectedPayment] = useState(null);
+   const [showPaymentModal, setShowPaymentModal] = useState(false);
+   const [showManualPayment, setShowManualPayment] = useState(false);
+   const [manualPayment, setManualPayment] = useState({ student_name: '', email: '', course_title: '', amount: '', phone: '' });
+   const [bankAccounts, setBankAccounts] = useState([]);
+   const [showBankModal, setShowBankModal] = useState(false);
+   const [editingBankId, setEditingBankId] = useState(null);
+   const [bankForm, setBankForm] = useState({ bank_name: '', account_holder_name: '', account_number: '', is_active: true });
 
   const showToast = (message, type = 'success') => setToast({ message, type });
   const closeToast = () => setToast({ message: '', type: 'success' });
@@ -313,7 +329,7 @@ export default function AdminDashboard() {
      try {
        const [
          dashboardRes, coursesRes, categoriesRes, paymentsRes, announcementsRes, newsRes,
-         heroRes, aboutRes, settingsRes, testimonialsRes, faqsRes, homepageRes,
+         heroRes, aboutRes, settingsRes, testimonialsRes, faqsRes, homepageRes, bankRes,
        ] = await Promise.all([
          api.get('/admin/dashboard/'),
          api.get('/admin/courses/'),
@@ -327,6 +343,7 @@ export default function AdminDashboard() {
          api.get('/admin/testimonials/'),
          api.get('/admin/faqs/'),
          api.get('/homepage/'),
+         api.get('/bank-accounts/'),
        ]);
        setMetrics(dashboardRes.data || emptyMetrics);
        setCourses(unwrapResults(coursesRes.data));
@@ -341,6 +358,7 @@ export default function AdminDashboard() {
        setAboutForm({ ...emptyAbout, ...aboutRes.data, image: null });
        setSettingsForm({ ...emptySettings, ...settingsRes.data });
        buildUserList(dashboardRes.data, unwrapResults(paymentsRes.data));
+       setBankAccounts(unwrapResults(bankRes.data));
      } catch (err) {
        showToast(apiError(err, 'Could not load admin dashboard data.'), 'error');
      } finally {
@@ -380,6 +398,21 @@ export default function AdminDashboard() {
          });
        }
      });
+     if (user) {
+       const adminKey = user.email || user.username;
+       if (adminKey && !map.has(adminKey)) {
+         map.set(adminKey, {
+           id: 'current_admin',
+           username: user.username || '',
+           email: user.email || '',
+           full_name: user.full_name || '',
+           role: 'admin',
+           phone_number: user.phone_number || '',
+           is_active: true,
+           created_at: user.created_at || '',
+         });
+       }
+     }
      const apiUsers = Array.from(map.values());
      const localUsers = (users || []).filter((u) => String(u.id).startsWith('local_'));
      setUsers([...apiUsers, ...localUsers]);
@@ -388,14 +421,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadAdminData();
   }, []);
-
-  useEffect(() => {
-    if (!loading) {
-      const published = announcements.filter(a => a.is_published);
-      localStorage.setItem('elevateskill_public_announcements', JSON.stringify(published));
-      window.dispatchEvent(new Event('announcements-updated'));
-    }
-  }, [announcements, loading]);
 
   useEffect(() => {
     if (mobileSidebar) document.body.style.overflow = 'hidden';
@@ -414,6 +439,22 @@ export default function AdminDashboard() {
   }, [courses, query]);
 
   const pendingPayments = payments.filter((payment) => payment.status === 'pending');
+
+  const filteredPayments = useMemo(() => {
+    let result = payments;
+    if (paymentStatusFilter !== 'all') {
+      result = result.filter((p) => p.status === paymentStatusFilter);
+    }
+    const needle = paymentSearch.trim().toLowerCase();
+    if (needle) {
+      result = result.filter((p) =>
+        [p.full_name, p.student_username, p.email, p.course_title, p.phone]
+          .filter(Boolean)
+          .some((val) => val.toLowerCase().includes(needle))
+      );
+    }
+    return result;
+  }, [payments, paymentStatusFilter, paymentSearch]);
 
   const runSave = async (work, successText) => {
     setSaving(true);
@@ -569,6 +610,7 @@ export default function AdminDashboard() {
        username: user.username || '',
        email: user.email || '',
        full_name: user.full_name || '',
+       phone_number: user.phone_number || '',
        password: '',
        role: user.role || '',
        is_active: Boolean(user.is_active),
@@ -581,18 +623,28 @@ export default function AdminDashboard() {
        const payload = { ...userForm };
        if (editingUserId) {
          setUsers((prev) => prev.map((u) =>
-           u.id === editingUserId ? { ...u, username: payload.username, email: payload.email, full_name: payload.full_name, role: payload.role || u.role, is_active: payload.is_active } : u
+           u.id === editingUserId ? {
+             ...u,
+             username: payload.username,
+             email: payload.email,
+             full_name: payload.full_name,
+             phone_number: payload.phone_number || u.phone_number,
+             role: payload.role || u.role,
+             is_active: payload.is_active,
+           } : u
          ));
        } else {
-         const res = await api.post('/auth/register/', {
+         const regPayload = {
            username: payload.username,
            email: payload.email,
            password: payload.password,
            full_name: payload.full_name,
            role: payload.role || 'student',
-         });
+         };
+         if (payload.phone_number) regPayload.phone_number = payload.phone_number;
+         const res = await api.post('/auth/register/', regPayload);
          const created = res.data?.user || res.data;
-         setUsers((prev) => [{ ...created, id: `local_${created.id || Date.now()}` }, ...prev]);
+         setUsers((prev) => [{ ...created, id: `user_${created.id || Date.now()}` }, ...prev]);
        }
        resetUserForm();
      }, editingUserId ? 'User updated.' : 'User created.');
@@ -691,6 +743,56 @@ export default function AdminDashboard() {
     }, 'FAQ deleted.'));
   };
 
+  const resetBankForm = () => {
+    setBankForm({ bank_name: '', account_holder_name: '', account_number: '', is_active: true });
+    setEditingBankId(null);
+  };
+
+  const editBank = (account) => {
+    setEditingBankId(account.id);
+    setBankForm({
+      bank_name: account.bank_name || '',
+      account_holder_name: account.account_holder_name || '',
+      account_number: account.account_number || '',
+      is_active: account.is_active !== undefined ? account.is_active : true,
+    });
+    setShowBankModal(true);
+  };
+
+  const saveBank = (event) => {
+    event.preventDefault();
+    runSave(async () => {
+      const payload = { ...bankForm };
+      if (editingBankId) {
+        const res = await api.put(`/admin/bank-accounts/${editingBankId}/update/`, payload);
+        setBankAccounts((prev) => prev.map((a) => (a.id === editingBankId ? res.data : a)));
+      } else {
+        const res = await api.post('/admin/bank-accounts/create/', payload);
+        setBankAccounts((prev) => [res.data, ...prev]);
+      }
+      resetBankForm();
+    }, editingBankId ? 'Bank account updated.' : 'Bank account created.');
+  };
+
+  const toggleBankStatus = async (account) => {
+    runSave(async () => {
+      const res = await api.put(`/admin/bank-accounts/${account.id}/update/`, {
+        bank_name: account.bank_name,
+        account_holder_name: account.account_holder_name,
+        account_number: account.account_number,
+        is_active: !account.is_active,
+      });
+      setBankAccounts((prev) => prev.map((a) => (a.id === account.id ? res.data : a)));
+    }, account.is_active ? 'Bank account deactivated.' : 'Bank account activated.');
+  };
+
+  const deleteBank = (id) => {
+    confirmThen(() => runSave(async () => {
+      await api.delete(`/admin/bank-accounts/${id}/delete/`);
+      setBankAccounts((prev) => prev.filter((a) => a.id !== id));
+    }, 'Bank account deleted.'));
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -698,56 +800,65 @@ export default function AdminDashboard() {
 
   const sidebarContent = (
     <div className="flex h-full flex-col">
-      <div className="mb-6 sm:mb-8 flex items-center gap-3">
-        <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center overflow-hidden rounded-xl bg-surface shadow-lg shadow-black/10 ring-1 ring-white/10">
-          <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-lg bg-gradient-to-br from-[#15c8fb] to-[#f89f29] flex items-center justify-center text-white text-[10px] font-black">ES</div>
+      <div className="mb-8 flex items-center gap-3 px-1">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] shadow-lg shadow-[#15c8fb]/20">
+          <span className="text-sm font-black text-white">ES</span>
         </div>
         <div className="min-w-0">
-          <p className="font-black text-white text-sm sm:text-base truncate">ElevateSkill</p>
-          <p className="text-[11px] sm:text-xs font-medium text-gray-400">Admin dashboard</p>
+          <p className="truncate text-sm font-black text-white">ElevateSkill</p>
+          <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-white/60">Admin panel</p>
         </div>
       </div>
-      <nav className="flex-1 space-y-1">
-        {tabs.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
-            className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 sm:py-2.5 text-sm font-bold transition-all duration-200 ${
-              activeTab === id
-                ? 'bg-[#15c8fb]/10 text-white'
-                : 'text-white/60 hover:bg-white/5 hover:text-white'
-            }`}
-          >
-            {activeTab === id && (
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-gradient-to-b from-[#15c8fb] to-[#f89f29]" />
-            )}
-            <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${
-              activeTab === id ? 'bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-white shadow-sm' : ''
-            }`}>
-              <Icon size={16} />
-            </span>
-            <span className="flex-1 text-left">{label}</span>
-            {id === 'payments' && pendingPayments.length > 0 && (
-              <span className="rounded-full bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-2 py-0.5 text-[10px] font-black text-white shadow-sm">{pendingPayments.length}</span>
-            )}
-          </button>
-        ))}
+
+      <nav className="flex-1 space-y-0.5">
+        {tabs.map(({ id, label, icon: Icon }) => {
+          const isActive = activeTab === id;
+          return (
+            <button
+              key={id}
+              onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
+              className={`relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold transition-all duration-200 ${
+                isActive
+                  ? 'bg-gradient-to-r from-[#15c8fb]/15 to-transparent text-white'
+                  : 'text-white/80 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              {isActive && (
+                <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-[#15c8fb]" />
+              )}
+              <span className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200 ${
+                isActive
+                  ? 'bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-white shadow-sm shadow-[#15c8fb]/30'
+                  : 'text-white/60'
+              }`}>
+                <Icon size={15} />
+              </span>
+              <span className="flex-1 text-left">{label}</span>
+              {id === 'payments' && pendingPayments.length > 0 && (
+                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-1.5 text-[10px] font-black text-white shadow-sm shadow-[#15c8fb]/20">
+                  {pendingPayments.length}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </nav>
-      <div className="mt-4 border-t border-white/10 pt-4">
+
+      <div className="mt-6 border-t border-white/[0.06] pt-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white shadow-sm">
             {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-bold text-white">{user?.full_name || user?.username || 'Admin'}</p>
-            <p className="truncate text-[11px] font-medium text-gray-400 capitalize">{user?.role || 'admin'}</p>
+            <p className="truncate text-[11px] font-medium text-white/60 capitalize">{user?.role || 'admin'}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-all"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all"
             title="Logout"
           >
-            <LogOut size={16} />
+            <LogOut size={15} />
           </button>
         </div>
       </div>
@@ -759,7 +870,7 @@ export default function AdminDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-xl border p-6 shadow-sm bg-gradient-to-br from-[#15c8fb]/5 via-surface to-[#15c8fb]/5 border-[#15c8fb]/20"
+        className="relative overflow-hidden rounded-xl border border-[#15c8fb]/15 bg-white dark:bg-[#0d1117] p-6 shadow-sm"
       >
         <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#15c8fb]/10 to-transparent blur-3xl" />
         <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#15c8fb]/10 to-transparent blur-3xl" />
@@ -805,27 +916,27 @@ export default function AdminDashboard() {
         className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
         <h2 className="mb-4 text-lg font-black text-gray-900 dark:text-white">Recent enrollments</h2>
-        <div className="overflow-x-auto rounded-lg border border-gray-100">
+        <div className="overflow-x-auto rounded-lg border border-gray-200/50 dark:border-white/10">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
-              <tr className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+              <tr className="bg-gray-100 dark:bg-white/[0.08] text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 <th className="px-4 py-3.5 font-bold">Student</th>
                 <th className="px-4 py-3.5 font-bold">Course</th>
                 <th className="px-4 py-3.5 font-bold">Status</th>
                 <th className="px-4 py-3.5 font-bold">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/10">
                {metrics.recent_enrollments?.map((item) => (
-                <tr key={item.id} className="transition-colors hover:bg-gray-50">
+                <tr key={item.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.03]">
                   <td className="px-4 py-3.5 font-semibold text-gray-900 dark:text-white">{item.student_full_name || item.student_username}</td>
-                  <td className="px-4 py-3.5 text-gray-600">{item.course_title}</td>
+                  <td className="px-4 py-3.5 text-gray-700 dark:text-gray-300">{item.course_title}</td>
                   <td className="px-4 py-3.5"><Badge>{item.status}</Badge></td>
-                  <td className="px-4 py-3.5 text-gray-500">{formatDate(item.enrolled_at)}</td>
+                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-400">{formatDate(item.enrolled_at)}</td>
                 </tr>
               ))}
               {!metrics.recent_enrollments?.length && (
-                <tr><td colSpan="4" className="px-4 py-10 text-center text-sm text-gray-500">No enrollments recorded yet.</td></tr>
+                <tr><td colSpan="4" className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">No enrollments recorded yet.</td></tr>
               )}
             </tbody>
           </table>
@@ -846,7 +957,7 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-black text-gray-900 dark:text-white">Course management</h2>
             <p className="text-sm text-gray-500">Create, edit, publish, hide, and manage course content.</p>
           </div>
-          <label className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-2.5 text-sm text-gray-500 dark:text-gray-400 transition-all duration-200 focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
+          <label className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-2.5 text-sm text-gray-600 dark:text-gray-300 transition-all duration-200 focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
             <Search size={16} className="shrink-0" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search courses..." className="w-full bg-transparent outline-none" />
           </label>
@@ -892,8 +1003,8 @@ export default function AdminDashboard() {
             </motion.article>
           ))}
           {!filteredCourses.length && (
-              <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-400">
-              <BookOpen size={48} className="mb-3 opacity-30" />
+              <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-500">
+              <BookOpen size={48} className="mb-3 text-gray-300" />
               <p className="text-sm">No courses found</p>
             </div>
           )}
@@ -989,7 +1100,7 @@ export default function AdminDashboard() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-black text-gray-900 dark:text-white">{cat.name}</h3>
-                    <p className="mt-0.5 text-xs text-gray-500">/{cat.slug} &middot; {count} course{count !== 1 ? 's' : ''}</p>
+                    <p className="mt-0.5 text-xs text-gray-600 dark:text-gray-400">/{cat.slug} &middot; {count} course{count !== 1 ? 's' : ''}</p>
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <button onClick={() => { setEditingCategory(cat); setCategoryName(cat.name); }} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">Edit</button>
@@ -1001,7 +1112,7 @@ export default function AdminDashboard() {
           })}
           {!categories.length && (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
-              <Tags size={40} className="mb-2 opacity-30" />
+              <Tags size={40} className="mb-2 text-gray-300" />
               <p className="text-sm">No categories created yet</p>
             </div>
           )}
@@ -1010,76 +1121,519 @@ export default function AdminDashboard() {
     </div>
   );
 
-  const renderPayments = () => (
-    <motion.section
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
-    >
-      <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-lg font-black text-gray-900 dark:text-white">Payment review</h2>
-        <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">{pendingPayments.length} pending</span>
-      </div>
-      <div className="overflow-x-auto rounded-lg border border-gray-100">
-        <table className="w-full min-w-[900px] text-left text-sm">
-          <thead>
-            <tr className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
-              <th className="px-4 py-3.5 font-bold">Student</th>
-              <th className="px-4 py-3.5 font-bold">Course</th>
-              <th className="px-4 py-3.5 font-bold">Contact</th>
-              <th className="px-4 py-3.5 font-bold">Proof</th>
-              <th className="px-4 py-3.5 font-bold">Status</th>
-              <th className="px-4 py-3.5 font-bold">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {payments.map((payment) => (
-              <tr key={payment.id} className="transition-colors hover:bg-gray-50">
-                <td className="px-4 py-3.5">
-                  <p className="font-semibold text-gray-900 dark:text-white">{payment.full_name || payment.student_username}</p>
-                  <p className="text-xs text-gray-500">{formatDate(payment.submitted_at)}</p>
-                </td>
-                <td className="px-4 py-3.5 text-gray-600">{payment.course_title}</td>
-                <td className="px-4 py-3.5 text-gray-500">
-                  <p>{payment.email}</p>
-                  <p className="text-xs">{payment.phone}</p>
-                </td>
-                <td className="px-4 py-3.5">
-                  {payment.proof_file ? (
-                    <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg bg-[#15c8fb]/10 px-3 py-1.5 font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/20 text-xs">
-                      <FileText size={14} /> View proof
-                    </a>
-                  ) : <span className="text-gray-500">No file</span>}
-                </td>
-                <td className="px-4 py-3.5"><Badge>{payment.status}</Badge></td>
-                <td className="px-4 py-3.5">
-                  <div className="flex gap-2">
-                    <button
-                      disabled={saving || payment.status !== 'pending'}
-                      onClick={() => updatePayment(payment, 'approve')}
-                      className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      disabled={saving || payment.status !== 'pending'}
-                      onClick={() => updatePayment(payment, 'reject')}
-                      className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-rose-700 disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </td>
+  const renderPayments = () => {
+    const statusCounts = {
+      all: payments.length,
+      pending: pendingPayments.length,
+      approved: payments.filter((p) => p.status === 'approved').length,
+      rejected: payments.filter((p) => p.status === 'rejected').length,
+    };
+    const total = statusCounts.all || 1;
+    return (
+    <div className="space-y-6">
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid gap-4 sm:grid-cols-4"
+      >
+        <div className="rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-500/5 via-surface to-surface p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-3xl font-black text-amber-400"><AnimatedCounter value={statusCounts.pending} /></p>
+            <span className="text-xs text-amber-500/80 font-bold">{Math.round(statusCounts.pending/total*100)}%</span>
+          </div>
+          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-amber-500 rounded-full" style={{width:`${statusCounts.pending/total*100}%`}} /></div>
+          <p className="mt-2 text-sm font-medium text-gray-600">Pending</p>
+        </div>
+        <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-surface to-surface p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-3xl font-black text-emerald-400"><AnimatedCounter value={statusCounts.approved} /></p>
+            <span className="text-xs text-emerald-500/80 font-bold">{Math.round(statusCounts.approved/total*100)}%</span>
+          </div>
+          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width:`${statusCounts.approved/total*100}%`}} /></div>
+          <p className="mt-2 text-sm font-medium text-gray-600">Approved</p>
+        </div>
+        <div className="rounded-xl border border-rose-500/20 bg-gradient-to-br from-rose-500/5 via-surface to-surface p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-3xl font-black text-rose-400"><AnimatedCounter value={statusCounts.rejected} /></p>
+            <span className="text-xs text-rose-500/80 font-bold">{Math.round(statusCounts.rejected/total*100)}%</span>
+          </div>
+          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-rose-500 rounded-full" style={{width:`${statusCounts.rejected/total*100}%`}} /></div>
+          <p className="mt-2 text-sm font-medium text-gray-600">Rejected</p>
+        </div>
+        <div className="rounded-xl border border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-surface to-surface p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-3xl font-black text-[#15c8fb]"><AnimatedCounter value={statusCounts.all} /></p>
+            <span className="text-xs text-[#15c8fb]/80 font-bold">100%</span>
+          </div>
+          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-[#15c8fb] rounded-full" style={{width:'100%'}} /></div>
+          <p className="mt-2 text-sm font-medium text-gray-600">Total Payments</p>
+        </div>
+      </motion.div>
+
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
+      >
+        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <h2 className="text-lg font-black text-gray-900 dark:text-white">Payment review</h2>
+            <span className="hidden sm:inline-flex rounded-full bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 border border-amber-500/20">
+              {pendingPayments.length} pending
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setShowManualPayment(true)}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-3.5 py-2 text-xs font-black text-white hover:brightness-110 transition-all"
+            >
+              <Plus size={14} /> Add Manual
+            </button>
+            <label className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 px-3 py-2 text-sm text-gray-500 transition-all focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
+              <Search size={15} className="shrink-0" />
+              <input
+                value={paymentSearch}
+                onChange={(e) => setPaymentSearch(e.target.value)}
+                placeholder="Search name, email, course..."
+                className="w-full min-w-[180px] bg-transparent outline-none text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="mb-4 flex flex-wrap gap-2 border-b border-gray-100 dark:border-white/10 pb-3">
+          {['all', 'pending', 'approved', 'rejected'].map((status) => (
+            <button
+              key={status}
+              onClick={() => setPaymentStatusFilter(status)}
+              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
+                paymentStatusFilter === status
+                  ? 'bg-[#15c8fb] text-white shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
+              }`}
+            >
+              {status === 'all' ? `All (${statusCounts.all})` : `${status} (${statusCounts[status]})`}
+            </button>
+          ))}
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-white/5">
+          <table className="w-full min-w-[1000px] text-left text-sm">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-white/[0.08] text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                <th className="px-4 py-3.5 font-bold">Student</th>
+                <th className="px-4 py-3.5 font-bold">Course</th>
+                <th className="px-4 py-3.5 font-bold">Contact</th>
+                <th className="px-4 py-3.5 font-bold">Method</th>
+                <th className="px-4 py-3.5 font-bold">Proof</th>
+                <th className="px-4 py-3.5 font-bold">Date</th>
+                <th className="px-4 py-3.5 font-bold">Status</th>
+                <th className="px-4 py-3.5 font-bold">Actions</th>
               </tr>
-            ))}
-            {!payments.length && (
-              <tr><td colSpan="6" className="px-4 py-12 text-center text-sm text-gray-500">No payment submissions yet.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </motion.section>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+              {filteredPayments.map((payment) => (
+                <tr
+                  key={payment.id}
+                  className="transition-colors hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer"
+                  onClick={() => { setSelectedPayment(payment); setShowPaymentModal(true); }}
+                >
+                  <td className="px-4 py-3.5">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white">
+                        {(payment.full_name || payment.student_username || '?').charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">{payment.full_name || payment.student_username}</p>
+                        <p className="text-xs text-gray-500">@{payment.student_username || '—'}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300 max-w-[180px] truncate" title={payment.course_title}>
+                    {payment.course_title || '—'}
+                  </td>
+                  <td className="px-4 py-3.5 text-gray-500 text-xs">
+                    <p>{payment.email || '—'}</p>
+                    <p className="text-gray-500">{payment.phone || '—'}</p>
+                  </td>
+                  <td className="px-4 py-3.5 text-xs text-gray-500">
+                    {payment.payment_method || '—'}
+                  </td>
+                  <td className="px-4 py-3.5">
+                    {payment.proof_file ? (
+                      <a
+                        href={getMediaUrl(payment.proof_file)}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#15c8fb]/10 px-3 py-1.5 font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/20 text-xs"
+                      >
+                        <FileText size={13} /> View
+                      </a>
+                    ) : <span className="text-gray-400 text-xs">—</span>}
+                  </td>
+                  <td className="px-4 py-3.5 text-xs text-gray-500 whitespace-nowrap">
+                    {formatDate(payment.submitted_at)}
+                  </td>
+                  <td className="px-4 py-3.5"><Badge>{payment.status}</Badge></td>
+                  <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex gap-1.5">
+                      <button
+                        disabled={saving || payment.status !== 'pending'}
+                        onClick={() => updatePayment(payment, 'approve')}
+                        className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-emerald-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Approve payment"
+                      >
+                        <CheckCircle size={14} />
+                      </button>
+                      <button
+                        disabled={saving || payment.status !== 'pending'}
+                        onClick={() => updatePayment(payment, 'reject')}
+                        className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-rose-700 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Reject payment"
+                      >
+                        <XCircle size={14} />
+                      </button>
+                      <button
+                        onClick={() => confirmThen(() => {
+                          setPayments((prev) => prev.filter((p) => p.id !== payment.id));
+                          showToast('Payment record removed.', 'success');
+                        })}
+                        className="rounded-lg border border-rose-500/30 px-2 py-2 text-xs font-bold text-rose-500 transition-all hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                        title="Delete record"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {!filteredPayments.length && (
+                <tr>
+                  <td colSpan="8" className="px-4 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+                      <CreditCard size={40} className="mb-3 text-gray-300" />
+                      <p className="text-sm font-medium">
+                        {paymentSearch || paymentStatusFilter !== 'all'
+                          ? 'No payments match your filter.'
+                          : 'No payment submissions yet.'}
+                      </p>
+                      {(paymentSearch || paymentStatusFilter !== 'all') && (
+                        <button
+                          onClick={() => { setPaymentSearch(''); setPaymentStatusFilter('all'); }}
+                          className="mt-3 text-xs font-bold text-[#15c8fb] hover:underline"
+                        >
+                          Clear filters
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+          <span>Showing {filteredPayments.length} of {payments.length} payments</span>
+          <span className="hidden sm:inline">Click any row for details · Approve to activate enrollment</span>
+        </div>
+      </motion.section>
+
+      {/* Payment Detail Modal */}
+      <AnimatePresence>
+        {showPaymentModal && selectedPayment && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPaymentModal(false)}
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className="relative w-full max-w-lg rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-2xl">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white">Payment Details</h3>
+                  <button onClick={() => setShowPaymentModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 hover:text-gray-900 dark:hover:text-white">
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 pb-4 border-b border-gray-100 dark:border-white/10">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xl font-black text-white">
+                      {(selectedPayment.full_name || selectedPayment.student_username || '?').charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-black text-gray-900 dark:text-white text-lg">{selectedPayment.full_name || selectedPayment.student_username}</p>
+                      <p className="text-sm text-gray-500">@{selectedPayment.student_username || '—'}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div><span className="text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Email</span><p className="mt-1 text-gray-900 dark:text-white">{selectedPayment.email || '—'}</p></div>
+                    <div><span className="text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Phone</span><p className="mt-1 text-gray-900 dark:text-white">{selectedPayment.phone || '—'}</p></div>
+                    <div><span className="text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Course</span><p className="mt-1 text-gray-900 dark:text-white">{selectedPayment.course_title || '—'}</p></div>
+                    <div><span className="text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Method</span><p className="mt-1 text-gray-900 dark:text-white">{selectedPayment.payment_method || '—'}</p></div>
+                    <div><span className="text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Status</span><div className="mt-1"><Badge>{selectedPayment.status}</Badge></div></div>
+                    <div><span className="text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Submitted</span><p className="mt-1 text-gray-900 dark:text-white">{formatDate(selectedPayment.submitted_at)}</p></div>
+                  </div>
+                  {selectedPayment.proof_file && (
+                    <div className="pt-4 border-t border-gray-100 dark:border-white/10">
+                      <a href={getMediaUrl(selectedPayment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl bg-[#15c8fb]/10 px-4 py-2.5 text-sm font-bold text-[#15c8fb] hover:bg-[#15c8fb]/20 transition-all">
+                        <FileText size={16} /> View Payment Proof
+                      </a>
+                    </div>
+                  )}
+                  {selectedPayment.status === 'pending' && (
+                    <div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-white/10">
+                      <button
+                        disabled={saving}
+                        onClick={() => { updatePayment(selectedPayment, 'approve'); setShowPaymentModal(false); }}
+                        className="flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white hover:bg-emerald-700 transition-all disabled:opacity-50"
+                      >
+                        <CheckCircle size={16} className="inline mr-2" />Approve
+                      </button>
+                      <button
+                        disabled={saving}
+                        onClick={() => { updatePayment(selectedPayment, 'reject'); setShowPaymentModal(false); }}
+                        className="flex-1 rounded-xl bg-rose-600 px-4 py-3 text-sm font-black text-white hover:bg-rose-700 transition-all disabled:opacity-50"
+                      >
+                        <XCircle size={16} className="inline mr-2" />Reject
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Manual Payment Modal */}
+      <AnimatePresence>
+        {showManualPayment && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowManualPayment(false)}
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className="relative w-full max-w-md rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-2xl">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white">Add Manual Payment</h3>
+                  <button onClick={() => setShowManualPayment(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400">
+                    <X size={18} />
+                  </button>
+                </div>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  const newPayment = {
+                    id: `manual_${Date.now()}`,
+                    full_name: manualPayment.student_name,
+                    email: manualPayment.email,
+                    course_title: manualPayment.course_title,
+                    phone: manualPayment.phone,
+                    status: 'approved',
+                    payment_method: 'Manual Entry',
+                    proof_file: null,
+                    submitted_at: new Date().toISOString(),
+                    student_username: manualPayment.student_name?.toLowerCase().replace(/\s/g, '_'),
+                  };
+                  setPayments((prev) => [newPayment, ...prev]);
+                  setManualPayment({ student_name: '', email: '', course_title: '', amount: '', phone: '' });
+                  setShowManualPayment(false);
+                  showToast('Manual payment record created.', 'success');
+                }} className="space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Student Name</label>
+                    <input required value={manualPayment.student_name} onChange={(e) => setManualPayment({...manualPayment, student_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Full name" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Email</label>
+                      <input required type="email" value={manualPayment.email} onChange={(e) => setManualPayment({...manualPayment, email: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Email" />
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Phone</label>
+                      <input value={manualPayment.phone} onChange={(e) => setManualPayment({...manualPayment, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Phone" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Course</label>
+                    <input required value={manualPayment.course_title} onChange={(e) => setManualPayment({...manualPayment, course_title: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Course name" />
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button type="submit" className="flex-1 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all">
+                      <Plus size={16} className="inline mr-2" />Create Record
+                    </button>
+                    <button type="button" onClick={() => setShowManualPayment(false)} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Bank Accounts Section */}
+      <motion.section
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-black text-gray-900 dark:text-white">Payment Accounts</h2>
+            <p className="text-sm text-gray-500">Manage bank accounts for student payments</p>
+          </div>
+          <button
+            onClick={() => { resetBankForm(); setShowBankModal(true); }}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-2.5 text-xs font-black text-white hover:brightness-110 transition-all"
+          >
+            <Plus size={14} /> Add Account
+          </button>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {bankAccounts.map((account) => (
+            <div key={account.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-5 shadow-sm hover:shadow-md transition-all">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#15c8fb]/10 text-[#15c8fb]">
+                    <Building2 size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 dark:text-white text-sm">{account.bank_name}</h3>
+                    <p className="text-[11px] text-gray-500">{account.account_holder_name}</p>
+                  </div>
+                </div>
+                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                  account.is_active ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-gray-200 text-gray-700 border border-gray-300'
+                }`}>
+                  {account.is_active ? 'Active' : 'Inactive'}
+                </span>
+              </div>
+              <div className="mb-3">
+                <p className="text-[9px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-1">Account Number</p>
+                <div className="rounded-lg bg-white dark:bg-charcoal border border-gray-200 dark:border-white/10 px-3 py-2 font-mono text-sm font-bold text-gray-900 dark:text-white">
+                  {account.account_number}
+                </div>
+              </div>
+              <div className="rounded-lg bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 p-2.5 mb-3">
+                <p className="text-[10px] leading-relaxed text-amber-700 dark:text-amber-400">
+                  Transfer to this account and upload receipt as proof of payment.
+                </p>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-white/10">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <div
+                    onClick={() => toggleBankStatus(account)}
+                    className={`relative h-4 w-8 rounded-full transition-colors ${
+                      account.is_active ? 'bg-[#15c8fb]' : 'bg-gray-300 dark:bg-white/20'
+                    }`}
+                  >
+                    <div className={`absolute top-0.5 left-0.5 h-3 w-3 rounded-full bg-white shadow-sm transition-transform ${
+                      account.is_active ? 'translate-x-4' : 'translate-x-0'
+                    }`} />
+                  </div>
+                  <span className="text-[10px] font-semibold text-gray-500">Active</span>
+                </label>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => editBank(account)} className="rounded-lg p-1.5 text-gray-500 hover:text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all" title="Edit">
+                    <Edit3 size={13} />
+                  </button>
+                  <button onClick={() => deleteBank(account.id)} className="rounded-lg p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all" title="Delete">
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+          {!bankAccounts.length && (
+            <div className="col-span-full flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
+              <Building2 size={36} className="mb-2 text-gray-300" />
+              <p className="text-sm">No payment accounts configured.</p>
+              <button onClick={() => { resetBankForm(); setShowBankModal(true); }} className="mt-3 text-xs font-bold text-[#15c8fb] hover:underline">Add one now</button>
+            </div>
+          )}
+        </div>
+      </motion.section>
+
+      {/* Bank Account Modal */}
+      <AnimatePresence>
+        {showBankModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => { setShowBankModal(false); resetBankForm(); }}
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className="relative w-full max-w-md rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-2xl">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white">
+                    {editingBankId ? 'Edit Payment Account' : 'Add Payment Account'}
+                  </h3>
+                  <button onClick={() => { setShowBankModal(false); resetBankForm(); }} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-400">
+                    <X size={18} />
+                  </button>
+                </div>
+                <form onSubmit={(e) => { saveBank(e); setShowBankModal(false); }} className="space-y-4">
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Bank Name</label>
+                    <input required value={bankForm.bank_name} onChange={(e) => setBankForm({...bankForm, bank_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="e.g. Commercial Bank of Ethiopia" />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Account Holder</label>
+                    <input required value={bankForm.account_holder_name} onChange={(e) => setBankForm({...bankForm, account_holder_name: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="e.g. Amanuel Abraham" />
+                  </div>
+                  <div>
+                    <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Account Number</label>
+                    <input required value={bankForm.account_number} onChange={(e) => setBankForm({...bankForm, account_number: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Account number" />
+                  </div>
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+                    <input type="checkbox" checked={bankForm.is_active} onChange={(e) => setBankForm({...bankForm, is_active: e.target.checked})} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" />
+                    Active
+                  </label>
+                  <div className="flex gap-3 pt-2">
+                    <button type="submit" disabled={saving} className="flex-1 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60">
+                      {saving ? <Loader className="animate-spin inline mr-2" size={16} /> : <Save size={16} className="inline mr-2" />}
+                      {editingBankId ? 'Update' : 'Create'}
+                    </button>
+                    <button type="button" onClick={() => { setShowBankModal(false); resetBankForm(); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
   );
+  };
 
   const renderAnnouncements = () => (
     <div className="grid gap-6 xl:grid-cols-2">
@@ -1149,7 +1703,7 @@ export default function AdminDashboard() {
             ))}
             {!announcements.length && (
               <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
-                <Megaphone size={36} className="mb-2 opacity-30" />
+                <Megaphone size={36} className="mb-2 text-gray-300" />
                 <p className="text-sm">No announcements yet</p>
               </div>
             )}
@@ -1179,7 +1733,7 @@ export default function AdminDashboard() {
             ))}
             {!news.length && (
               <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
-                <Newspaper size={36} className="mb-2 opacity-30" />
+                <Newspaper size={36} className="mb-2 text-gray-300" />
                 <p className="text-sm">No news posts yet</p>
               </div>
             )}
@@ -1264,8 +1818,8 @@ export default function AdminDashboard() {
               </article>
             ))}
             {!testimonials.length && (
-              <div className="flex flex-col items-center justify-center py-8 text-gray-400">
-                <Star size={32} className="mb-2 opacity-30" />
+              <div className="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400">
+                <Star size={32} className="mb-2 text-gray-300" />
                 <p className="text-sm">No testimonials yet</p>
               </div>
             )}
@@ -1299,7 +1853,7 @@ export default function AdminDashboard() {
             ))}
             {!faqs.length && (
               <div className="flex flex-col items-center justify-center py-8 text-gray-500">
-                <HelpCircle size={32} className="mb-2 opacity-30" />
+                <HelpCircle size={32} className="mb-2 text-gray-300" />
                 <p className="text-sm">No FAQs yet</p>
               </div>
             )}
@@ -1401,7 +1955,7 @@ export default function AdminDashboard() {
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-black text-gray-900 dark:text-white">User management</h2>
-             <p className="text-sm text-gray-500">Manage students and admins across the platform.</p>
+             <p className="text-sm text-gray-500">Create users via API. Edit/role/status changes are local.</p>
            </div>
            <div className="flex gap-2">
             <span className="rounded-full bg-[#15c8fb]/10 px-3 py-1 text-xs font-bold text-[#15c8fb]">{students.length} students</span>
@@ -1420,9 +1974,10 @@ export default function AdminDashboard() {
           <div className="overflow-x-auto rounded-lg border border-gray-100">
             <table className="w-full min-w-[700px] text-left text-sm">
               <thead>
-                <tr className="bg-gray-50 text-xs uppercase tracking-wider text-gray-500">
+              <tr className="bg-gray-100 text-xs uppercase tracking-wider text-gray-700">
                   <th className="px-4 py-3.5 font-bold">Name</th>
                   <th className="px-4 py-3.5 font-bold">Email</th>
+                  <th className="px-4 py-3.5 font-bold">Phone</th>
                   <th className="px-4 py-3.5 font-bold">Role</th>
                   <th className="px-4 py-3.5 font-bold">Status</th>
                   <th className="px-4 py-3.5 font-bold">Actions</th>
@@ -1443,6 +1998,7 @@ export default function AdminDashboard() {
                     </div>
                   </td>
                    <td className="px-4 py-3.5 text-gray-600">{u.email}</td>
+                  <td className="px-4 py-3.5 text-gray-500 text-xs">{u.phone_number || '—'}</td>
                   <td className="px-4 py-3.5">
                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold capitalize ${
                        u.role === 'admin' ? 'bg-[#15c8fb]/10 text-[#15c8fb] border border-[#15c8fb]/20' : 'bg-[#15c8fb]/10 text-[#15c8fb] border border-[#15c8fb]/20'
@@ -1480,7 +2036,7 @@ export default function AdminDashboard() {
                 </tr>
               ))}
               {!users.length && (
-                <tr><td colSpan="5" className="px-4 py-12 text-center text-sm text-gray-500">No users found.</td></tr>
+                <tr><td colSpan="6" className="px-4 py-12 text-center text-sm text-gray-500">No users found.</td></tr>
               )}
             </tbody>
           </table>
@@ -1501,6 +2057,7 @@ export default function AdminDashboard() {
           <Field label="Username"><TextInput required value={userForm.username} onChange={(e) => setUserForm({ ...userForm, username: e.target.value })} placeholder="username" /></Field>
           <Field label="Email"><TextInput required type="email" value={userForm.email} onChange={(e) => setUserForm({ ...userForm, email: e.target.value })} placeholder="email@example.com" /></Field>
           <Field label="Full name"><TextInput value={userForm.full_name} onChange={(e) => setUserForm({ ...userForm, full_name: e.target.value })} placeholder="Full name" /></Field>
+          <Field label="Phone number"><TextInput value={userForm.phone_number} onChange={(e) => setUserForm({ ...userForm, phone_number: e.target.value })} placeholder="+251 9XX XXX XXX" /></Field>
           <Field label="Password">
             <TextInput type="password" value={userForm.password || ''} onChange={(e) => setUserForm({ ...userForm, password: e.target.value })} placeholder={editingUserId ? 'Leave blank to keep current' : 'Min 6 characters'} />
           </Field>
@@ -1619,7 +2176,7 @@ export default function AdminDashboard() {
           }))}
         />
       </div>
-      <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 text-sm text-gray-500 dark:text-gray-400 shadow-sm">
+      <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 text-sm text-gray-600 dark:text-gray-300 shadow-sm">
         <strong>Note:</strong> All exports are generated from live data. For large datasets, pagination may limit results. This is a <strong>client-side</strong> CSV generation — no backend export API exists.
       </div>
     </motion.div>
@@ -1661,7 +2218,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-charcoal text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-[#0a0e14] text-gray-900 dark:text-white transition-colors duration-300">
       <AnnouncementBar />
       <AnimatePresence>
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />
@@ -1678,7 +2235,7 @@ export default function AdminDashboard() {
         />
       </AnimatePresence>
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-white/10 bg-surface p-5 overflow-y-auto flex flex-col lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 border-r border-white/[0.06] bg-[#0d1117] p-4 overflow-y-auto flex flex-col lg:block">
         {sidebarContent}
       </aside>
 
@@ -1690,17 +2247,17 @@ export default function AdminDashboard() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileSidebar(false)}
-              className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
             />
             <motion.aside
-              initial={{ x: -300 }}
+              initial={{ x: -280 }}
               animate={{ x: 0 }}
-              exit={{ x: -300 }}
+              exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 w-68 border-r border-white/10 bg-surface p-5 shadow-2xl overflow-y-auto flex flex-col lg:hidden"
+              className="fixed inset-y-0 left-0 z-50 w-60 border-r border-white/[0.06] bg-[#0d1117] p-4 shadow-2xl overflow-y-auto flex flex-col"
             >
-              <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-2 text-gray-400 hover:bg-white/5" aria-label="Close menu">
-                <X size={20} />
+              <button onClick={() => setMobileSidebar(false)} className="absolute top-4 right-4 rounded-lg p-1.5 text-white/40 hover:bg-white/10 hover:text-white transition-all" aria-label="Close menu">
+                <X size={18} />
               </button>
               {sidebarContent}
             </motion.aside>
@@ -1708,30 +2265,41 @@ export default function AdminDashboard() {
         )}
       </AnimatePresence>
 
-      <main className="lg:pl-68">
-        <header className="sticky top-[40px] z-20 border-b border-gray-200 dark:border-white/10 bg-white/90 dark:bg-surface/90 px-4 py-4 backdrop-blur-lg lg:px-6 transition-colors duration-300">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <main className="lg:pl-60">
+        <header className="sticky top-[40px] z-20 border-b border-gray-200/50 dark:border-white/[0.06] bg-white/80 dark:bg-[#0d1117]/80 px-4 py-3 backdrop-blur-xl lg:px-6 transition-colors duration-300">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-all hover:text-[#15c8fb]" title="Go home">
-                <ArrowLeft size={20} />
+              <button onClick={() => navigate('/')} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]" title="Go home">
+                <ArrowLeft size={18} />
               </button>
-              <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 lg:hidden">
-                <Menu size={20} />
+              <button onClick={() => setMobileSidebar(true)} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 lg:hidden">
+                <Menu size={18} />
               </button>
+              <div className="h-5 w-px bg-gray-200 dark:bg-white/10 lg:hidden" />
               <div>
-                <p className="text-[11px] font-black uppercase tracking-wider text-[#15c8fb]">Real backend controls</p>
-                <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">Admin dashboard</h1>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#15c8fb]">Admin dashboard</p>
+                <h1 className="text-lg font-black text-gray-900 dark:text-white capitalize">{activeTab.replace('-', ' ')}</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2"></div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => loadAdminData()}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]"
+                title="Refresh"
+              >
+                <RefreshCw size={15} />
+              </button>
+            </div>
           </div>
-          <div className="mt-4 flex gap-2 overflow-x-auto lg:hidden">
+          <div className="mt-3 flex gap-1.5 overflow-x-auto lg:hidden">
             {tabs.map(({ id, label }) => (
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`shrink-0 rounded-xl px-3.5 py-2 text-sm font-bold transition-all ${
-                  activeTab === id ? accent.button : 'bg-white dark:bg-surface text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-gray-700'
+                className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
+                  activeTab === id
+                    ? 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-sm'
+                    : 'bg-white dark:bg-white/5 text-gray-500 dark:text-white/50 border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
                 }`}
               >
                 {label}
@@ -1744,9 +2312,9 @@ export default function AdminDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 rounded-xl border border-[#15c8fb]/20 dark:border-[#15c8fb]/10 bg-gradient-to-r from-[#15c8fb]/5 to-[#15c8fb]/5 p-3 sm:p-4 text-sm text-gray-600 dark:text-gray-400 shadow-sm"
+            className="mb-6 rounded-xl border border-[#15c8fb]/10 dark:border-[#15c8fb]/5 bg-gradient-to-r from-[#15c8fb]/5 to-transparent p-3 sm:p-4 text-sm text-gray-600 dark:text-white/50"
           >
-            Signed in as <strong className="text-gray-900 dark:text-white">{user?.full_name || user?.username}</strong>. All controls map to documented backend endpoints.
+            Signed in as <strong className="text-gray-900 dark:text-white">{user?.full_name || user?.username}</strong>
           </motion.div>
 
           {loading ? (

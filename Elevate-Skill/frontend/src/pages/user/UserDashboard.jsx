@@ -625,122 +625,159 @@ export default function UserDashboard() {
   );
 
   // ========== PAYMENTS TAB ==========
-  const renderPayments = () => (
-    <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
-      <motion.div
-        initial={{ opacity: 0, x: -16 }}
-        animate={{ opacity: 1, x: 0 }}
-      >
-        <form onSubmit={submitPayment} className="rounded-xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-surface to-[#f07000]/5 p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-white">
-            <Upload size={18} className="text-[#f89f29]" /> Submit Payment Proof
-          </h2>
-          <p className="mb-5 text-sm text-gray-400 border-b border-white/5 pb-4">Upload your payment receipt for a pending enrollment to activate your course access.</p>
-          <div className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-400">Select Pending Enrollment</label>
-              <select
-                required
-                value={selectedEnrollment}
-                onChange={(e) => setSelectedEnrollment(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-charcoal px-3 py-3 text-sm text-white outline-none focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all"
-              >
-                <option value="">Choose a pending enrollment...</option>
-                {pendingEnrollments.map((item) => (
-                  <option key={item.id} value={item.id}>{item.course?.title}</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
-              <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
-              <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
-            </div>
-            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-charcoal px-4 py-6 text-center hover:border-[#f89f29]/40 hover:bg-[#f89f29]/5 transition-all">
-              <FileText className="mb-2 text-[#f89f29]" size={28} />
-              <p className="text-sm font-medium text-gray-300">{proofFile ? proofFile.name : 'Upload receipt or screenshot'}</p>
-              <p className="text-xs text-gray-400 mt-1">PDF, JPG or PNG</p>
-              <input type="file" accept="image/*,.pdf" onChange={(e) => setProofFile(e.target.files?.[0] || null)} className="hidden" />
-            </label>
-            <button
-              disabled={saving || !pendingEnrollments.length}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f89f29] to-[#f07000] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg shadow-[#f89f29]/20"
-            >
-              {saving ? <Loader className="animate-spin" size={16} /> : <Send size={16} />}
-              Submit Payment Proof
-            </button>
-          </div>
-        </form>
+  const renderPayments = () => {
+    const userPendingCount = payments.filter(p => p.status === 'pending').length;
+    const userApprovedCount = payments.filter(p => p.status === 'approved').length;
+    return (
+    <div className="space-y-6">
 
-        {payments.length > 0 && (
-          <div className="mt-4 rounded-xl border border-white/10 bg-surface p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-black text-white">Export Data</h3>
-              <button
-                onClick={() => {
-                  const data = payments.map(p => ({
-                    course: p.course_title,
-                    status: p.status,
-                    submitted_at: p.submitted_at
-                  }));
-                  exportToCSV(data, 'my_payments.csv');
-                }}
-                className="rounded-lg border border-[#f89f29]/30 px-3 py-1.5 text-xs font-bold text-[#f89f29] hover:bg-[#f89f29]/10 transition-all"
-              >
-                <Download size={12} className="inline mr-1" /> CSV
-              </button>
-            </div>
-          </div>
-        )}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid gap-4 sm:grid-cols-3"
+      >
+        <div className="rounded-xl border border-amber-500/20 bg-gradient-to-br from-amber-500/5 via-surface to-amber-500/5 p-4 shadow-sm">
+          <p className="text-2xl font-black text-amber-400">{userPendingCount}</p>
+          <p className="mt-1 text-sm font-medium text-gray-400">Pending</p>
+        </div>
+        <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-surface to-emerald-500/5 p-4 shadow-sm">
+          <p className="text-2xl font-black text-emerald-400">{userApprovedCount}</p>
+          <p className="mt-1 text-sm font-medium text-gray-400">Approved</p>
+        </div>
+        <div className="rounded-xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-surface to-[#f89f29]/5 p-4 shadow-sm">
+          <p className="text-2xl font-black text-[#f89f29]">{payments.length}</p>
+          <p className="mt-1 text-sm font-medium text-gray-400">Total</p>
+        </div>
       </motion.div>
 
-      <motion.section
-        initial={{ opacity: 0, x: 16 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
-      >
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-black text-white">Payment History</h2>
-          <Badge>{payments.length} total</Badge>
-        </div>
-        {payments.length > 0 ? (
-          <div className="overflow-x-auto rounded-lg border border-white/5">
-            <table className="w-full min-w-[600px] text-left text-sm">
-              <thead>
-                <tr className="bg-surface text-[10px] uppercase tracking-wider text-gray-400">
-                  <th className="px-4 py-3 font-bold">Course</th>
-                  <th className="px-4 py-3 font-bold">Submitted</th>
-                  <th className="px-4 py-3 font-bold">Proof</th>
-                  <th className="px-4 py-3 font-bold">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {payments.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-white/5 transition-colors">
-                    <td className="px-4 py-3 font-semibold text-white">{payment.course_title}</td>
-                    <td className="px-4 py-3 text-gray-400 text-xs">{formatDate(payment.submitted_at)}</td>
-                    <td className="px-4 py-3">
-                      {payment.proof_file ? (
-                        <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#f89f29]/10 px-3 py-1.5 text-xs font-bold text-[#f89f29] hover:bg-[#f89f29]/20 transition-all">
-                          <FileText size={13} /> View
-                        </a>
-                      ) : <span className="text-gray-400 text-xs">No file</span>}
-                    </td>
-                    <td className="px-4 py-3"><Badge>{payment.status}</Badge></td>
+      <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
+        <motion.div
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          <form onSubmit={submitPayment} className="rounded-xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-surface to-[#f07000]/5 p-6 shadow-sm">
+            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-white">
+              <Upload size={18} className="text-[#f89f29]" /> Submit Payment Proof
+            </h2>
+            <p className="mb-5 text-sm text-gray-400 border-b border-white/5 pb-4">Upload your payment receipt for a pending enrollment to activate your course access.</p>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-400">Select Pending Enrollment</label>
+                <select
+                  required
+                  value={selectedEnrollment}
+                  onChange={(e) => setSelectedEnrollment(e.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-charcoal px-3 py-3 text-sm text-white outline-none focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all"
+                >
+                  <option value="">Choose a pending enrollment...</option>
+                  {pendingEnrollments.map((item) => (
+                    <option key={item.id} value={item.id}>{item.course?.title}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
+                <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
+                <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
+              </div>
+              <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-charcoal px-4 py-6 text-center hover:border-[#f89f29]/40 hover:bg-[#f89f29]/5 transition-all">
+                <FileText className="mb-2 text-[#f89f29]" size={28} />
+                <p className="text-sm font-medium text-gray-300">{proofFile ? proofFile.name : 'Upload receipt or screenshot'}</p>
+                <p className="text-xs text-gray-400 mt-1">PDF, JPG or PNG</p>
+                <input type="file" accept="image/*,.pdf" onChange={(e) => setProofFile(e.target.files?.[0] || null)} className="hidden" />
+              </label>
+              <button
+                disabled={saving || !pendingEnrollments.length}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f89f29] to-[#f07000] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg shadow-[#f89f29]/20"
+              >
+                {saving ? <Loader className="animate-spin" size={16} /> : <Send size={16} />}
+                Submit Payment Proof
+              </button>
+            </div>
+          </form>
+
+          {payments.length > 0 && (
+            <div className="mt-4 rounded-xl border border-white/10 bg-surface p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-black text-white">Export Data</h3>
+                <button
+                  onClick={() => {
+                    const data = payments.map(p => ({
+                      course: p.course_title,
+                      status: p.status,
+                      method: p.payment_method || '—',
+                      submitted_at: p.submitted_at
+                    }));
+                    exportToCSV(data, 'my_payments.csv');
+                  }}
+                  className="rounded-lg border border-[#f89f29]/30 px-3 py-1.5 text-xs font-bold text-[#f89f29] hover:bg-[#f89f29]/10 transition-all"
+                >
+                  <Download size={12} className="inline mr-1" /> CSV
+                </button>
+              </div>
+            </div>
+          )}
+        </motion.div>
+
+        <motion.section
+          initial={{ opacity: 0, x: 16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
+        >
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-lg font-black text-white">Payment History</h2>
+            <Badge>{payments.length} total</Badge>
+          </div>
+          {payments.length > 0 ? (
+            <div className="overflow-x-auto rounded-lg border border-white/5">
+              <table className="w-full min-w-[650px] text-left text-sm">
+                <thead>
+                  <tr className="bg-surface text-[10px] uppercase tracking-wider text-gray-400">
+                    <th className="px-4 py-3 font-bold">Course</th>
+                    <th className="px-4 py-3 font-bold">Method</th>
+                    <th className="px-4 py-3 font-bold">Submitted</th>
+                    <th className="px-4 py-3 font-bold">Proof</th>
+                    <th className="px-4 py-3 font-bold">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-            <CreditCard size={40} className="mb-2 opacity-30" />
-            <p className="text-sm">No payment records yet</p>
-          </div>
-        )}
-      </motion.section>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {payments.map((payment) => (
+                    <tr key={payment.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-3 font-semibold text-white max-w-[180px] truncate" title={payment.course_title}>
+                        {payment.course_title}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-gray-400">
+                        {payment.payment_method || '—'}
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
+                        {formatDate(payment.submitted_at)}
+                      </td>
+                      <td className="px-4 py-3">
+                        {payment.proof_file ? (
+                          <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#f89f29]/10 px-3 py-1.5 text-xs font-bold text-[#f89f29] hover:bg-[#f89f29]/20 transition-all">
+                            <FileText size={13} /> View
+                          </a>
+                        ) : <span className="text-gray-500 text-xs">—</span>}
+                      </td>
+                      <td className="px-4 py-3"><Badge>{payment.status}</Badge></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+              <CreditCard size={40} className="mb-2 opacity-30" />
+              <p className="text-sm">No payment records yet</p>
+            </div>
+          )}
+        </motion.section>
+      </div>
     </div>
   );
+  };
 
   // ========== ANNOUNCEMENTS TAB ==========
   const renderAnnouncements = () => (
