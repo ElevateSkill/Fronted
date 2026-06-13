@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle, Code, Megaphone, Video, Palette, Headphones, Smartphone, Sparkles, Timer, Tag, Gift } from 'lucide-react';
+import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle } from 'lucide-react';
 import { api, unwrapResults, getMediaUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-const colorMap = ['#dc2626', '#f89f29', '#17c966', '#dc2626'];
-const levelMap = ['Beginner to Advanced', 'All Levels', 'Intermediate', 'Intermediate'];
+const colorMap = ['#dc2626', '#f89f29', '#17c966', '#3C83F6', '#a855f7', '#0ea5e9'];
+const levelMap = ['Beginner to Advanced', 'All Levels', 'Intermediate', 'Beginner', 'All Levels', 'All Levels'];
+
+const winterCourses = [
+  { title: 'Website Development', category: 'Full-Stack', desc: 'Build modern web apps from scratch — master React, Node.js, PostgreSQL, and deployment. Go from zero to full-stack developer.', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', duration: '96h', lessons: 48, level: 'Beginner to Advanced', price: '950 ETB', originalPrice: '2,999 ETB' },
+  { title: 'Digital Marketing', category: 'Marketing', desc: 'Master SEO, Google Ads, social media algorithms, and AI-powered analytics to drive real business growth.', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600', duration: '48h', lessons: 24, level: 'All Levels', price: '950 ETB', originalPrice: '2,999 ETB' },
+  { title: 'Video Editing', category: 'Creative', desc: 'Professional video editing with Premiere Pro, After Effects, and DaVinci Resolve. Create stunning content.', image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600', duration: '64h', lessons: 32, level: 'Beginner', price: '950 ETB', originalPrice: '2,999 ETB' },
+  { title: 'Graphics Design', category: 'Design', desc: 'Master Photoshop, Illustrator, and Figma. Design logos, brands, UI/UX, and marketing materials that captivate.', image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600', duration: '56h', lessons: 28, level: 'Intermediate', price: '950 ETB', originalPrice: '2,999 ETB' },
+  { title: 'Virtual Assistance', category: 'Business', desc: 'Build a remote career supporting global clients. Learn project management, CRM, automation, and admin skills.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600', duration: '40h', lessons: 20, level: 'All Levels', price: '950 ETB', originalPrice: '2,999 ETB' },
+  { title: 'Application Development', category: 'Mobile', desc: 'Build cross-platform mobile apps with React Native. Publish to iOS and Android app stores.', image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600', duration: '72h', lessons: 36, level: 'All Levels', price: '950 ETB', originalPrice: '2,999 ETB' },
+];
 
 export default function Courses() {
   const { user } = useAuth();
@@ -21,27 +30,37 @@ export default function Courses() {
     api.get('/courses/')
       .then(res => {
         const data = unwrapResults(res.data);
-        setCourses(data.map((c, i) => ({
-          id: c.id,
-          title: c.title,
-          category: c.category?.name || c.category || '',
-          desc: c.short_description || '',
-          image: getMediaUrl(c.thumbnail) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
-          students: c.enrolled_count || 0,
-          duration: c.duration ? `${c.duration}h` : '',
-          lessons: c.lessons || 0,
-          level: levelMap[i % levelMap.length],
-          color: colorMap[i % colorMap.length],
-          price: c.price ? `${c.price} ETB` : '',
-        })));
+        if (data.length > 0 && data[0].title && data[0].title !== 'wew') {
+          setCourses(data.map((c, i) => ({
+            id: c.id,
+            title: c.title,
+            category: c.category?.name || c.category || '',
+            desc: c.short_description || '',
+            image: getMediaUrl(c.thumbnail) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
+            students: c.enrolled_count || 0,
+            duration: c.duration ? `${c.duration}h` : '',
+            lessons: c.lessons || 0,
+            level: levelMap[i % levelMap.length],
+            color: colorMap[i % colorMap.length],
+            price: c.price ? `${c.price} ETB` : '',
+          })));
+        } else {
+          setCourses(winterCourses.map((c, i) => ({ ...c, id: `w${i}`, students: 0, color: colorMap[i % colorMap.length] })));
+        }
       })
-      .catch(() => {})
+      .catch(() => {
+        setCourses(winterCourses.map((c, i) => ({ ...c, id: `w${i}`, students: 0, color: colorMap[i % colorMap.length] })));
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const handleEnroll = async (course) => {
     if (!user) {
       navigate(`/register?courseId=${course.id || ''}`);
+      return;
+    }
+    if (typeof course.id === 'string' && course.id.startsWith('w')) {
+      navigate(`/register?ref=ELEVATEC73BC490`);
       return;
     }
     setEnrollingId(course.id || course.title);
@@ -93,78 +112,6 @@ export default function Courses() {
             Industry-driven curriculum designed to take you from beginner to job-ready professional.
           </motion.p>
         </div>
-
-        {/* — Winter Training Promotion — */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="relative mb-14 overflow-hidden rounded-2xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-[#dc2626]/5 to-black p-[2px]"
-        >
-          <div className="relative bg-black p-6 md:p-8">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#f89f29]/10 rounded-full blur-[80px]" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#dc2626]/10 rounded-full blur-[80px]" />
-
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-              <div className="space-y-4 flex-1">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider">
-                    <Timer size={11} /> 15hr left
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f89f29]/10 border border-[#f89f29]/20 text-[#f89f29] text-[10px] font-black uppercase tracking-wider">
-                    <Sparkles size={11} /> Registration close
-                  </span>
-                </div>
-
-                <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-                  የክረምት ስልጠና <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f89f29] to-[#dc2626]">Winter Training</span>
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5">
-                  {[
-                    { icon: Code, label: 'Website Development (Backend & Frontend)' },
-                    { icon: Megaphone, label: 'Digital Marketing' },
-                    { icon: Video, label: 'Video Editing' },
-                    { icon: Palette, label: 'Graphics Design' },
-                    { icon: Headphones, label: 'Virtual Assistance' },
-                    { icon: Smartphone, label: 'Application Development' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-2.5 text-sm text-white/80">
-                      <item.icon size={15} className="text-[#f89f29] shrink-0" />
-                      {item.label}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-4 pt-2">
-                  <div className="flex items-center gap-2">
-                    <Tag size={16} className="text-green-400" />
-                    <span className="text-green-400 font-black text-lg">950 ETB</span>
-                    <span className="text-white/40 text-xs line-through">2,999 ETB</span>
-                  </div>
-                  <span className="text-white/30 text-[11px]">per course · after Jun 12 full price</span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3 w-full lg:w-auto shrink-0">
-                <motion.a
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  href="https://elevate-skill-hazel.vercel.app/register?ref=ELEVATEC73BC490"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#f89f29] to-[#dc2626] text-white font-black text-sm rounded-xl shadow-xl hover:brightness-110 transition-all"
-                >
-                  Register Now <Gift size={16} />
-                </motion.a>
-                <div className="flex items-center gap-3 text-[10px] text-white/40">
-                  <span>📞 +251 981 80 7055</span>
-                  <span>✉️ elevateskill369@gmail.com</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -220,8 +167,9 @@ export default function Courses() {
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <div>
-                    <span className="text-xl font-black text-white block leading-none">{course.price}</span>
-                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{course.lessons > 1 ? `${course.lessons} lessons` : ''}</span>
+                    <span className="text-lg font-black text-white block leading-none">{course.price}</span>
+                    {course.originalPrice && <span className="text-[10px] text-gray-500 line-through ml-1">{course.originalPrice}</span>}
+                    <span className="block text-[10px] text-gray-500 uppercase tracking-wider">{course.lessons > 1 ? `${course.lessons} lessons` : ''}</span>
                   </div>
                   <button
                     onClick={() => handleEnroll(course)}
