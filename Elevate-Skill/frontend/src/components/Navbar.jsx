@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, ArrowLeft } from 'lucide-react';
+import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Megaphone, Video, PenTool, Headphones, Smartphone, LogOut, User, Shield, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import logoJpg from '../assets/logo.jpg';
@@ -36,10 +36,11 @@ export default function Navbar() {
       name: 'Courses',
       isMega: true,
       subItems: [
-        { title: 'Web Development', desc: 'React, Node, and scalable architectures.', icon: <Code2 /> },
-        { title: 'UI/UX Design', desc: 'Prototyping and user-centric systems.', icon: <Palette /> },
-        { title: 'AI Engineering', desc: 'LLMs and Neural Networks.', icon: <BrainCircuit /> },
-        { title: 'Cloud Systems', desc: 'Docker, K8s, and AWS.', icon: <Rocket /> },
+        { title: 'Website Development', desc: 'Full-stack — React, Node.js, PostgreSQL, and deployment.', icon: <Code2 /> },
+        { title: 'Digital Marketing', desc: 'SEO, ads, social media, and AI-powered analytics.', icon: <Megaphone /> },
+        { title: 'Video Editing', desc: 'Premiere Pro, After Effects, and DaVinci Resolve.', icon: <Video /> },
+        { title: 'Graphics Design', desc: 'Photoshop, Illustrator, Figma, and branding.', icon: <Palette /> },
+        { title: 'Application Development', desc: 'Cross-platform mobile apps with React Native.', icon: <Smartphone /> },
       ]
     },
     { name: 'Services', href: '#services' },
@@ -149,7 +150,7 @@ export default function Navbar() {
               initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
               className="absolute top-full left-0 w-full bg-black border-b border-white/10 shadow-2xl py-10 px-10 hidden lg:block"
             >
-              <div className="max-w-7xl mx-auto grid grid-cols-4 gap-6">
+              <div className="max-w-7xl mx-auto grid grid-cols-5 gap-6">
                 {navLinks.find(l => l.name === activeMega)?.subItems?.map((sub, i) => (
                   <div key={i} className="group cursor-pointer p-4 rounded-xl hover:bg-gradient-to-br hover:from-[#dc2626]/5 hover:to-[#f89f29]/5 transition-all border border-transparent hover:border-[#15c8fb]/10">
                     <h4 className="text-xs font-black text-white mb-2 uppercase tracking-widest group-hover:text-[#f87b07]">{sub.title}</h4>

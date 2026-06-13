@@ -1,21 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle, User, Sparkles } from 'lucide-react';
+import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle, User } from 'lucide-react';
 import { api, unwrapResults, getMediaUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-const colorMap = ['#dc2626', '#f89f29', '#17c966', '#3C83F6', '#a855f7', '#0ea5e9'];
-const levelMap = ['Beginner to Advanced', 'All Levels', 'Intermediate', 'Beginner', 'All Levels', 'All Levels'];
-
-const winterCourses = [
-  { title: 'Website Development', category: 'Full-Stack', desc: 'Build modern web apps from scratch — master React, Node.js, PostgreSQL, and deployment. Go from zero to full-stack developer.', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', duration: '96h', lessons: 48, level: 'Beginner to Advanced', price: '950 ETB', originalPrice: '2,999 ETB' },
-  { title: 'Digital Marketing', category: 'Marketing', desc: 'Master SEO, Google Ads, social media algorithms, and AI-powered analytics to drive real business growth.', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600', duration: '48h', lessons: 24, level: 'All Levels', price: '950 ETB', originalPrice: '2,999 ETB' },
-  { title: 'Video Editing', category: 'Creative', desc: 'Professional video editing with Premiere Pro, After Effects, and DaVinci Resolve. Create stunning content.', image: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=600', duration: '64h', lessons: 32, level: 'Beginner', price: '950 ETB', originalPrice: '2,999 ETB' },
-  { title: 'Graphics Design', category: 'Design', desc: 'Master Photoshop, Illustrator, and Figma. Design logos, brands, UI/UX, and marketing materials that captivate.', image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=600', duration: '56h', lessons: 28, level: 'Intermediate', price: '950 ETB', originalPrice: '2,999 ETB' },
-  { title: 'Virtual Assistance', category: 'Business', desc: 'Build a remote career supporting global clients. Learn project management, CRM, automation, and admin skills.', image: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600', duration: '40h', lessons: 20, level: 'All Levels', price: '950 ETB', originalPrice: '2,999 ETB' },
-  { title: 'Application Development', category: 'Mobile', desc: 'Build cross-platform mobile apps with React Native. Publish to iOS and Android app stores.', image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600', duration: '72h', lessons: 36, level: 'All Levels', price: '950 ETB', originalPrice: '2,999 ETB' },
-];
+const colors = ['#dc2626', '#f89f29', '#17c966', '#3C83F6', '#a855f7', '#0ea5e9'];
+const levels = ['Beginner to Advanced', 'All Levels', 'Intermediate', 'Beginner', 'All Levels', 'All Levels'];
 
 export default function Courses() {
   const { user } = useAuth();
@@ -30,39 +21,27 @@ export default function Courses() {
     api.get('/courses/')
       .then(res => {
         const data = unwrapResults(res.data);
-        if (data.length > 0 && data[0].title && data[0].title !== 'wew') {
-          setCourses(data.map((c, i) => ({
-            id: c.id,
-            title: c.title,
-            category: c.category?.name || c.category || '',
-            desc: c.short_description || '',
-            instructor: c.instructor || '',
-            image: getMediaUrl(c.thumbnail) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
-            students: c.enrolled_count || 0,
-            duration: c.duration ? `${c.duration}h` : '',
-            lessons: c.lessons || 0,
-            level: levelMap[i % levelMap.length],
-            color: colorMap[i % colorMap.length],
-            price: c.price ? `${c.price} ETB` : '',
-            originalPrice: null,
-          })));
-        } else {
-          setCourses(winterCourses.map((c, i) => ({ ...c, id: `w${i}`, students: 0, color: colorMap[i % colorMap.length] })));
-        }
+        setCourses(data.map((c, i) => ({
+          id: c.id,
+          title: c.title,
+          category: c.category?.name || c.category || '',
+          desc: c.short_description || '',
+          instructor: c.instructor || '',
+          image: getMediaUrl(c.thumbnail) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
+          duration: c.duration ? `${c.duration}h` : '',
+          lessons: c.lessons || 0,
+          level: levels[i % levels.length],
+          color: colors[i % colors.length],
+          price: c.price ? `${c.price} ETB` : '',
+        })));
       })
-      .catch(() => {
-        setCourses(winterCourses.map((c, i) => ({ ...c, id: `w${i}`, students: 0, color: colorMap[i % colorMap.length] })));
-      })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const handleEnroll = async (course) => {
     if (!user) {
       navigate(`/register?courseId=${course.id || ''}`);
-      return;
-    }
-    if (typeof course.id === 'string' && course.id.startsWith('w')) {
-      navigate(`/register?ref=ELEVATEC73BC490`);
       return;
     }
     setEnrollingId(course.id || course.title);
@@ -172,7 +151,6 @@ export default function Courses() {
                 <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <div>
                     <span className="text-lg font-black text-white block leading-none">{course.price}</span>
-                    {course.originalPrice && <span className="text-[10px] text-gray-500 line-through ml-1">{course.originalPrice}</span>}
                     <span className="block text-[10px] text-gray-500 uppercase tracking-wider">{course.lessons > 1 ? `${course.lessons} lessons` : ''}</span>
                   </div>
                   <button
