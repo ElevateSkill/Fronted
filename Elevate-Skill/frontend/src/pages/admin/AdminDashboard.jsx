@@ -90,7 +90,7 @@ function Badge({ children }) {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">{label}</span>
+      <span className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-900 dark:text-white">{label}</span>
       {children}
     </label>
   );
@@ -211,7 +211,7 @@ function Modal({ open, title, message, confirmLabel, onConfirm, onCancel }) {
         <h3 className="text-lg font-black text-gray-900 dark:text-white">{title || 'Confirm'}</h3>
         <p className="mt-2 text-sm text-gray-600">{message}</p>
         <div className="mt-6 flex justify-end gap-3">
-          <button onClick={onCancel} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-2.5 text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">Cancel</button>
+          <button onClick={onCancel} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-2.5 text-sm font-bold text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">Cancel</button>
           <button onClick={onConfirm} className="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-rose-700 transition-colors">{confirmLabel || 'Delete'}</button>
         </div>
       </motion.div>
@@ -957,7 +957,7 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-black text-gray-900 dark:text-white">Course management</h2>
             <p className="text-sm text-gray-500">Create, edit, publish, hide, and manage course content.</p>
           </div>
-          <label className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-2.5 text-sm text-gray-600 dark:text-gray-300 transition-all duration-200 focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
+          <label className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white transition-all duration-200 focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
             <Search size={16} className="shrink-0" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search courses..." className="w-full bg-transparent outline-none" />
           </label>
@@ -996,7 +996,7 @@ export default function AdminDashboard() {
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
                   <button onClick={() => editCourse(course)} className="inline-flex items-center gap-1.5 rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10 hover:border-[#15c8fb]/50"><Edit3 size={14} /> Edit</button>
                   <button onClick={() => patchCourse(course, { is_published: !course.is_published })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">{course.is_published ? 'Unpublish' : 'Publish'}</button>
-                  <button onClick={() => patchCourse(course, { is_active: !course.is_active })} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">{course.is_active ? 'Deactivate' : 'Activate'}</button>
+                  <button onClick={() => patchCourse(course, { is_active: !course.is_active })} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">{course.is_active ? 'Deactivate' : 'Activate'}</button>
                   <button onClick={() => deleteCourse(course.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50"><Trash2 size={14} /> Delete</button>
                 </div>
               </div>
@@ -1039,12 +1039,18 @@ export default function AdminDashboard() {
           <Field label="Duration"><TextInput value={courseForm.duration} onChange={(e) => setCourseForm({ ...courseForm, duration: e.target.value })} /></Field>
           <Field label="Requirements"><TextArea value={courseForm.requirements} onChange={(e) => setCourseForm({ ...courseForm, requirements: e.target.value })} rows="2" /></Field>
           <Field label="Learning outcomes"><TextArea value={courseForm.learning_outcomes} onChange={(e) => setCourseForm({ ...courseForm, learning_outcomes: e.target.value })} rows="2" /></Field>
-          <Field label="Thumbnail"><TextInput type="file" accept="image/*" onChange={(e) => setCourseForm({ ...courseForm, thumbnail: e.target.files?.[0] || null })} /></Field>
+          <Field label="Thumbnail">
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-gray-300 dark:border-white/20 bg-gray-50 dark:bg-white/[0.03] px-4 py-4 text-sm text-gray-500 dark:text-gray-400 transition-all hover:border-[#15c8fb]/50 hover:bg-[#15c8fb]/5">
+              <Upload size={18} className="text-gray-400" />
+              <span>{courseForm.thumbnail?.name || 'Click to upload thumbnail'}</span>
+              <input type="file" accept="image/*" onChange={(e) => setCourseForm({ ...courseForm, thumbnail: e.target.files?.[0] || null })} className="hidden" />
+            </label>
+          </Field>
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={courseForm.is_active} onChange={(e) => setCourseForm({ ...courseForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active
             </label>
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={courseForm.is_published} onChange={(e) => setCourseForm({ ...courseForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Published
             </label>
           </div>
@@ -1052,7 +1058,7 @@ export default function AdminDashboard() {
             <button disabled={saving} className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />} Save
             </button>
-            {editingCourseId && <button type="button" onClick={resetCourseForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
+            {editingCourseId && <button type="button" onClick={resetCourseForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
           </div>
         </div>
       </motion.form>
@@ -1076,7 +1082,7 @@ export default function AdminDashboard() {
         </Field>
         <div className="mt-5 flex gap-2">
           <button disabled={saving} className={`flex-1 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save category</button>
-          {editingCategory && <button type="button" onClick={() => { setEditingCategory(null); setCategoryName(''); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-black text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
+          {editingCategory && <button type="button" onClick={() => { setEditingCategory(null); setCategoryName(''); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-black text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
         </div>
       </motion.form>
 
@@ -1251,7 +1257,7 @@ export default function AdminDashboard() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-300 max-w-[180px] truncate" title={payment.course_title}>
+                  <td className="px-4 py-3.5 text-gray-900 dark:text-white max-w-[180px] truncate" title={payment.course_title}>
                     {payment.course_title || '—'}
                   </td>
                   <td className="px-4 py-3.5 text-gray-500 text-xs">
@@ -1481,7 +1487,7 @@ export default function AdminDashboard() {
                     <button type="submit" className="flex-1 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all">
                       <Plus size={16} className="inline mr-2" />Create Record
                     </button>
-                    <button type="button" onClick={() => setShowManualPayment(false)} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
+                    <button type="button" onClick={() => setShowManualPayment(false)} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
                   </div>
                 </form>
               </div>
@@ -1614,7 +1620,7 @@ export default function AdminDashboard() {
                     <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-600 dark:text-gray-400">Account Number</label>
                     <input required value={bankForm.account_number} onChange={(e) => setBankForm({...bankForm, account_number: e.target.value})} className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10" placeholder="Account number" />
                   </div>
-                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+                  <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-bold text-gray-900 dark:text-white hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
                     <input type="checkbox" checked={bankForm.is_active} onChange={(e) => setBankForm({...bankForm, is_active: e.target.checked})} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" />
                     Active
                   </label>
@@ -1623,7 +1629,7 @@ export default function AdminDashboard() {
                       {saving ? <Loader className="animate-spin inline mr-2" size={16} /> : <Save size={16} className="inline mr-2" />}
                       {editingBankId ? 'Update' : 'Create'}
                     </button>
-                    <button type="button" onClick={() => { setShowBankModal(false); resetBankForm(); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
+                    <button type="button" onClick={() => { setShowBankModal(false); resetBankForm(); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
                   </div>
                 </form>
               </div>
@@ -1649,7 +1655,7 @@ export default function AdminDashboard() {
           </h2>
           <Field label="Title"><TextInput required value={announcementForm.title} onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })} placeholder="Announcement title" /></Field>
           <Field label="Content"><TextArea required value={announcementForm.content} onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })} rows="5" placeholder="Write your announcement..." /></Field>
-          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/20 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/20 px-3.5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
             <input type="checkbox" checked={announcementForm.is_published} onChange={(e) => setAnnouncementForm({ ...announcementForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 dark:border-white/20 text-[#15c8fb] focus:ring-[#15c8fb]" /> Publish to students
           </label>
           <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save announcement</button>
@@ -1694,7 +1700,7 @@ export default function AdminDashboard() {
                   <h3 className="font-black text-gray-900 dark:text-white text-sm sm:text-base">{item.title}</h3>
                   <Badge>{item.is_published ? 'published' : 'draft'}</Badge>
                 </div>
-                <p className="text-sm leading-6 text-gray-600 dark:text-gray-300 line-clamp-3">{item.content}</p>
+                <p className="text-sm leading-6 text-gray-900 dark:text-white line-clamp-3">{item.content}</p>
                 <div className="mt-3 flex gap-2">
                   <button onClick={() => patchAnnouncement(item, { is_published: !item.is_published })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">{item.is_published ? 'Unpublish' : 'Publish'}</button>
                   <button onClick={() => deleteAnnouncement(item.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 transition-all hover:bg-rose-50 dark:hover:bg-rose-500/10">Delete</button>
@@ -1724,7 +1730,7 @@ export default function AdminDashboard() {
                   <h3 className="font-black text-gray-900 dark:text-white">{item.title}</h3>
                   <Badge>{item.status}</Badge>
                 </div>
-                <p className="text-sm leading-6 text-gray-600 dark:text-gray-300 line-clamp-2">{item.excerpt}</p>
+                <p className="text-sm leading-6 text-gray-900 dark:text-white line-clamp-2">{item.excerpt}</p>
                 <div className="mt-3 flex gap-2">
                   <button onClick={() => patchNews(item, { status: item.status === 'published' ? 'draft' : 'published' })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">{item.status === 'published' ? 'Move to draft' : 'Publish'}</button>
                   <button onClick={() => deleteNews(item.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 transition-all hover:bg-rose-50 dark:hover:bg-rose-500/10">Delete</button>
@@ -1793,7 +1799,7 @@ export default function AdminDashboard() {
             </div>
             <Field label="Message"><TextArea required value={testimonialForm.message} onChange={(e) => setTestimonialForm({ ...testimonialForm, message: e.target.value })} rows="3" /></Field>
             <Field label="Student image"><TextInput type="file" accept="image/*" onChange={(e) => setTestimonialForm({ ...testimonialForm, student_image: e.target.files?.[0] || null })} /></Field>
-            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={testimonialForm.is_active} onChange={(e) => setTestimonialForm({ ...testimonialForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active on homepage
             </label>
             <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save testimonial</button>
@@ -1832,7 +1838,7 @@ export default function AdminDashboard() {
             <Field label="Question"><TextInput required value={faqForm.question} onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })} /></Field>
             <Field label="Answer"><TextArea required value={faqForm.answer} onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })} rows="3" /></Field>
             <Field label="Order"><TextInput type="number" value={faqForm.order} onChange={(e) => setFaqForm({ ...faqForm, order: Number(e.target.value) })} /></Field>
-            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={faqForm.is_active} onChange={(e) => setFaqForm({ ...faqForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active on homepage
             </label>
             <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save FAQ</button>
@@ -2024,7 +2030,7 @@ export default function AdminDashboard() {
                         </button>
                       )}
                       {u.role === 'admin' && (
-                        <button onClick={() => changeUserRole(u, 'student')} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">
+                        <button onClick={() => changeUserRole(u, 'student')} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">
                           Make student
                         </button>
                       )}
@@ -2068,14 +2074,14 @@ export default function AdminDashboard() {
               <option value="admin">Admin</option>
             </Select>
           </Field>
-          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-900 dark:text-white transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
             <input type="checkbox" checked={userForm.is_active} onChange={(e) => setUserForm({ ...userForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active
           </label>
           <div className="flex gap-2 pt-1">
             <button disabled={saving} className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />} Save
             </button>
-            {editingUserId && <button type="button" onClick={resetUserForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
+            {editingUserId && <button type="button" onClick={resetUserForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
           </div>
         </div>
       </motion.form>
@@ -2176,7 +2182,7 @@ export default function AdminDashboard() {
           }))}
         />
       </div>
-      <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 text-sm text-gray-600 dark:text-gray-300 shadow-sm">
+      <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 text-sm text-gray-900 dark:text-white shadow-sm">
         <strong>Note:</strong> All exports are generated from live data. For large datasets, pagination may limit results. This is a <strong>client-side</strong> CSV generation — no backend export API exists.
       </div>
     </motion.div>
