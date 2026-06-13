@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle } from 'lucide-react';
+import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle, User, Sparkles } from 'lucide-react';
 import { api, unwrapResults, getMediaUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -36,6 +36,7 @@ export default function Courses() {
             title: c.title,
             category: c.category?.name || c.category || '',
             desc: c.short_description || '',
+            instructor: c.instructor || '',
             image: getMediaUrl(c.thumbnail) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
             students: c.enrolled_count || 0,
             duration: c.duration ? `${c.duration}h` : '',
@@ -43,6 +44,7 @@ export default function Courses() {
             level: levelMap[i % levelMap.length],
             color: colorMap[i % colorMap.length],
             price: c.price ? `${c.price} ETB` : '',
+            originalPrice: null,
           })));
         } else {
           setCourses(winterCourses.map((c, i) => ({ ...c, id: `w${i}`, students: 0, color: colorMap[i % colorMap.length] })));
@@ -151,19 +153,21 @@ export default function Courses() {
               <div className="p-5">
                 <h3 className="text-base font-black text-white mb-2 group-hover:text-[#dc2626] transition-colors leading-tight">{course.title}</h3>
                 <p className="text-xs text-gray-300 mb-4 leading-relaxed line-clamp-2">{course.desc}</p>
-                <div className="grid grid-cols-2 gap-y-2 gap-x-1 mb-4">
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
-                    <Users size={13} className="text-cyan-400 shrink-0" /> {course.students || '—'}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
-                    <Clock size={13} className="text-amber-400 shrink-0" /> {course.duration}
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
-                    <BookOpen size={13} className="text-cyan-400 shrink-0" /> {course.lessons} lessons
-                  </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
-                    <Award size={13} className="text-amber-400 shrink-0" /> {course.level}
-                  </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1.5 mb-4 text-[11px]">
+                  {course.instructor && (
+                    <span className="flex items-center gap-1.5 text-gray-300">
+                      <User size={12} className="text-amber-400 shrink-0" /> {course.instructor}
+                    </span>
+                  )}
+                  <span className="flex items-center gap-1.5 text-gray-300">
+                    <Clock size={12} className="text-cyan-400 shrink-0" /> {course.duration || '—'}
+                  </span>
+                  <span className="flex items-center gap-1.5 text-gray-300">
+                    <BookOpen size={12} className="text-amber-400 shrink-0" /> {course.lessons} lessons
+                  </span>
+                  <span className="flex items-center gap-1.5 text-gray-300">
+                    <Award size={12} className="text-cyan-400 shrink-0" /> {course.level}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <div>

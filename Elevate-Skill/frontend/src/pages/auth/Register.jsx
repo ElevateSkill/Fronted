@@ -39,7 +39,7 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
           required
           autoComplete={name === 'password' ? 'new-password' : name === 'email' ? 'email' : 'off'}
           placeholder={placeholder}
-          className={`w-full border border-white/10 bg-white/[0.04] py-3.5 text-base text-white outline-none transition focus:border-[red] focus:ring-2 focus:ring-[red]/20 placeholder:text-slate-500 ${Icon ? 'pl-11' : 'pl-4'} ${isShowable ? 'pr-11' : 'pr-4'}`}
+           className={`w-full rounded-xl border border-white/10 bg-white/[0.04] py-3.5 text-base text-white outline-none transition focus:border-[red] focus:ring-2 focus:ring-[red]/20 placeholder:text-gray-500 ${Icon ? 'pl-11' : 'pl-4'} ${isShowable ? 'pr-11' : 'pr-4'}`}
         />
         {isShowable && (
           <button
@@ -474,7 +474,7 @@ export default function Register() {
                           value={userAccountNumber}
                           onChange={(e) => setUserAccountNumber(e.target.value)}
                           placeholder="e.g. 1000 123456 789"
-                          className="w-full border border-white/10 bg-white/[0.04] py-3 px-4 text-base text-white outline-none transition focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 placeholder:text-slate-500"
+                          className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 px-4 text-base text-white outline-none transition focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 placeholder:text-gray-500"
                         />
                       </motion.div>
                     )}

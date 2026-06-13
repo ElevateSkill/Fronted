@@ -89,22 +89,22 @@ export default function Contact() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Full Name</label>
-                    <input name="name" value={form.name} onChange={handleChange} required type="text" placeholder="John Doe" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
+                    <input name="name" value={form.name} onChange={handleChange} required type="text" placeholder="John Doe" className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all placeholder:text-gray-500" />
                   </div>
                   <div>
                     <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Email</label>
-                    <input name="email" value={form.email} onChange={handleChange} required type="email" placeholder="hello@example.com" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
+                    <input name="email" value={form.email} onChange={handleChange} required type="email" placeholder="hello@example.com" className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all placeholder:text-gray-500" />
                   </div>
                 </div>
 
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Subject</label>
-                  <input name="subject" value={form.subject} onChange={handleChange} type="text" placeholder="How can we help?" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
+                  <input name="subject" value={form.subject} onChange={handleChange} type="text" placeholder="How can we help?" className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all placeholder:text-gray-500" />
                 </div>
 
                 <div>
                   <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Message</label>
-                  <textarea name="message" value={form.message} onChange={handleChange} required rows={4} placeholder="Tell us more about your project..." className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20 resize-none" />
+                  <textarea name="message" value={form.message} onChange={handleChange} required rows={4} placeholder="Tell us more about your project..." className="w-full px-4 py-3.5 bg-white/[0.04] border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all placeholder:text-gray-500 resize-none" />
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">

@@ -109,7 +109,7 @@ export default function Login() {
                     required
                     autoComplete="email"
                     placeholder="your@domain.com"
-                    className="w-full border border-white/10 bg-white/[0.04] px-11 py-3.5 text-base text-white outline-none transition focus:border-[#ff9d00] focus:ring-2 focus:ring-[#ff9d00]/20 placeholder:text-slate-500"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-11 py-3.5 text-base text-white outline-none transition focus:border-[#ff9d00] focus:ring-2 focus:ring-[#ff9d00]/20 placeholder:text-gray-500"
                   />
                 </div>
               </div>
@@ -127,7 +127,7 @@ export default function Login() {
                     required
                     autoComplete="current-password"
                     placeholder="••••••••"
-                    className="w-full border border-white/10 bg-white/[0.04] px-11 py-3.5 pr-12 text-base text-white outline-none transition focus:border-[#ff9d00] focus:ring-2 focus:ring-[#ff9d00]/20 placeholder:text-slate-500"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-11 py-3.5 pr-12 text-base text-white outline-none transition focus:border-[#ff9d00] focus:ring-2 focus:ring-[#ff9d00]/20 placeholder:text-gray-500"
                   />
                   <button
                     type="button"
