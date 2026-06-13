@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, User, ArrowRight, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar, User, ArrowRight, ChevronRight, ChevronUp } from 'lucide-react';
 import { api, unwrapResults, getMediaUrl } from '../services/api';
 
 const fallbackPosts = [
-  { id: 'p1', title: 'Why Full-Stack Development is the Future', author: 'Admin', date: '2026-05-20', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', excerpt: 'The tech industry is evolving rapidly. Full-stack developers who can handle both frontend and backend are becoming invaluable assets to modern teams.' },
-  { id: 'p2', title: 'UI/UX Trends for 2026', author: 'Admin', date: '2026-05-18', image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600', excerpt: 'Stay ahead of the curve with these emerging design trends that are shaping how users interact with digital products.' }
+  { id: 'p1', title: 'Why Full-Stack Development is the Future', author: 'Admin', date: 'May 20, 2026', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600', excerpt: 'The tech industry is evolving rapidly. Full-stack developers who can handle both frontend and backend are becoming invaluable assets to modern teams.', content: 'The tech industry is evolving rapidly. Full-stack developers who can handle both frontend and backend are becoming invaluable assets to modern teams. Companies today are looking for versatile engineers who can navigate the entire stack, from database design to responsive UIs. Our comprehensive full-stack program covers React, Node.js, PostgreSQL, and cloud deployment, ensuring you graduate with real-world skills that employers demand.' },
+  { id: 'p2', title: 'UI/UX Trends for 2026', author: 'Admin', date: 'May 18, 2026', image: 'https://images.unsplash.com/photo-1559028012-481c04fa702d?w=600', excerpt: 'Stay ahead of the curve with these emerging design trends that are shaping how users interact with digital products.', content: 'Stay ahead of the curve with these emerging design trends that are shaping how users interact with digital products. From glassmorphism to micro-interactions, the design landscape continues to evolve. We break down the top trends you need to know, including AI-assisted design workflows, dark mode optimization, and accessibility-first approaches that are defining the next generation of digital experiences.' }
 ];
 
 export default function Blog() {
   const [posts, setPosts] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     api.get('/news/')
@@ -22,7 +23,8 @@ export default function Blog() {
             author: p.author?.full_name || p.author?.username || 'Admin',
             date: p.created_at ? new Date(p.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' }) : '',
             image: getMediaUrl(p.image) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
-            excerpt: p.excerpt || p.content?.substring(0, 120) || ''
+            excerpt: p.excerpt || p.content?.substring(0, 120) || '',
+            content: p.content || p.excerpt || ''
           })));
         }
       })
@@ -80,9 +82,18 @@ export default function Blog() {
                   <span className="flex items-center gap-1"><User size={10} /> {post.author}</span>
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#15c8fb] transition-colors line-clamp-2">{post.title}</h3>
-                <p className="text-xs text-gray-400 mb-4 line-clamp-3 leading-relaxed">{post.excerpt}</p>
-                <button className="flex items-center gap-1.5 text-[white] font-bold text-xs hover:gap-2 transition-all">
-                  Read More <ChevronRight size={12} />
+                <AnimatePresence mode="wait" initial={false}>
+                  {expandedId === post.id ? (
+                    <motion.p key="full" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-xs text-gray-300 mb-3 leading-relaxed">{post.content}</motion.p>
+                  ) : (
+                    <motion.p key="excerpt" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="text-xs text-gray-400 mb-3 line-clamp-3 leading-relaxed">{post.excerpt}</motion.p>
+                  )}
+                </AnimatePresence>
+                <button
+                  onClick={() => setExpandedId(expandedId === post.id ? null : post.id)}
+                  className="flex items-center gap-1.5 text-[white] font-bold text-xs hover:gap-2 transition-all"
+                >
+                  {expandedId === post.id ? <>Show Less <ChevronUp size={12} /></> : <>Read More <ChevronRight size={12} /></>}
                 </button>
               </div>
             </motion.div>
