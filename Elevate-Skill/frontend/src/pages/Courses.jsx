@@ -27,8 +27,8 @@ export default function Courses() {
           category: c.category?.name || c.category || '',
           desc: c.short_description || '',
           image: getMediaUrl(c.thumbnail) || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600',
-          students: 0,
-          duration: c.duration || '',
+          students: c.enrolled_count || 0,
+          duration: c.duration ? `${c.duration}h` : '',
           lessons: c.lessons || 0,
           level: levelMap[i % levelMap.length],
           color: colorMap[i % colorMap.length],
@@ -131,25 +131,25 @@ export default function Courses() {
               </div>
               <div className="p-5">
                 <h3 className="text-base font-black text-white mb-2 group-hover:text-[#dc2626] transition-colors leading-tight">{course.title}</h3>
-                <p className="text-xs text-gray-400 mb-4 leading-relaxed line-clamp-2">{course.desc}</p>
+                <p className="text-xs text-gray-300 mb-4 leading-relaxed line-clamp-2">{course.desc}</p>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-1 mb-4">
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                    <Users size={13} className="text-[#fea305] shrink-0" /> {course.students || '—'}
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
+                    <Users size={13} className="text-cyan-400 shrink-0" /> {course.students || '—'}
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                    <Clock size={13} className="text-[#f89f29] shrink-0" /> {course.duration}
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
+                    <Clock size={13} className="text-amber-400 shrink-0" /> {course.duration}
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                    <BookOpen size={13} className="text-[#fea305] shrink-0" /> {course.lessons} lessons
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
+                    <BookOpen size={13} className="text-cyan-400 shrink-0" /> {course.lessons} lessons
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                    <Award size={13} className="text-[#f89f29] shrink-0" /> {course.level}
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-300">
+                    <Award size={13} className="text-amber-400 shrink-0" /> {course.level}
                   </div>
                 </div>
                 <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <div>
-                    <span className="text-sm text-gray-500 line-through font-medium">{course.price ? `${Math.round(parseInt(course.price) * 1.1)} ETB` : ''}</span>
-                    <span className="text-xl font-black text-white block leading-none mt-0.5">{course.price}</span>
+                    <span className="text-xl font-black text-white block leading-none">{course.price}</span>
+                    <span className="text-[10px] text-gray-500 uppercase tracking-wider">{course.lessons > 1 ? `${course.lessons} lessons` : ''}</span>
                   </div>
                   <button
                     onClick={() => handleEnroll(course)}
