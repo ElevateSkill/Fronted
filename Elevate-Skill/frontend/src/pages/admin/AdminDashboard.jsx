@@ -5,7 +5,7 @@ import {
   ArrowLeft, BarChart3, BookOpen, Building2, CheckCircle, Clock, CreditCard, Edit3, FileText,
   GraduationCap, HelpCircle, Image, Loader, LogOut, Megaphone, Menu,
   Newspaper, Plus, RefreshCw, Save, Search, Settings, Star, Tags, Trash2,
-  User, UserPlus, Users, X, XCircle, AlertTriangle, Shield
+  Upload, User, UserPlus, Users, X, XCircle, AlertTriangle, Shield
 } from 'lucide-react';
 import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
