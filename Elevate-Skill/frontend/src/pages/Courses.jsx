@@ -66,7 +66,7 @@ export default function Courses() {
     try {
       await api.post('/enrollments/', { course: course.id });
       setEnrollSuccessId(course.id || course.title);
-      setTimeout(() => navigate('/dashboard'), 1200);
+      setTimeout(() => navigate('/dashboard?enrolled=true'), 1200);
     } catch (err) {
       const msg = err?.response?.data?.course?.[0] || err?.response?.data?.detail || 'Failed to enroll';
       alert(msg);

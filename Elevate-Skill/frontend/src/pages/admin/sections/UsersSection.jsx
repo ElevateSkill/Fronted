@@ -22,63 +22,90 @@ export default function UsersSection() {
   const [userRoleFilter, setUserRoleFilter] = useState('student');
   const { toast, showToast, closeToast } = useToast();
 
-  const buildUserList = (dashboard, payments) => {
-    const map = new Map();
-    (payments || []).forEach((p) => {
-      const key = p.email || p.student_username;
-      if (key && !map.has(key)) {
-        map.set(key, {
-          id: `student_${p.id}`,
-          username: p.student_username || '',
-          email: p.email || '',
-          full_name: p.full_name || '',
-          role: 'student',
-          phone_number: p.phone || '',
-          is_active: true,
-          created_at: p.submitted_at || '',
-        });
-      }
-    });
-    (dashboard?.recent_enrollments || []).forEach((e) => {
-      const key = e.student_username;
-      if (key && !map.has(key)) {
-        map.set(key, {
-          id: `enrolled_${e.id}`,
-          username: e.student_username || '',
-          email: '',
-          full_name: e.student_full_name || '',
-          role: 'student',
-          phone_number: '',
-          is_active: true,
-          created_at: e.enrolled_at || '',
-        });
-      }
-    });
-    if (user) {
-      const adminKey = user.email || user.username;
-      if (adminKey && !map.has(adminKey)) {
-        map.set(adminKey, {
-          id: 'current_admin',
-          username: user.username || '',
-          email: user.email || '',
-          full_name: user.full_name || '',
-          role: 'admin',
-          phone_number: user.phone_number || '',
-          is_active: true,
-          created_at: user.created_at || '',
-        });
-      }
-    }
-      setUsers(Array.from(map.values()));
-  };
-
   const loadData = async () => {
     try {
-      const [dashRes, payRes] = await Promise.all([
+      const [dashRes, payRes, adminUsersRes] = await Promise.allSettled([
         api.get('/admin/dashboard/'),
         api.get('/admin/payments/'),
+        api.get('/admin/users/'),
       ]);
-      buildUserList(dashRes.data || {}, unwrapResults(payRes.data));
+
+      const allUsers = new Map();
+
+      // 1. Real users from /admin/users/ (highest priority)
+      if (adminUsersRes.status === 'fulfilled') {
+        const realUsers = unwrapResults(adminUsersRes.value.data);
+        realUsers.forEach((u) => {
+          const key = u.email || u.username;
+          if (key) {
+            allUsers.set(key, {
+              id: u.id,
+              username: u.username || '',
+              email: u.email || '',
+              full_name: u.full_name || '',
+              role: u.role || 'student',
+              phone_number: u.phone_number || '',
+              is_active: true,
+              created_at: u.created_at || u.date_joined || '',
+            });
+          }
+        });
+      }
+
+      // 2. Synthesize from payments (for students with payments but missing from /admin/users/)
+      const payments = payRes.status === 'fulfilled' ? unwrapResults(payRes.value.data) : [];
+      payments.forEach((p) => {
+        const key = p.email || p.student_email || p.student_username;
+        if (key && !allUsers.has(key)) {
+          allUsers.set(key, {
+            id: `student_${p.id}`,
+            username: p.student_username || p.student_email || '',
+            email: p.email || p.student_email || '',
+            full_name: p.full_name || '',
+            role: 'student',
+            phone_number: p.phone || '',
+            is_active: true,
+            created_at: p.submitted_at || '',
+          });
+        }
+      });
+
+      // 3. Synthesize from enrollments
+      const dashboard = dashRes.status === 'fulfilled' ? dashRes.value.data || {} : {};
+      (dashboard.recent_enrollments || []).forEach((e) => {
+        const key = e.student_username;
+        if (key && !allUsers.has(key)) {
+          allUsers.set(key, {
+            id: `enrolled_${e.id}`,
+            username: e.student_username || '',
+            email: '',
+            full_name: e.student_full_name || '',
+            role: 'student',
+            phone_number: '',
+            is_active: true,
+            created_at: e.enrolled_at || '',
+          });
+        }
+      });
+
+      // 4. Current admin as fallback
+      if (user) {
+        const adminKey = user.email || user.username;
+        if (adminKey && !allUsers.has(adminKey)) {
+          allUsers.set(adminKey, {
+            id: 'current_admin',
+            username: user.username || '',
+            email: user.email || '',
+            full_name: user.full_name || '',
+            role: 'admin',
+            phone_number: user.phone_number || '',
+            is_active: true,
+            created_at: user.created_at || '',
+          });
+        }
+      }
+
+      setUsers(Array.from(allUsers.values()));
     } catch (err) {
       showToast(apiError(err, 'Could not load users.'), 'error');
     } finally {
@@ -116,10 +143,31 @@ export default function UsersSection() {
     try {
       const payload = { ...userForm };
       if (editingUserId) {
-        setUsers((prev) => prev.map((u) =>
-          u.id === editingUserId ? { ...u, ...payload } : u
-        ));
-        showToast('User updated.', 'success');
+        const isRealUser = String(editingUserId).startsWith('student_') || String(editingUserId).startsWith('enrolled_');
+        if (isRealUser) {
+          // Synthetic user - just update locally
+          setUsers((prev) => prev.map((u) =>
+            u.id === editingUserId ? { ...u, ...payload } : u
+          ));
+          showToast('User updated locally.', 'success');
+        } else {
+          // Real user from backend - persist via API
+          try {
+            const updatePayload = { ...payload };
+            if (!updatePayload.password) delete updatePayload.password;
+            const res = await api.put(`/admin/users/${editingUserId}/`, updatePayload);
+            setUsers((prev) => prev.map((u) =>
+              u.id === editingUserId ? { ...u, ...res.data } : u
+            ));
+            showToast('User updated.', 'success');
+          } catch {
+            // Fallback to local update
+            setUsers((prev) => prev.map((u) =>
+              u.id === editingUserId ? { ...u, ...payload } : u
+            ));
+            showToast('User updated locally.', 'success');
+          }
+        }
       } else {
         const regPayload = {
           username: payload.username,
@@ -131,7 +179,12 @@ export default function UsersSection() {
         if (payload.phone_number) regPayload.phone_number = payload.phone_number;
         const res = await api.post('/auth/register/', regPayload);
         const created = res.data?.user || res.data;
-        setUsers((prev) => [{ ...created, id: `user_${created.id || Date.now()}` }, ...prev]);
+        const newUser = {
+          ...created,
+          id: created.id || `user_${Date.now()}`,
+          is_active: true,
+        };
+        setUsers((prev) => [newUser, ...prev]);
         showToast('User created.', 'success');
       }
       resetUserForm();
@@ -142,19 +195,44 @@ export default function UsersSection() {
     }
   };
 
-  const deleteUser = (id) => {
+  const deleteUser = async (id) => {
+    const isRealUser = !String(id).startsWith('student_') && !String(id).startsWith('enrolled_') && String(id) !== 'current_admin';
+    if (isRealUser) {
+      try {
+        await api.delete(`/admin/users/${id}/`);
+      } catch {
+        // Proceed with local removal even if API fails
+      }
+    }
     setUsers((prev) => prev.filter((u) => u.id !== id));
-    showToast('User deleted.', 'success');
+    showToast('User removed.', 'success');
   };
 
-  const toggleUserStatus = (u) => {
+  const toggleUserStatus = async (u) => {
+    const newStatus = !u.is_active;
+    const isRealUser = !String(u.id).startsWith('student_') && !String(u.id).startsWith('enrolled_') && String(u.id) !== 'current_admin';
+    if (isRealUser) {
+      try {
+        await api.put(`/admin/users/${u.id}/`, { is_active: newStatus });
+      } catch {
+        // proceed with local toggle
+      }
+    }
     setUsers((prev) => prev.map((x) =>
-      x.id === u.id ? { ...x, is_active: !x.is_active } : x
+      x.id === u.id ? { ...x, is_active: newStatus } : x
     ));
-    showToast(u.is_active ? 'User deactivated.' : 'User activated.', 'success');
+    showToast(newStatus ? 'User activated.' : 'User deactivated.', 'success');
   };
 
-  const changeUserRole = (u, role) => {
+  const changeUserRole = async (u, role) => {
+    const isRealUser = !String(u.id).startsWith('student_') && !String(u.id).startsWith('enrolled_') && String(u.id) !== 'current_admin';
+    if (isRealUser) {
+      try {
+        await api.put(`/admin/users/${u.id}/`, { role });
+      } catch {
+        // proceed with local change
+      }
+    }
     setUsers((prev) => prev.map((x) =>
       x.id === u.id ? { ...x, role } : x
     ));

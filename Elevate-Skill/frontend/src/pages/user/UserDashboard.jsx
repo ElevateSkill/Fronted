@@ -115,7 +115,9 @@ export default function UserDashboard() {
   const [payments, setPayments] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [bankAccounts, setBankAccounts] = useState([]);
   const [selectedEnrollment, setSelectedEnrollment] = useState('');
+  const [selectedBankId, setSelectedBankId] = useState('');
   const [proofFile, setProofFile] = useState(null);
   const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '' });
   const [profile, setProfile] = useState({ full_name: '', email: '', phone_number: '', password: '' });
@@ -133,16 +135,32 @@ export default function UserDashboard() {
     setError('');
     setMessage('');
     try {
-      const [enrollmentsRes, paymentsRes, announcementsRes, coursesRes] = await Promise.all([
+      const [enrollmentsRes, paymentsRes, announcementsRes, coursesRes, bankRes] = await Promise.all([
         api.get('/my-enrollments/'),
         api.get('/payments/'),
         api.get('/announcements/'),
         api.get('/courses/'),
+        api.get('/bank-accounts/').catch(() => ({ data: [] })),
       ]);
-      setEnrollments(unwrapResults(enrollmentsRes.data));
-      setPayments(Array.isArray(paymentsRes.data) ? paymentsRes.data : unwrapResults(paymentsRes.data));
+      const enrollmentsData = unwrapResults(enrollmentsRes.data);
+      setEnrollments(enrollmentsData);
+      
+      // Enrich payment data with course info from enrollments if missing
+      const paymentsData = Array.isArray(paymentsRes.data) ? paymentsRes.data : unwrapResults(paymentsRes.data);
+      const enrichedPayments = paymentsData.map((p) => {
+        if (!p.course_title && !p.course && p.enrollment_id) {
+          const matched = enrollmentsData.find((e) => e.id === p.enrollment_id);
+          if (matched?.course) {
+            return { ...p, course: matched.course };
+          }
+        }
+        return p;
+      });
+      setPayments(enrichedPayments);
+      
       setAnnouncements(unwrapResults(announcementsRes.data));
       setCourses(unwrapResults(coursesRes.data));
+      setBankAccounts(unwrapResults(bankRes.data));
     } catch (err) {
       setError(err?.response?.data?.detail || 'Could not load dashboard data.');
       setTimeout(() => setError(''), 5000);
@@ -153,6 +171,17 @@ export default function UserDashboard() {
 
   useEffect(() => {
     loadStudentData();
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('registered') === 'true') {
+      showToast('Account created! Submit payment proof to activate your course.', 'success');
+      window.history.replaceState({}, '', '/dashboard');
+    } else if (params.get('enrolled') === 'true') {
+      showToast('Enrolled! Submit payment proof to activate your course.', 'success');
+      window.history.replaceState({}, '', '/dashboard');
+    }
   }, []);
 
   useEffect(() => {
@@ -196,6 +225,15 @@ export default function UserDashboard() {
   const approvedPaymentCount = payments.filter(p => p.status === 'approved').length;
   const latestAnnouncement = announcements.length > 0 ? announcements[0] : null;
 
+  const paymentStatusMap = useMemo(() => {
+    const map = {};
+    payments.forEach((p) => {
+      const key = p.course_title || p.course?.title;
+      if (key) map[key] = p.status;
+    });
+    return map;
+  }, [payments]);
+
   const enrollInCourse = async (courseId) => {
     setSaving(true);
     setError('');
@@ -213,8 +251,8 @@ export default function UserDashboard() {
 
   const submitPayment = async (event) => {
     event.preventDefault();
-    if (!selectedEnrollment || !proofFile) {
-      showToast('Select a pending enrollment and upload proof.', 'error');
+    if (!selectedEnrollment || !proofFile || !selectedBankId) {
+      showToast('Select a pending enrollment, bank account, and upload proof.', 'error');
       return;
     }
     setSaving(true);
@@ -226,9 +264,11 @@ export default function UserDashboard() {
       formData.append('full_name', paymentForm.full_name);
       formData.append('email', paymentForm.email);
       formData.append('phone', paymentForm.phone);
+      formData.append('payment_method', selectedBankId);
       await api.post('/payments/', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       setProofFile(null);
       setSelectedEnrollment('');
+      setSelectedBankId('');
       showToast('Payment proof submitted. Awaiting admin approval.', 'success');
       await loadStudentData();
     } catch (err) {
@@ -260,20 +300,27 @@ export default function UserDashboard() {
   const handleEnrollSubmit = async (event) => {
     event.preventDefault();
     if (!selectedCourse) return;
-    if (!enrollProof) {
-      showToast('Please upload payment proof to enroll.', 'error');
+    if (!enrollProof || !selectedBankId) {
+      showToast('Please select a bank account and upload payment proof.', 'error');
       return;
     }
     setSaving(true);
     setError('');
     try {
+      // Step 1: Enroll in course (backend only needs course id)
+      const enrollRes = await api.post('/enrollments/', { course: selectedCourse.id });
+      const enrollmentId = enrollRes.data?.id;
+
+      // Step 2: Submit payment proof with the enrollment
       const formData = new FormData();
-      formData.append('course', selectedCourse.id);
+      formData.append('enrollment_id', enrollmentId);
+      formData.append('proof_file', enrollProof);
       formData.append('full_name', enrollForm.full_name);
       formData.append('email', enrollForm.email);
       formData.append('phone', enrollForm.phone);
-      formData.append('proof_file', enrollProof);
-      await api.post('/enrollments/', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      formData.append('payment_method', selectedBankId);
+      await api.post('/payments/', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+
       showToast('Enrolled! Payment proof submitted for admin approval.', 'success');
       setShowEnrollModal(false);
       setSelectedCourse(null);
@@ -396,6 +443,33 @@ export default function UserDashboard() {
         <StatCard label="Pending Payments" value={pendingEnrollments.length} icon={Clock} tone="orange" />
         <StatCard label="Completed" value={completedEnrollments.length} icon={GraduationCap} />
       </motion.div>
+
+      {/* Pending Payment Alert */}
+      {pendingEnrollments.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.07 }}
+          className="rounded-xl border border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-[#f07000]/5 p-5 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <Clock size={24} className="text-amber-400 shrink-0" />
+            <div className="flex-1">
+              <p className="font-black text-white">Payment Proof Required</p>
+              <p className="text-sm text-gray-300 mt-1">
+                You have {pendingEnrollments.length} enrollment{pendingEnrollments.length > 1 ? 's' : ''} pending activation.
+                Submit your payment receipt to get started.
+              </p>
+            </div>
+            <button
+              onClick={() => setActiveTab('payments')}
+              className="shrink-0 rounded-xl bg-gradient-to-r from-[#f89f29] to-[#f07000] px-5 py-3 text-xs font-black text-white hover:brightness-110 transition-all shadow-lg"
+            >
+              Upload Proof
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Quick Actions */}
       <motion.section
@@ -543,12 +617,20 @@ export default function UserDashboard() {
                 <div className="p-4">
                   <h3 className="font-black text-white">{item.course?.title}</h3>
                   <p className="mt-1 line-clamp-2 text-xs text-gray-400">{item.course?.short_description}</p>
-                  <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
-                    <span className="text-xs text-gray-400 flex items-center gap-1">
-                      <Calendar size={12} /> {formatDate(item.created_at)}
-                    </span>
-                    {item.course?.price && (
-                      <span className="font-black text-white text-sm">{item.course.price} ETB</span>
+                  <div className="mt-3 space-y-2 border-t border-white/5 pt-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400 flex items-center gap-1">
+                        <Calendar size={12} /> {formatDate(item.created_at)}
+                      </span>
+                      {item.course?.price && (
+                        <span className="font-black text-white text-sm">{item.course.price} ETB</span>
+                      )}
+                    </div>
+                    {paymentStatusMap[item.course?.title] && (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-medium text-gray-500">Payment:</span>
+                        <Badge>{paymentStatusMap[item.course?.title]}</Badge>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -673,6 +755,20 @@ export default function UserDashboard() {
                   <option value="">Choose a pending enrollment...</option>
                   {pendingEnrollments.map((item) => (
                     <option key={item.id} value={item.id}>{item.course?.title}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-400">Bank Account</label>
+                <select
+                  required
+                  value={selectedBankId}
+                  onChange={(e) => setSelectedBankId(e.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-charcoal px-3 py-3 text-sm text-white outline-none focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all"
+                >
+                  <option value="">Choose a bank account...</option>
+                  {bankAccounts.map((account) => (
+                    <option key={account.id} value={account.id}>{account.bank_name} — {account.account_number}</option>
                   ))}
                 </select>
               </div>
@@ -973,6 +1069,20 @@ export default function UserDashboard() {
                   <input required value={enrollForm.full_name} onChange={(e) => setEnrollForm({ ...enrollForm, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
                   <input required type="email" value={enrollForm.email} onChange={(e) => setEnrollForm({ ...enrollForm, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
                   <input required value={enrollForm.phone} onChange={(e) => setEnrollForm({ ...enrollForm, phone: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
+                  <div>
+                    <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-400">Bank Account</label>
+                    <select
+                      required
+                      value={selectedBankId}
+                      onChange={(e) => setSelectedBankId(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-charcoal px-3 py-3 text-sm text-white outline-none focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all"
+                    >
+                      <option value="">Choose a bank account...</option>
+                      {bankAccounts.map((account) => (
+                        <option key={account.id} value={account.id}>{account.bank_name} — {account.account_number}</option>
+                      ))}
+                    </select>
+                  </div>
                   <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-charcoal px-4 py-5 text-center hover:border-[#f89f29]/40 hover:bg-[#f89f29]/5 transition-all">
                     <FileText size={28} className="mb-2 text-[#f89f29]" />
                     <p className="text-sm font-medium text-gray-300">{enrollProof ? enrollProof.name : 'Upload payment proof (receipt/screenshot)'}</p>

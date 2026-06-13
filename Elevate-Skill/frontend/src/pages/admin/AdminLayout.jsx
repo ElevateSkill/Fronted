@@ -146,7 +146,7 @@ export default function AdminLayout() {
         <header className="sticky top-0 z-20 border-b border-gray-200/50 dark:border-white/[0.06] bg-white/80 dark:bg-[#0d1117]/80 px-4 py-3 backdrop-blur-xl lg:px-6 transition-colors duration-300">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/')} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]" title="Go home">
+              <button onClick={() => navigate('/admin')} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]" title="Back to Dashboard">
                 <ArrowLeft size={18} />
               </button>
               <button onClick={() => setMobileSidebar(true)} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 lg:hidden">

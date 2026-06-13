@@ -38,17 +38,14 @@ export function AuthProvider({ children }) {
   const registerUser = async (userData) => {
     const res = await api.post('/auth/register/', userData);
     const { access, refresh, user: registeredUser } = res.data;
-    if (access && refresh) {
-      localStorage.setItem('access_token', access);
-      localStorage.setItem('refresh_token', refresh);
-      api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-      // Fetch full profile including phone_number
-      try {
-        const profileRes = await api.get('/profile/');
-        setUser(profileRes.data);
-      } catch {
-        setUser(registeredUser);
-      }
+    localStorage.setItem('access_token', access);
+    localStorage.setItem('refresh_token', refresh);
+    api.defaults.headers.common['Authorization'] = `Bearer ${access}`;
+    try {
+      const profileRes = await api.get('/profile/');
+      setUser(profileRes.data);
+    } catch {
+      setUser(registeredUser);
     }
     return res.data;
   };

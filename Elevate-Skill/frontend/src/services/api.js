@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
-const apiBaseUrl = rawApiUrl.replace(/\/$/, '').endsWith('/api/v1')
-  ? rawApiUrl.replace(/\/$/, '')
-  : `${rawApiUrl.replace(/\/$/, '')}/api/v1`;
+const raw = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const apiBaseUrl = raw.replace(/\/+$/, '').replace(/\/api\/v1$/, '') + '/api/v1';
 
 const api = axios.create({
   baseURL: apiBaseUrl,
+  timeout: 15000,
+  headers: { 'Accept': 'application/json' },
 });
 
 api.interceptors.request.use((config) => {
@@ -40,6 +40,19 @@ export function unwrapResults(data) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.results)) return data.results;
   return [];
+}
+
+export function extractError(err, fallback = 'Something went wrong.') {
+  const data = err?.response?.data;
+  if (!data) return fallback;
+  if (typeof data === 'string') return data;
+  if (data.detail) return data.detail;
+  if (typeof data === 'object') {
+    const firstKey = Object.keys(data)[0];
+    const val = data[firstKey];
+    return Array.isArray(val) ? val[0] : val;
+  }
+  return fallback;
 }
 
 // ========== CLIENT-SIDE CSV EXPORT UTILITY ==========

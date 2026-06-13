@@ -53,7 +53,7 @@ export default function PaymentsSection() {
     const needle = paymentSearch.trim().toLowerCase();
     if (needle) {
       result = result.filter((p) =>
-        [p.full_name, p.student_username, p.email, p.course_title, p.phone]
+        [p.full_name, p.student_email, p.email, p.course_title, p.phone]
           .filter(Boolean)
           .some((val) => val.toLowerCase().includes(needle))
       );
@@ -64,13 +64,9 @@ export default function PaymentsSection() {
   const updatePayment = async (payment, action) => {
     setSaving(true);
     try {
-      const res = await api.put(`/admin/payments/${payment.id}/${action}/`);
-      setPayments((items) => {
-        const updated = items.map((item) => (item.id === payment.id ? res.data : item));
-        window.__adminPendingPayments = updated.filter((p) => p.status === 'pending').length;
-        return updated;
-      });
+      await api.put(`/admin/payments/${payment.id}/${action}/`);
       showToast(action === 'approve' ? 'Payment approved and enrollment activated.' : 'Payment rejected and enrollment cancelled.', 'success');
+      await loadData();
     } catch (err) {
       showToast(apiError(err, 'Action failed.'), 'error');
     } finally {
@@ -271,11 +267,11 @@ export default function PaymentsSection() {
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white">
-                        {(payment.full_name || payment.student_username || '?').charAt(0).toUpperCase()}
+                        {(payment.full_name || payment.student_username || payment.student_email || '?').charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">{payment.full_name || payment.student_username}</p>
-                        <p className="text-xs text-gray-500">@{payment.student_username || '—'}</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{payment.full_name || payment.student_email}</p>
+                        <p className="text-xs text-gray-500">{payment.student_email || '—'}</p>
                       </div>
                     </div>
                   </td>
@@ -356,11 +352,11 @@ export default function PaymentsSection() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-4 pb-4 border-b border-gray-100 dark:border-white/10">
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xl font-black text-white">
-                      {(selectedPayment.full_name || selectedPayment.student_username || '?').charAt(0).toUpperCase()}
+                        {(selectedPayment.full_name || selectedPayment.student_email || '?').charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-black text-gray-900 dark:text-white text-lg">{selectedPayment.full_name || selectedPayment.student_username}</p>
-                      <p className="text-sm text-gray-500">@{selectedPayment.student_username || '—'}</p>
+                      <p className="font-black text-gray-900 dark:text-white text-lg">{selectedPayment.full_name || selectedPayment.student_email}</p>
+                      <p className="text-sm text-gray-500">{selectedPayment.student_email || '—'}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
@@ -424,7 +420,8 @@ export default function PaymentsSection() {
                       payment_method: 'Manual Entry',
                       proof_file: null,
                       submitted_at: new Date().toISOString(),
-                      student_username: manualPayment.student_name?.toLowerCase().replace(/\s/g, '_'),
+                      student_email: manualPayment.email,
+                      updated_at: new Date().toISOString(),
                     };
                     const updated = [newPayment, ...prev];
                     window.__adminPendingPayments = updated.filter((p) => p.status === 'pending').length;

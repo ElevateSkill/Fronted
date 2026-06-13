@@ -142,10 +142,6 @@ export default function Register() {
         setMsg({ type: 'error', text: 'Please select a payment account.' });
         return false;
       }
-      if (!userAccountNumber.trim()) {
-        setMsg({ type: 'error', text: 'Please enter your account number.' });
-        return false;
-      }
       if (!proofFile) {
         setMsg({ type: 'error', text: 'Please upload payment proof.' });
         return false;
@@ -208,7 +204,7 @@ export default function Register() {
         formData.append('full_name', form.full_name);
         formData.append('email', form.email);
         formData.append('phone', form.phone_number);
-        formData.append('bank_account_id', selectedBankId);
+        formData.append('payment_method', selectedBankId);
         formData.append('user_account_number', userAccountNumber.trim());
 
         await api.post('/payments/', formData, {
@@ -219,7 +215,7 @@ export default function Register() {
         console.error('Enrollment/payment error:', enrollErr);
       }
 
-      setTimeout(() => navigate('/dashboard'), 800);
+      setTimeout(() => navigate('/dashboard?registered=true'), 800);
     } catch (err) {
       const errorData = err?.response?.data;
       let errorMessage = 'Something went wrong. Please try again.';
