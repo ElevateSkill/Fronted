@@ -34,7 +34,7 @@ export default function Blog() {
   if (!displayPosts.length) return null;
 
   return (
-    <div id="blog" className="relative w-full bg-gray-50 dark:bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
+    <div id="blog" className="relative w-full bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
       <div className="absolute top-1/3 right-0 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[100px] pointer-events-none" />
 
@@ -45,7 +45,7 @@ export default function Blog() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight"
+            className="text-4xl sm:text-5xl font-black text-white tracking-tight"
           >
             From Our BLOG{' '}
           </motion.h2>
@@ -54,7 +54,7 @@ export default function Blog() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-gray-500 dark:text-gray-300 text-sm mt-3 max-w-xl mx-auto"
+            className="text-gray-400 text-sm mt-3 max-w-xl mx-auto"
           >
             Insights, tutorials, and updates from the Elevate Skill team.
           </motion.p>
@@ -68,19 +68,19 @@ export default function Blog() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ delay: i * 0.1 }}
-              className="group bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 overflow-hidden hover:border-gray-300 dark:hover:border-white/20 transition-all hover:shadow-2xl"
+              className="group bg-white/5 border border-white/10 overflow-hidden hover:border-white/20 transition-all hover:shadow-2xl"
             >
               <div className="h-48 overflow-hidden relative">
                 <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
               <div className="p-5">
-                <div className="flex items-center gap-4 text-[10px] text-gray-400 dark:text-gray-300 mb-3">
+                <div className="flex items-center gap-4 text-[10px] text-gray-300 mb-3">
                   <span className="flex items-center gap-1"><Calendar size={10} /> {post.date}</span>
                   <span className="flex items-center gap-1"><User size={10} /> {post.author}</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 group-hover:text-[#15c8fb] transition-colors line-clamp-2">{post.title}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-300 mb-4 line-clamp-3 leading-relaxed">{post.excerpt}</p>
+                <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#15c8fb] transition-colors line-clamp-2">{post.title}</h3>
+                <p className="text-xs text-gray-400 mb-4 line-clamp-3 leading-relaxed">{post.excerpt}</p>
                 <button className="flex items-center gap-1.5 text-[white] font-bold text-xs hover:gap-2 transition-all">
                   Read More <ChevronRight size={12} />
                 </button>

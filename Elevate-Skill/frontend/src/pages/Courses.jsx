@@ -57,7 +57,7 @@ export default function Courses() {
     }
   };
   return (
-    <div id="courses" className="relative w-full bg-gray-50 dark:bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
+    <div id="courses" className="relative w-full bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
       <div className="absolute top-1/3 right-0 w-96 h-96 bg-[#dc2626]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#f89f29]/10 rounded-full blur-[100px] pointer-events-none" />
 
@@ -78,7 +78,7 @@ export default function Courses() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight"
+            className="text-4xl sm:text-5xl font-black text-white tracking-tight"
           >
             CHOOSE YOUR PROGRAM{' '}
             {/* <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4a2ba0] to-[#f27821]">Path</span> */}
@@ -88,7 +88,7 @@ export default function Courses() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-gray-500 dark:text-gray-300 text-sm mt-3 max-w-xl mx-auto"
+            className="text-gray-400 text-sm mt-3 max-w-xl mx-auto"
           >
             Industry-driven curriculum designed to take you from beginner to job-ready professional.
           </motion.p>
@@ -97,18 +97,18 @@ export default function Courses() {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white p-0 overflow-hidden animate-pulse">
-                <div className="h-44 bg-gray-200" />
+              <div key={i} className="rounded-xl border border-white/10 bg-white/5 p-0 overflow-hidden animate-pulse">
+                <div className="h-44 bg-white/10" />
                 <div className="p-5 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-200 rounded w-full" />
-                  <div className="h-3 bg-gray-200 rounded w-1/2" />
+                  <div className="h-4 bg-white/10 rounded w-3/4" />
+                  <div className="h-3 bg-white/10 rounded w-full" />
+                  <div className="h-3 bg-white/10 rounded w-1/2" />
                 </div>
               </div>
             ))}
           </div>
         ) : courses.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-20 text-gray-500">
             <BookOpen size={56} className="mb-4 opacity-30" />
             <p className="text-lg font-bold">No courses available yet</p>
             <p className="text-sm mt-1">Check back later for new programs.</p>
@@ -122,7 +122,7 @@ export default function Courses() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ delay: i * 0.1 }}
-              className="group relative bg-white dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 overflow-hidden hover:border-[#f89f29]/30 dark:hover:border-[#f89f29]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#dc2626]/5"
+              className="group relative bg-white/5 border border-white/10 overflow-hidden hover:border-[#f89f29]/30 transition-all duration-300 hover:shadow-xl hover:shadow-[#dc2626]/5"
             >
               <div className="h-44 overflow-hidden relative">
                 <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -130,26 +130,26 @@ export default function Courses() {
                 <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-lg text-[10px] font-bold text-white border border-white/10">{course.category}</div>
               </div>
               <div className="p-5">
-                <h3 className="text-base font-black text-gray-900 dark:text-white mb-2 group-hover:text-[#dc2626] transition-colors leading-tight">{course.title}</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">{course.desc}</p>
+                <h3 className="text-base font-black text-white mb-2 group-hover:text-[#dc2626] transition-colors leading-tight">{course.title}</h3>
+                <p className="text-xs text-gray-400 mb-4 leading-relaxed line-clamp-2">{course.desc}</p>
                 <div className="grid grid-cols-2 gap-y-2 gap-x-1 mb-4">
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
                     <Users size={13} className="text-[#fea305] shrink-0" /> {course.students || '—'}
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
                     <Clock size={13} className="text-[#f89f29] shrink-0" /> {course.duration}
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
                     <BookOpen size={13} className="text-[#fea305] shrink-0" /> {course.lessons} lessons
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-gray-300">
+                  <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
                     <Award size={13} className="text-[#f89f29] shrink-0" /> {course.level}
                   </div>
                 </div>
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-white/10">
+                <div className="flex items-center justify-between pt-4 border-t border-white/10">
                   <div>
-                    <span className="text-sm text-gray-400 dark:text-gray-500 line-through font-medium">{course.price ? `${Math.round(parseInt(course.price) * 1.1)} ETB` : ''}</span>
-                    <span className="text-xl font-black text-gray-900 dark:text-white block leading-none mt-0.5">{course.price}</span>
+                    <span className="text-sm text-gray-500 line-through font-medium">{course.price ? `${Math.round(parseInt(course.price) * 1.1)} ETB` : ''}</span>
+                    <span className="text-xl font-black text-white block leading-none mt-0.5">{course.price}</span>
                   </div>
                   <button
                     onClick={() => handleEnroll(course)}

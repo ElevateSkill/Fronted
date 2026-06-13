@@ -5,15 +5,15 @@ import {
   ArrowLeft, Bell, BookOpen, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
   Home, Loader, LogOut, Mail, Megaphone, Menu, MessageCircle, Phone,
   RefreshCw, Save, Send, Settings, Shield, Upload, User, X, AlertTriangle,
-  Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff, Sun, Moon
+  Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff
 } from 'lucide-react';
 import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
+import AnnouncementBar from '../../components/AnnouncementBar';
 
 const accent = {
-  button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20 hover:shadow-xl hover:shadow-[#15c8fb]/30 active:scale-[0.97] transition-all duration-200',
-  panel: 'border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-white to-[#f89f29]/5',
+  button: 'bg-gradient-to-r from-[#f89f29] to-[#f07000] text-white shadow-lg shadow-[#f89f29]/20 hover:shadow-xl hover:shadow-[#f89f29]/30 active:scale-[0.97] transition-all duration-200',
+  panel: 'border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-surface to-[#f07000]/5',
 };
 
 const tabs = [
@@ -35,9 +35,9 @@ function formatDate(value) {
 
 function statusClass(status) {
   const key = String(status || '').toLowerCase();
-  if (key === 'approved' || key === 'active' || key === 'completed') return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-  if (key === 'rejected' || key === 'cancelled') return 'bg-rose-100 text-rose-700 border-rose-200';
-  return 'bg-amber-100 text-amber-700 border-amber-200';
+  if (key === 'approved' || key === 'active' || key === 'completed') return 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30';
+  if (key === 'rejected' || key === 'cancelled') return 'bg-rose-500/15 text-rose-400 border-rose-500/30';
+  return 'bg-amber-500/15 text-amber-400 border-amber-500/30';
 }
 
 function Badge({ children }) {
@@ -46,24 +46,24 @@ function Badge({ children }) {
 
 function StatCard({ label, value, icon: Icon, tone = 'red' }) {
   const tones = {
-    red: { bg: 'bg-[#15c8fb]/10', text: 'text-[#15c8fb]', border: 'border-[#15c8fb]/20' },
-    orange: { bg: 'bg-[#f89f29]/10', text: 'text-[#f89f29]', border: 'border-[#f89f29]/20' },
-    green: { bg: 'bg-emerald-100', text: 'text-emerald-600', border: 'border-emerald-200' },
-    rose: { bg: 'bg-rose-100', text: 'text-rose-600', border: 'border-rose-200' },
+    red: { bg: 'bg-[#f89f29]/10', text: 'text-[#f89f29]', border: 'border-[#f89f29]/20', gradient: 'from-[#f89f29]/5 via-surface to-surface' },
+    orange: { bg: 'bg-[#f89f29]/10', text: 'text-[#f89f29]', border: 'border-[#f89f29]/20', gradient: 'from-[#f89f29]/5 via-surface to-surface' },
+    green: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', gradient: 'from-emerald-500/5 via-surface to-surface' },
+    rose: { bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/20', gradient: 'from-rose-500/5 via-surface to-surface' },
   };
   const t = tones[tone] || tones.red;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -3 }}
-      className={`rounded-xl border ${t.border} bg-white p-5 shadow-sm hover:shadow-md transition-all duration-300`}
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      className={`rounded-xl border ${t.border} bg-gradient-to-br ${t.gradient} p-5 shadow-sm hover:shadow-md transition-all duration-300`}
     >
       <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl border ${t.border} ${t.bg}`}>
         <Icon size={20} className={t.text} />
       </div>
-      <p className="text-2xl font-black text-gray-900">{value}</p>
-      <p className="mt-0.5 text-sm font-medium text-gray-500">{label}</p>
+      <p className="text-2xl font-black text-white">{value}</p>
+      <p className="mt-0.5 text-sm font-medium text-gray-400">{label}</p>
     </motion.div>
   );
 }
@@ -77,8 +77,8 @@ function Toast({ message, type, onClose }) {
   if (!message) return null;
 
   const styles = {
-    success: 'bg-emerald-600 text-white',
-    error: 'bg-rose-600 text-white',
+    success: 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20',
+    error: 'bg-rose-600 text-white shadow-lg shadow-rose-600/20',
   };
 
   return (
@@ -103,7 +103,6 @@ const pageVariants = {
 
 export default function UserDashboard() {
   const { user, logout, setUser } = useAuth();
-  const { darkMode, toggleDark } = useTheme();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('home');
   const [loading, setLoading] = useState(true);
@@ -121,6 +120,10 @@ export default function UserDashboard() {
   const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '' });
   const [profile, setProfile] = useState({ full_name: '', email: '', phone_number: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [showEnrollModal, setShowEnrollModal] = useState(false);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [enrollForm, setEnrollForm] = useState({ full_name: '', email: '', phone: '' });
+  const [enrollProof, setEnrollProof] = useState(null);
 
   const showToast = (msg, type = 'success') => setToast({ message: msg, type });
   const closeToast = () => setToast({ message: '', type: 'success' });
@@ -167,6 +170,11 @@ export default function UserDashboard() {
     };
     setProfile(nextProfile);
     setPaymentForm({
+      full_name: user?.full_name || '',
+      email: user?.email || '',
+      phone: user?.phone_number || '',
+    });
+    setEnrollForm({
       full_name: user?.full_name || '',
       email: user?.email || '',
       phone: user?.phone_number || '',
@@ -249,6 +257,36 @@ export default function UserDashboard() {
     }
   };
 
+  const handleEnrollSubmit = async (event) => {
+    event.preventDefault();
+    if (!selectedCourse) return;
+    if (!enrollProof) {
+      showToast('Please upload payment proof to enroll.', 'error');
+      return;
+    }
+    setSaving(true);
+    setError('');
+    try {
+      const formData = new FormData();
+      formData.append('course', selectedCourse.id);
+      formData.append('full_name', enrollForm.full_name);
+      formData.append('email', enrollForm.email);
+      formData.append('phone', enrollForm.phone);
+      formData.append('proof_file', enrollProof);
+      await api.post('/enrollments/', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      showToast('Enrolled! Payment proof submitted for admin approval.', 'success');
+      setShowEnrollModal(false);
+      setSelectedCourse(null);
+      setEnrollProof(null);
+      setActiveTab('payments');
+      await loadStudentData();
+    } catch (err) {
+      showToast(err?.response?.data?.detail || 'Could not enroll.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -257,7 +295,7 @@ export default function UserDashboard() {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="mb-6 sm:mb-8 flex items-center gap-3">
-        <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20">
+        <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#f89f29] to-[#f07000] text-white shadow-lg shadow-[#f89f29]/20">
           <GraduationCap size={20} />
         </div>
         <div className="min-w-0">
@@ -272,15 +310,15 @@ export default function UserDashboard() {
             onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
             className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 sm:py-2.5 text-sm font-bold transition-all duration-200 ${
               activeTab === id
-                ? 'bg-white/10 text-white'
-                : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                ? 'bg-surface/10 text-white'
+                : 'text-gray-400 hover:bg-surface/5 hover:text-white'
             }`}
           >
             {activeTab === id && (
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-gradient-to-b from-[#15c8fb] to-[#f89f29]" />
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-gradient-to-b from-[#f89f29] to-[#f07000]" />
             )}
             <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${
-              activeTab === id ? 'bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-white shadow-sm' : ''
+              activeTab === id ? 'bg-gradient-to-br from-[#f89f29] to-[#f07000] text-white shadow-sm' : ''
             }`}>
               <Icon size={16} />
             </span>
@@ -293,7 +331,7 @@ export default function UserDashboard() {
       </nav>
       <div className="mt-4 border-t border-white/10 pt-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white shadow-sm">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f89f29] to-[#f07000] text-xs font-black text-white shadow-sm">
             {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'S'}
           </div>
           <div className="min-w-0 flex-1">
@@ -302,7 +340,7 @@ export default function UserDashboard() {
           </div>
           <button
             onClick={handleLogout}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-white/10 hover:text-white transition-all"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 hover:bg-surface/10 hover:text-white transition-all"
             title="Logout"
           >
             <LogOut size={16} />
@@ -319,29 +357,29 @@ export default function UserDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-white to-[#f89f29]/5 p-6 shadow-sm"
+        className="relative overflow-hidden rounded-xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-surface to-[#f07000]/5 p-6 shadow-sm"
       >
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        {/* Decorative gradient blobs */}
+        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#f89f29]/10 to-transparent blur-3xl" />
+        <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#f89f29]/10 to-transparent blur-3xl" />
+        
+        <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-2xl font-black text-white shadow-lg shadow-[#15c8fb]/20">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f89f29] to-[#f07000] text-2xl font-black text-white shadow-lg shadow-[#f89f29]/20">
               {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'S'}
             </div>
             <div>
               <p className="text-xs font-black uppercase tracking-wider text-[#f89f29]">Student Portal</p>
-              <h1 className="text-2xl font-black text-gray-900">Welcome back, {user?.full_name || user?.username || 'Student'}!</h1>
-              <p className="mt-1 text-sm text-gray-500">{user?.email} · {enrollments.length} enrollments</p>
+              <h1 className="text-2xl font-black text-white">Welcome back, {user?.full_name || user?.username || 'Student'}!</h1>
+              <p className="mt-1 text-sm text-gray-400">{user?.email} · {enrollments.length} enrollments</p>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={loadStudentData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all"><RefreshCw size={16} /> Refresh</button>
-            <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-3.5 py-2.5 text-sm font-bold text-white"><LogOut size={16} /> Logout</button>
           </div>
         </div>
         {latestAnnouncement && (
-          <div className="mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#15c8fb]/10 to-[#f89f29]/10 px-4 py-3 text-sm">
+          <div className="relative mt-4 flex items-center gap-3 rounded-xl bg-gradient-to-r from-[#f89f29]/10 to-[#f07000]/10 px-4 py-3 text-sm">
             <Megaphone size={16} className="shrink-0 text-[#f89f29]" />
-            <span className="font-semibold text-gray-900">{latestAnnouncement.title}:</span>
-            <span className="text-gray-600 truncate">{latestAnnouncement.content}</span>
+            <span className="font-semibold text-white">{latestAnnouncement.title}:</span>
+            <span className="text-gray-300 truncate">{latestAnnouncement.content}</span>
           </div>
         )}
       </motion.section>
@@ -364,24 +402,27 @@ export default function UserDashboard() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-4 text-lg font-black text-gray-900">Quick Actions</h2>
+        <h2 className="mb-4 text-lg font-black text-white">Quick Actions</h2>
         <div className="grid gap-3 sm:grid-cols-3">
-          <button onClick={() => setActiveTab('courses')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5 transition-all">
-            <BookOpen size={22} className="mb-2 text-[#15c8fb] group-hover:scale-110 transition-transform" />
-            <p className="font-black text-gray-900">Browse Courses</p>
-            <p className="mt-1 text-xs text-gray-500">{unpaidCourses.length} available to enroll</p>
+          <button onClick={() => setActiveTab('courses')} className="group relative overflow-hidden rounded-xl border border-white/10 p-4 text-left hover:border-[#f89f29]/30 hover:bg-[#f89f29]/5 transition-all">
+            <div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#f89f29]/5 transition-all duration-500 group-hover:scale-[3]" />
+            <BookOpen size={22} className="mb-2 text-[#f89f29] group-hover:scale-110 transition-transform relative" />
+            <p className="font-black text-white relative">My Courses</p>
+            <p className="mt-1 text-xs text-gray-400 relative">{enrollments.length} enrolled</p>
           </button>
-          <button onClick={() => setActiveTab('payments')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-[#f89f29]/30 hover:bg-[#f89f29]/5 transition-all">
-            <Upload size={22} className="mb-2 text-[#f89f29] group-hover:scale-110 transition-transform" />
-            <p className="font-black text-gray-900">Upload Proof</p>
-            <p className="mt-1 text-xs text-gray-500">{pendingEnrollments.length} pending payments</p>
+          <button onClick={() => setActiveTab('payments')} className="group relative overflow-hidden rounded-xl border border-white/10 p-4 text-left hover:border-[#f89f29]/30 hover:bg-[#f89f29]/5 transition-all">
+            <div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-[#f89f29]/5 transition-all duration-500 group-hover:scale-[3]" />
+            <Upload size={22} className="mb-2 text-[#f89f29] group-hover:scale-110 transition-transform relative" />
+            <p className="font-black text-white relative">Upload Proof</p>
+            <p className="mt-1 text-xs text-gray-400 relative">{pendingEnrollments.length} pending payments</p>
           </button>
-          <button onClick={() => setActiveTab('announcements')} className="group rounded-xl border border-gray-200 p-4 text-left hover:border-emerald-500/30 hover:bg-emerald-50 transition-all">
-            <Bell size={22} className="mb-2 text-emerald-600 group-hover:scale-110 transition-transform" />
-            <p className="font-black text-gray-900">View Updates</p>
-            <p className="mt-1 text-xs text-gray-500">{announcements.length} new announcements</p>
+          <button onClick={() => setActiveTab('announcements')} className="group relative overflow-hidden rounded-xl border border-white/10 p-4 text-left hover:border-emerald-500/30 hover:bg-emerald-500/10 transition-all">
+            <div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-emerald-500/5 transition-all duration-500 group-hover:scale-[3]" />
+            <Bell size={22} className="mb-2 text-emerald-400 group-hover:scale-110 transition-transform relative" />
+            <p className="font-black text-white relative">View Updates</p>
+            <p className="mt-1 text-xs text-gray-400 relative">{announcements.length} new announcements</p>
           </button>
         </div>
       </motion.section>
@@ -391,21 +432,21 @@ export default function UserDashboard() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-4 text-lg font-black text-gray-900">Payment Summary</h2>
+        <h2 className="mb-4 text-lg font-black text-white">Payment Summary</h2>
         <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl bg-amber-50 border border-amber-200 p-4">
-            <p className="text-2xl font-black text-amber-700">{pendingPaymentCount}</p>
-            <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Pending</p>
+          <div className="rounded-xl bg-amber-500/10 border border-amber-500/20 p-4 hover:shadow-md transition-all">
+            <p className="text-2xl font-black text-amber-400">{pendingPaymentCount}</p>
+            <p className="text-xs font-bold text-amber-400 uppercase tracking-wider">Pending</p>
           </div>
-          <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4">
-            <p className="text-2xl font-black text-emerald-700">{approvedPaymentCount}</p>
-            <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Approved</p>
+          <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4 hover:shadow-md transition-all">
+            <p className="text-2xl font-black text-emerald-400">{approvedPaymentCount}</p>
+            <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider">Approved</p>
           </div>
-          <div className="rounded-xl bg-rose-50 border border-rose-200 p-4">
-            <p className="text-2xl font-black text-rose-700">{payments.filter(p => p.status === 'rejected').length}</p>
-            <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">Rejected</p>
+          <div className="rounded-xl bg-rose-500/10 border border-rose-500/20 p-4 hover:shadow-md transition-all">
+            <p className="text-2xl font-black text-rose-400">{payments.filter(p => p.status === 'rejected').length}</p>
+            <p className="text-xs font-bold text-rose-400 uppercase tracking-wider">Rejected</p>
           </div>
         </div>
       </motion.section>
@@ -416,10 +457,10 @@ export default function UserDashboard() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
         >
-          <h2 className="mb-3 text-lg font-black text-gray-900">Enrollment Breakdown</h2>
-          <div className="flex h-4 rounded-full overflow-hidden bg-gray-100">
+          <h2 className="mb-3 text-lg font-black text-white">Enrollment Breakdown</h2>
+          <div className="flex h-4 rounded-full overflow-hidden bg-white/5">
             {activeEnrollments.length > 0 && (
               <div 
                 className="bg-emerald-500 transition-all duration-500" 
@@ -436,7 +477,7 @@ export default function UserDashboard() {
             )}
             {completedEnrollments.length > 0 && (
               <div 
-                className="bg-[#15c8fb] transition-all duration-500" 
+                className="bg-[#f89f29] transition-all duration-500" 
                 style={{ width: `${(completedEnrollments.length / enrollments.length) * 100}%` }}
                 title={`Completed: ${completedEnrollments.length}`}
               />
@@ -449,10 +490,10 @@ export default function UserDashboard() {
               />
             )}
           </div>
-          <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-600">
+          <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-300">
             {activeEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Active ({activeEnrollments.length})</span>}
             {pendingEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-400" /> Pending ({pendingEnrollments.length})</span>}
-            {completedEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#15c8fb]" /> Completed ({completedEnrollments.length})</span>}
+            {completedEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-[#f89f29]" /> Completed ({completedEnrollments.length})</span>}
             {cancelledEnrollments.length > 0 && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-rose-400" /> Cancelled ({cancelledEnrollments.length})</span>}
           </div>
         </motion.section>
@@ -466,12 +507,12 @@ export default function UserDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
       >
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-black text-gray-900">My Enrollments</h2>
-            <p className="text-sm text-gray-500">{enrollments.length} total · {activeEnrollments.length} active</p>
+            <h2 className="text-lg font-black text-white">My Enrollments</h2>
+            <p className="text-sm text-gray-400">{enrollments.length} total · {activeEnrollments.length} active</p>
           </div>
         </div>
         {enrollments.length > 0 ? (
@@ -483,7 +524,7 @@ export default function UserDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
                 whileHover={{ y: -2 }}
-                className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all"
+                className="group overflow-hidden rounded-xl border border-white/10 bg-surface shadow-sm hover:shadow-md transition-all"
               >
                 <div className="relative h-36 overflow-hidden">
                   <img
@@ -493,21 +534,21 @@ export default function UserDashboard() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                   <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                    <span className="rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#15c8fb] backdrop-blur">
+                    <span className="rounded-lg bg-surface/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#f89f29] backdrop-blur">
                       {item.course?.category?.name || 'Course'}
                     </span>
                     <Badge>{item.status}</Badge>
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-black text-gray-900">{item.course?.title}</h3>
-                  <p className="mt-1 line-clamp-2 text-xs text-gray-500">{item.course?.short_description}</p>
-                  <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                  <h3 className="font-black text-white">{item.course?.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-xs text-gray-400">{item.course?.short_description}</p>
+                  <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
+                    <span className="text-xs text-gray-400 flex items-center gap-1">
                       <Calendar size={12} /> {formatDate(item.created_at)}
                     </span>
                     {item.course?.price && (
-                      <span className="font-black text-gray-900 text-sm">{item.course.price} ETB</span>
+                      <span className="font-black text-white text-sm">{item.course.price} ETB</span>
                     )}
                   </div>
                 </div>
@@ -527,10 +568,10 @@ export default function UserDashboard() {
         <motion.section
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
         >
-          <h2 className="mb-5 text-lg font-black text-gray-900">
-            Available Courses <span className="text-sm font-medium text-gray-500">({unpaidCourses.length})</span>
+          <h2 className="mb-5 text-lg font-black text-white">
+            Available Courses <span className="text-sm font-medium text-gray-400">({unpaidCourses.length})</span>
           </h2>
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {unpaidCourses.map((course, i) => (
@@ -539,7 +580,7 @@ export default function UserDashboard() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all"
+                className="group overflow-hidden rounded-xl border border-white/10 bg-surface shadow-sm hover:shadow-md transition-all"
               >
                 <div className="relative h-36 overflow-hidden">
                   <img
@@ -549,29 +590,28 @@ export default function UserDashboard() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                   <div className="absolute bottom-3 left-3">
-                    <span className="rounded-lg bg-white/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#f89f29] backdrop-blur">
+                    <span className="rounded-lg bg-surface/90 px-2.5 py-1 text-[10px] font-black uppercase text-[#f89f29] backdrop-blur">
                       {course.category?.name || 'Course'}
                     </span>
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-black text-gray-900">{course.title}</h3>
-                  <p className="mt-1 line-clamp-2 text-xs text-gray-500">{course.short_description}</p>
-                  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-gray-500">
+                  <h3 className="font-black text-white">{course.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-xs text-gray-400">{course.short_description}</p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-gray-400">
                     <span>{course.lessons || 0} lessons</span>
                     <span>·</span>
                     <span>{course.instructor || 'No instructor'}</span>
                     <span>·</span>
                     <span>{course.duration || 'Self-paced'}</span>
                   </div>
-                  <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
-                    <span className="font-black text-gray-900">{course.price || 'Free'} ETB</span>
+                  <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-3">
+                    <span className="font-black text-white">{course.price || 'Free'} ETB</span>
                     <button
-                      onClick={() => enrollInCourse(course.id)}
-                      disabled={saving}
-                      className="rounded-lg bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#15c8fb]/20"
+                      onClick={() => { setSelectedCourse(course); setShowEnrollModal(true); }}
+                      className="rounded-lg bg-gradient-to-r from-[#f89f29] to-[#f07000] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all shadow-lg shadow-[#f89f29]/20"
                     >
-                      {saving ? <Loader size={13} className="animate-spin" /> : 'Enroll Now'}
+                      Enroll Now
                     </button>
                   </div>
                 </div>
@@ -580,6 +620,7 @@ export default function UserDashboard() {
           </div>
         </motion.section>
       )}
+
     </div>
   );
 
@@ -590,18 +631,19 @@ export default function UserDashboard() {
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
       >
-        <form onSubmit={submitPayment} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
-            <Upload size={18} className="text-[#15c8fb]" /> Submit Proof
+        <form onSubmit={submitPayment} className="rounded-xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-surface to-[#f07000]/5 p-6 shadow-sm">
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-white">
+            <Upload size={18} className="text-[#f89f29]" /> Submit Payment Proof
           </h2>
+          <p className="mb-5 text-sm text-gray-400 border-b border-white/5 pb-4">Upload your payment receipt for a pending enrollment to activate your course access.</p>
           <div className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-500">Select Enrollment</label>
+              <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-400">Select Pending Enrollment</label>
               <select
                 required
                 value={selectedEnrollment}
                 onChange={(e) => setSelectedEnrollment(e.target.value)}
-                className="w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all"
+                className="w-full rounded-xl border border-white/10 bg-charcoal px-3 py-3 text-sm text-white outline-none focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all"
               >
                 <option value="">Choose a pending enrollment...</option>
                 {pendingEnrollments.map((item) => (
@@ -610,19 +652,19 @@ export default function UserDashboard() {
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
-              <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
-              <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 transition-all" />
+              <input required value={paymentForm.full_name} onChange={(e) => setPaymentForm({ ...paymentForm, full_name: e.target.value })} placeholder="Full name" className="col-span-2 rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
+              <input required type="email" value={paymentForm.email} onChange={(e) => setPaymentForm({ ...paymentForm, email: e.target.value })} placeholder="Email" className="rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
+              <input required value={paymentForm.phone} onChange={(e) => setPaymentForm({ ...paymentForm, phone: e.target.value })} placeholder="Phone" className="rounded-xl border border-white/10 bg-charcoal px-3 py-2.5 text-sm text-white outline-none placeholder:text-gray-500 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
             </div>
-            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white px-4 py-6 text-center hover:border-[#15c8fb]/40 hover:bg-[#15c8fb]/5 transition-all">
-              <FileText className="mb-2 text-[#15c8fb]" size={28} />
-              <p className="text-sm font-medium text-gray-600">{proofFile ? proofFile.name : 'Upload receipt or screenshot'}</p>
-              <p className="text-xs text-gray-500 mt-1">PDF, JPG or PNG · Max 5MB</p>
+            <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-charcoal px-4 py-6 text-center hover:border-[#f89f29]/40 hover:bg-[#f89f29]/5 transition-all">
+              <FileText className="mb-2 text-[#f89f29]" size={28} />
+              <p className="text-sm font-medium text-gray-300">{proofFile ? proofFile.name : 'Upload receipt or screenshot'}</p>
+              <p className="text-xs text-gray-400 mt-1">PDF, JPG or PNG</p>
               <input type="file" accept="image/*,.pdf" onChange={(e) => setProofFile(e.target.files?.[0] || null)} className="hidden" />
             </label>
             <button
               disabled={saving || !pendingEnrollments.length}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg shadow-[#15c8fb]/20"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f89f29] to-[#f07000] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-50 shadow-lg shadow-[#f89f29]/20"
             >
               {saving ? <Loader className="animate-spin" size={16} /> : <Send size={16} />}
               Submit Payment Proof
@@ -631,9 +673,9 @@ export default function UserDashboard() {
         </form>
 
         {payments.length > 0 && (
-          <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="mt-4 rounded-xl border border-white/10 bg-surface p-4 shadow-sm">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-black text-gray-900">Export Data</h3>
+              <h3 className="text-sm font-black text-white">Export Data</h3>
               <button
                 onClick={() => {
                   const data = payments.map(p => ({
@@ -643,7 +685,7 @@ export default function UserDashboard() {
                   }));
                   exportToCSV(data, 'my_payments.csv');
                 }}
-                className="rounded-lg border border-[#15c8fb]/30 px-3 py-1.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all"
+                className="rounded-lg border border-[#f89f29]/30 px-3 py-1.5 text-xs font-bold text-[#f89f29] hover:bg-[#f89f29]/10 transition-all"
               >
                 <Download size={12} className="inline mr-1" /> CSV
               </button>
@@ -655,17 +697,17 @@ export default function UserDashboard() {
       <motion.section
         initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm"
       >
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-black text-gray-900">Payment History</h2>
+          <h2 className="text-lg font-black text-white">Payment History</h2>
           <Badge>{payments.length} total</Badge>
         </div>
         {payments.length > 0 ? (
-          <div className="overflow-x-auto rounded-lg border border-gray-100">
+          <div className="overflow-x-auto rounded-lg border border-white/5">
             <table className="w-full min-w-[600px] text-left text-sm">
               <thead>
-                <tr className="bg-gray-50 text-[10px] uppercase tracking-wider text-gray-500">
+                <tr className="bg-surface text-[10px] uppercase tracking-wider text-gray-400">
                   <th className="px-4 py-3 font-bold">Course</th>
                   <th className="px-4 py-3 font-bold">Submitted</th>
                   <th className="px-4 py-3 font-bold">Proof</th>
@@ -674,15 +716,15 @@ export default function UserDashboard() {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {payments.map((payment) => (
-                  <tr key={payment.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-semibold text-gray-900">{payment.course_title}</td>
-                    <td className="px-4 py-3 text-gray-500 text-xs">{formatDate(payment.submitted_at)}</td>
+                  <tr key={payment.id} className="hover:bg-white/5 transition-colors">
+                    <td className="px-4 py-3 font-semibold text-white">{payment.course_title}</td>
+                    <td className="px-4 py-3 text-gray-400 text-xs">{formatDate(payment.submitted_at)}</td>
                     <td className="px-4 py-3">
                       {payment.proof_file ? (
-                        <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#15c8fb]/10 px-3 py-1.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/20 transition-all">
+                        <a href={getMediaUrl(payment.proof_file)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-[#f89f29]/10 px-3 py-1.5 text-xs font-bold text-[#f89f29] hover:bg-[#f89f29]/20 transition-all">
                           <FileText size={13} /> View
                         </a>
-                      ) : <span className="text-gray-500 text-xs">No file</span>}
+                      ) : <span className="text-gray-400 text-xs">No file</span>}
                     </td>
                     <td className="px-4 py-3"><Badge>{payment.status}</Badge></td>
                   </tr>
@@ -714,22 +756,22 @@ export default function UserDashboard() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-all"
+              className="rounded-xl border border-white/10 bg-surface p-5 shadow-sm hover:shadow-md transition-all"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb]/20 to-[#f89f29]/20">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#f89f29]/20 to-[#f07000]/20">
                     <Megaphone size={16} className="text-[#f89f29]" />
                   </div>
                   <div>
-                    <h2 className="font-black text-gray-900">{item.title}</h2>
-                    <p className="text-xs text-gray-500">{formatDate(item.created_at || item.date)}</p>
+                    <h2 className="font-black text-white">{item.title}</h2>
+                    <p className="text-xs text-gray-400">{formatDate(item.created_at || item.date)}</p>
                   </div>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-gray-600">{item.content}</p>
+              <p className="text-sm leading-relaxed text-gray-300">{item.content}</p>
               {item.created_by && (
-                <p className="mt-3 text-xs text-gray-500 border-t border-gray-100 pt-3">
+                <p className="mt-3 text-xs text-gray-400 border-t border-white/5 pt-3">
                   Posted by {item.created_by?.full_name || item.created_by?.username || 'Admin'}
                 </p>
               )}
@@ -737,9 +779,9 @@ export default function UserDashboard() {
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-gray-200 bg-white p-10 text-center">
+        <div className="rounded-xl border border-white/10 bg-surface p-10 text-center">
           <Megaphone size={48} className="mx-auto mb-3 text-gray-400" />
-          <p className="font-medium text-gray-500">No announcements yet</p>
+          <p className="font-medium text-gray-400">No announcements yet</p>
           <p className="text-sm text-gray-400 mt-1">Check back later for updates from your instructors.</p>
         </div>
       )}
@@ -753,46 +795,46 @@ export default function UserDashboard() {
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
       >
-        <form onSubmit={saveProfile} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
-            <User size={18} className="text-[#15c8fb]" /> Profile Settings
+        <form onSubmit={saveProfile} className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm">
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-white">
+            <User size={18} className="text-[#f89f29]" /> Profile Settings
           </h2>
           <div className="space-y-4">
-              <div className="flex items-center gap-5 mb-4 pb-5 border-b border-gray-100">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-3xl font-black text-white shadow-lg shadow-[#15c8fb]/20">
+              <div className="flex items-center gap-5 mb-4 pb-5 border-b border-white/5">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f89f29] to-[#f07000] text-3xl font-black text-white shadow-lg shadow-[#f89f29]/20">
                 {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'S'}
               </div>
               <div>
-                <p className="text-xl font-black text-gray-900">{user?.full_name || user?.username}</p>
+                <p className="text-xl font-black text-white">{user?.full_name || user?.username}</p>
                 <div className="mt-1.5 space-y-1">
-                  <p className="text-sm text-gray-500 flex items-center gap-2"><Mail size={14} /> {user?.email}</p>
-                  <p className="text-sm text-gray-500 flex items-center gap-2"><Shield size={14} /> {user?.role}</p>
-                  {user?.phone_number && <p className="text-sm text-gray-500 flex items-center gap-2"><Phone size={14} /> {user.phone_number}</p>}
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><Mail size={14} /> {user?.email}</p>
+                  <p className="text-sm text-gray-400 flex items-center gap-2"><Shield size={14} /> {user?.role}</p>
+                  {user?.phone_number && <p className="text-sm text-gray-400 flex items-center gap-2"><Phone size={14} /> {user.phone_number}</p>}
                 </div>
               </div>
             </div>
             <div className="grid gap-4">
-              <input required value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
-              <input required type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
-              <input value={profile.phone_number} onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all" />
+              <input required value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-white/10 bg-surface px-4 py-3 text-sm text-white outline-[#f89f29]/50 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
+              <input required type="email" value={profile.email} onChange={(e) => setProfile({ ...profile, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-white/10 bg-surface px-4 py-3 text-sm text-white outline-[#f89f29]/50 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
+              <input value={profile.phone_number} onChange={(e) => setProfile({ ...profile, phone_number: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-white/10 bg-surface px-4 py-3 text-sm text-white outline-[#f89f29]/50 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all" />
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={profile.password}
                   onChange={(e) => setProfile({ ...profile, password: e.target.value })}
                   placeholder="New password (leave blank to keep current)"
-                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-12 text-sm text-gray-900 outline-[#15c8fb]/50 focus:border-[#15c8fb]/40 focus:ring-2 focus:ring-[#15c8fb]/10 transition-all"
+                  className="w-full rounded-xl border border-white/10 bg-surface px-4 py-3 pr-12 text-sm text-white outline-[#f89f29]/50 focus:border-[#f89f29]/40 focus:ring-2 focus:ring-[#f89f29]/10 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#15c8fb] transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#f89f29] transition-colors"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
-            <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#15c8fb]/20">
+            <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f89f29] to-[#f07000] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#f89f29]/20">
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}
               Save Changes
             </button>
@@ -805,9 +847,9 @@ export default function UserDashboard() {
         animate={{ opacity: 1, x: 0 }}
         className="space-y-4"
       >
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-gray-900"><Download size={16} className="text-[#15c8fb]" /> Export My Data</h3>
-          <p className="text-xs text-gray-500 mb-4">Download your records as CSV files.</p>
+        <div className="rounded-xl border border-white/10 bg-surface p-5 shadow-sm">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-white"><Download size={16} className="text-[#f89f29]" /> Export My Data</h3>
+          <p className="text-xs text-gray-400 mb-4">Download your records as CSV files.</p>
           <div className="space-y-2">
             <button
               onClick={() => {
@@ -820,10 +862,10 @@ export default function UserDashboard() {
                 exportToCSV(data, 'my_enrollments.csv');
               }}
               disabled={!enrollments.length}
-              className="w-full rounded-lg border border-[#15c8fb]/30 px-3 py-2.5 text-xs font-bold text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all disabled:opacity-40 flex items-center justify-between"
+              className="w-full rounded-lg border border-[#f89f29]/30 px-3 py-2.5 text-xs font-bold text-[#f89f29] hover:bg-[#f89f29]/10 transition-all disabled:opacity-40 flex items-center justify-between"
             >
               <span><FileText size={13} className="inline mr-1.5" />Enrollments</span>
-              <span className="text-gray-500">{enrollments.length}</span>
+              <span className="text-gray-400">{enrollments.length}</span>
             </button>
             <button
               onClick={() => {
@@ -838,16 +880,16 @@ export default function UserDashboard() {
               className="w-full rounded-lg border border-[#f89f29]/30 px-3 py-2.5 text-xs font-bold text-orange-400 hover:bg-[#f89f29]/10 transition-all disabled:opacity-40 flex items-center justify-between"
             >
               <span><FileText size={13} className="inline mr-1.5" />Payments</span>
-              <span className="text-gray-500">{payments.length}</span>
+              <span className="text-gray-400">{payments.length}</span>
             </button>
           </div>
         </div>
-        <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-          <h3 className="text-sm font-black text-gray-900">Account Info</h3>
-          <div className="mt-3 space-y-2 text-xs text-gray-500">
-            <div className="flex justify-between"><span>Username</span><span className="font-medium text-gray-900">{user?.username || '-'}</span></div>
-            <div className="flex justify-between"><span>Role</span><span className="font-medium text-gray-900 capitalize">{user?.role || '-'}</span></div>
-            <div className="flex justify-between"><span>Joined</span><span className="font-medium text-gray-900">{user?.created_at ? formatDate(user.created_at) : '-'}</span></div>
+        <div className="rounded-xl border border-white/10 bg-surface p-5 shadow-sm">
+          <h3 className="text-sm font-black text-white">Account Info</h3>
+          <div className="mt-3 space-y-2 text-xs text-gray-400">
+            <div className="flex justify-between"><span>Username</span><span className="font-medium text-white">{user?.username || '-'}</span></div>
+            <div className="flex justify-between"><span>Role</span><span className="font-medium text-white capitalize">{user?.role || '-'}</span></div>
+            <div className="flex justify-between"><span>Joined</span><span className="font-medium text-white">{user?.created_at ? formatDate(user.created_at) : '-'}</span></div>
           </div>
         </div>
       </motion.div>
@@ -855,9 +897,61 @@ export default function UserDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-charcoal text-white">
+      <AnnouncementBar />
       <AnimatePresence>
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />
+      </AnimatePresence>
+
+      {/* Enrollment Modal */}
+      <AnimatePresence>
+        {showEnrollModal && selectedCourse && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowEnrollModal(false)}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-surface p-6 shadow-2xl">
+                <div className="mb-5 flex items-center justify-between">
+                  <h2 className="text-lg font-black text-white">Enroll in Course</h2>
+                  <button onClick={() => setShowEnrollModal(false)} className="rounded-lg p-2 text-gray-400 hover:bg-white/5">
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="mb-5 rounded-xl border border-white/10 bg-charcoal p-4">
+                  <h3 className="font-black text-white">{selectedCourse.title}</h3>
+                  <p className="mt-1 text-sm text-gray-400">{selectedCourse.price || 'Free'} ETB · {selectedCourse.lessons || 0} lessons</p>
+                </div>
+                <form onSubmit={handleEnrollSubmit} className="space-y-4">
+                  <input required value={enrollForm.full_name} onChange={(e) => setEnrollForm({ ...enrollForm, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
+                  <input required type="email" value={enrollForm.email} onChange={(e) => setEnrollForm({ ...enrollForm, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
+                  <input required value={enrollForm.phone} onChange={(e) => setEnrollForm({ ...enrollForm, phone: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
+                  <label className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/10 bg-charcoal px-4 py-5 text-center hover:border-[#f89f29]/40 hover:bg-[#f89f29]/5 transition-all">
+                    <FileText size={28} className="mb-2 text-[#f89f29]" />
+                    <p className="text-sm font-medium text-gray-300">{enrollProof ? enrollProof.name : 'Upload payment proof (receipt/screenshot)'}</p>
+                    <p className="text-xs text-gray-500 mt-1">PDF, JPG or PNG</p>
+                    <input type="file" accept="image/*,.pdf" onChange={(e) => setEnrollProof(e.target.files?.[0] || null)} className="hidden" required />
+                  </label>
+                  <div className="flex gap-3">
+                    <button type="button" onClick={() => { setShowEnrollModal(false); setEnrollProof(null); }} className="flex-1 rounded-xl border border-white/10 px-4 py-3 text-sm font-black text-gray-300 hover:bg-white/5 transition-all">Cancel</button>
+                    <button disabled={saving} className="flex-1 rounded-xl bg-gradient-to-r from-[#f89f29] to-[#f07000] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#f89f29]/20">
+                      {saving ? <Loader className="animate-spin inline" size={16} /> : 'Submit & Enroll'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </>
+        )}
       </AnimatePresence>
 
       {/* Mobile sidebar overlay */}
@@ -878,7 +972,7 @@ export default function UserDashboard() {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="fixed inset-y-0 left-0 z-50 w-68 border-r border-white/10 bg-surface p-5 shadow-2xl overflow-y-auto flex flex-col lg:hidden"
             >
-              <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-2 text-gray-400 hover:bg-white/10">
+              <button onClick={() => setMobileSidebar(false)} className="absolute top-5 right-5 rounded-lg p-2 text-gray-400 hover:bg-surface/10">
                 <X size={20} />
               </button>
               {sidebarContent}
@@ -894,34 +988,19 @@ export default function UserDashboard() {
 
       <main className="lg:pl-68">
         {/* Header */}
-        <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-lg lg:px-6">
+        <header className="sticky top-[40px] z-20 border-b border-white/10 bg-surface/90 px-4 py-4 backdrop-blur-lg lg:px-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 transition-all hover:text-[#15c8fb]" title="Go home">
+              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-400 hover:bg-white/5 transition-all hover:text-[#f89f29]" title="Go home">
                 <ArrowLeft size={20} />
               </button>
-              <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden">
+              <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-400 hover:bg-white/5 lg:hidden">
                 <Menu size={20} />
               </button>
               <div>
                 <p className="text-[10px] font-black uppercase tracking-wider text-[#f89f29]">Backend Integrated</p>
-                <h1 className="text-xl sm:text-2xl font-black text-gray-900">Student Dashboard</h1>
+                <h1 className="text-xl sm:text-2xl font-black text-white">Student Dashboard</h1>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleDark}
-                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-50 shadow-sm"
-                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
-              <button onClick={loadStudentData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-all">
-                <RefreshCw size={16} /> Refresh
-              </button>
-              <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-3.5 py-2.5 text-sm font-bold text-white hover:brightness-110 transition-all">
-                <LogOut size={16} /> Logout
-              </button>
             </div>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto lg:hidden">
@@ -930,7 +1009,7 @@ export default function UserDashboard() {
                 key={id}
                 onClick={() => setActiveTab(id)}
                 className={`shrink-0 rounded-xl px-3.5 py-2 text-sm font-bold transition-all ${
-                  activeTab === id ? accent.button : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+                  activeTab === id ? accent.button : 'bg-surface text-gray-300 border border-white/10 hover:border-white/30'
                 }`}
               >
                 {label}
@@ -946,7 +1025,7 @@ export default function UserDashboard() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700"
+              className="mb-5 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-400"
             >
               <CheckCircle size={16} className="inline mr-2" />{message}
             </motion.div>
@@ -955,7 +1034,7 @@ export default function UserDashboard() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-5 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm font-semibold text-rose-700"
+              className="mb-5 rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm font-semibold text-rose-400"
             >
               <AlertTriangle size={16} className="inline mr-2" />{error}
             </motion.div>
@@ -965,16 +1044,16 @@ export default function UserDashboard() {
             <div className="space-y-5">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                    <div className="animate-pulse rounded-lg bg-gray-200 mb-4 h-10 w-10" />
-                    <div className="animate-pulse rounded-lg bg-gray-200 mb-2 h-8 w-20" />
-                    <div className="animate-pulse rounded-lg bg-gray-200 h-4 w-24" />
+                  <div key={i} className="rounded-xl border border-white/10 bg-surface p-5 shadow-sm">
+                    <div className="animate-pulse rounded-lg bg-white/10 mb-4 h-10 w-10" />
+                    <div className="animate-pulse rounded-lg bg-white/10 mb-2 h-8 w-20" />
+                    <div className="animate-pulse rounded-lg bg-white/10 h-4 w-24" />
                   </div>
                 ))}
               </div>
-              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="animate-pulse rounded-lg bg-gray-200 mb-4 h-6 w-48" />
-                <div className="animate-pulse rounded-lg bg-gray-200 h-40 w-full" />
+              <div className="rounded-xl border border-white/10 bg-surface p-6 shadow-sm">
+                <div className="animate-pulse rounded-lg bg-white/10 mb-4 h-6 w-48" />
+                <div className="animate-pulse rounded-lg bg-white/10 h-40 w-full" />
               </div>
             </div>
           ) : (

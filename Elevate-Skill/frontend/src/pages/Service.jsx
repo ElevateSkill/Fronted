@@ -88,7 +88,7 @@ export default function Services() {
   ];
 
   return (
-    <div id="services" className="relative w-full bg-[#f8fafc] dark:bg-black py-16 md:py-24 sm:px-6 overflow-hidden transition-colors duration-500 font-sans">
+    <div id="services" className="relative w-full bg-black py-16 md:py-24 sm:px-6 overflow-hidden transition-colors duration-500 font-sans">
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#f89f29]/10 rounded-full blur-[120px] pointer-events-none" />
 
@@ -100,7 +100,7 @@ export default function Services() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-16 md:mb-24 text-center lg:text-left"
         >
-          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white/95 dark:bg-white/[0.05] border border-slate-200 dark:border-white/[0.08] backdrop-blur-3xl shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5">
+          <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-10 p-10 bg-white/5 border border-white/10 backdrop-blur-3xl shadow-2xl shadow-black/50">
             <div className="flex-none max-w-xs">
               <div className="flex items-center gap-3 mb-2 justify-center lg:justify-start">
                 <span className="w-8 h-[2px] bg-[#fba613]" />
@@ -120,7 +120,7 @@ export default function Services() {
                       <img
                         src={partner.logo}
                         alt={`${partner.name} logo`}
-                        className="h-auto max-h-full max-w-full object-contain filter dark:brightness-75 transition-all group-hover:brightness-100 opacity-80 dark:opacity-70 group-hover:opacity-100 drop-shadow-lg"
+                        className="h-auto max-h-full max-w-full object-contain filter brightness-75 transition-all group-hover:brightness-100 opacity-70 group-hover:opacity-100 drop-shadow-lg"
                       />
                     </motion.div>
                   ))}
@@ -136,7 +136,7 @@ export default function Services() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tight"
+              className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-[1.1] tracking-tight"
             >
               Solutions For GROWTH
             </motion.h2>
@@ -145,7 +145,7 @@ export default function Services() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center lg:items-end gap-5 bg-white/95 dark:bg-white/[0.06] p-6 backdrop-blur-md border border-slate-200 dark:border-white/[0.08] shadow-2xl shadow-slate-900/5 dark:shadow-[#15c8fb]/5"
+            className="flex flex-col items-center lg:items-end gap-5 bg-white/5 p-6 backdrop-blur-md border border-white/10 shadow-2xl shadow-black/50"
           >
             <div className="flex justify-between">
               <div className="flex -space-x-3">
@@ -154,11 +154,11 @@ export default function Services() {
                     key={i}
                     whileHover={{ y: -5, zIndex: 10 }}
                     src={url}
-                    className="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white dark:border-black shadow-xl cursor-pointer"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-black shadow-xl cursor-pointer"
                     alt="user"
                   />
                 ))}
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#2c2260] to-[#291850] border-4 border-white dark:border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#2c2260] to-[#291850] border-4 border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
                   2k+
                 </div>
               </div>
@@ -184,8 +184,8 @@ export default function Services() {
               layout
               className={`group relative overflow-hidden rounded-[0rem] transition-all duration-500 border ${
                 activeService === service.id
-                  ? 'bg-white dark:bg-black/60 border-[#15c8fb] shadow-2xl shadow-[#15c8fb]/10'
-                  : 'bg-white/95 dark:bg-white/[0.06] border-transparent hover:border-slate-200 dark:hover:border-white/[0.12] shadow-xl shadow-slate-900/5 dark:shadow-white/5'
+                  ? 'bg-black/60 border-[#15c8fb] shadow-2xl shadow-[#15c8fb]/10'
+                  : 'bg-white/5 border-transparent hover:border-white/10 shadow-xl shadow-white/5'
               }`}
             >
               <div className="h-52 w-full overflow-hidden relative">
@@ -198,7 +198,7 @@ export default function Services() {
               </div>
 
               <div className="p-8">
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-[#15c8fb] transition-colors tracking-tight">
+                <h3 className="text-2xl font-black text-white mb-3 group-hover:text-[#15c8fb] transition-colors tracking-tight">
                   {service.title}
                 </h3>
 
@@ -207,7 +207,7 @@ export default function Services() {
                   className={`flex items-center justify-between w-full p-4 rounded-2xl transition-all duration-300 ${
                     activeService === service.id
                       ? 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20'
-                      : 'bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-white/15'
+                      : 'bg-white/10 text-gray-300 hover:bg-white/15'
                   }`}
                 >
                   <span className="font-bold text-xs uppercase tracking-[0.2em]">
@@ -227,9 +227,9 @@ export default function Services() {
                   transition={{ duration: 0.25 }}
                   className="pt-8 space-y-6 relative z-10"
                 >
-                  <div className="relative p-5 rounded-2xl bg-gradient-to-br from-slate-50 to-white dark:from-white/5 dark:to-black/40 border border-slate-200 dark:border-white/[0.06]">
+                  <div className="relative p-5 rounded-2xl bg-gradient-to-br from-white/5 to-surface border border-white/10">
                     {/* <Sparkles className="absolute -top-3 -left-3 text-[#f89f29]" size={20} /> */}
-                    <p className="text-sm leading-relaxed text-slate-600 dark:text-gray-300 italic font-medium">
+                    <p className="text-sm leading-relaxed text-gray-300 italic font-medium">
                       "{service.desc}"
                     </p>
                   </div>
@@ -245,9 +245,9 @@ export default function Services() {
           viewport={{ once: true }}
           className="mt-20 md:mt-32 p-[2px] bg-gradient-to-r from-transparent via-[#f44c04] to-transparent rounded-[3rem]"
         >
-          <div className="bg-white dark:bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] dark:shadow-slate-900/20">
+          <div className="bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-slate-900/20">
             <div className="text-center lg:text-left">
-              <p className="text-slate-600 dark:text-gray-300 text-lg max-w-md">JOIN 1000+ visionaries scaling their digital presence today.</p>
+              <p className="text-gray-300 text-lg max-w-md">JOIN 1000+ visionaries scaling their digital presence today.</p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">

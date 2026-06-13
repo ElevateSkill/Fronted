@@ -55,7 +55,7 @@ export default function Landing() {
   }, []);
 
   return (
-    <div id="home" className="relative min-h-screen w-full overflow-hidden bg-[#f8fafc] dark:bg-[#f8fafc] transition-colors duration-700">
+    <div id="home" className="relative min-h-screen w-full overflow-hidden bg-black transition-colors duration-700">
       {/* --- FULLSCREEN IMAGE WITH OVERLAY --- */}
       <div className="absolute inset-0 z-0">
         <motion.img
@@ -70,7 +70,7 @@ export default function Landing() {
           style={{ zIndex: 1 }}
         />
         {/* Subtle dark overlay for readability */}
-        <div className="absolute inset-0 bg-black/40 dark:bg-black/40" style={{zIndex:2}} />
+        <div className="absolute inset-0 bg-black/40" style={{zIndex:2}} />
       </div>
 
       {/* --- OVERLAID CONTENT --- */}
@@ -83,7 +83,7 @@ export default function Landing() {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="text-[clamp(2.5rem,6vw,5rem)] font-black tracking-tight text-slate-900 dark:text-white leading-[1.05] mb-4"
+      className="text-[clamp(2.5rem,6vw,5rem)] font-black tracking-tight text-white leading-[1.05] mb-4"
     >
       {/* {slides[current].title} <br /> */}
       
@@ -102,7 +102,7 @@ export default function Landing() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.4 }}
-      className="max-w-xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-10 text-slate-700 dark:text-slate-200"
+      className="max-w-xl mx-auto text-base md:text-lg font-medium leading-relaxed mb-10 text-gray-300"
     >
       {slides[current].subtitle}
     </motion.p>

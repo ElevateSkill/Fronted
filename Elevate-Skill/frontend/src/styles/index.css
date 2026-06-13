@@ -59,3 +59,30 @@ html:not(.dark) h5,
 html:not(.dark) h6 {
   color: #111827;
 }
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%) skewX(-45deg); }
+  100% { transform: translateX(100%) skewX(-45deg); }
+}
+
+.animate-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(21, 200, 251, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(21, 200, 251, 0.6); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

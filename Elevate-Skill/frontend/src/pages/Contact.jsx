@@ -4,23 +4,23 @@ import { Mail, Phone, MapPin, Send, ArrowRight, ShieldCheck } from 'lucide-react
 
 export default function Contact() {
   return (
-    <div id="contact" className="relative w-full bg-gray-50 dark:bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
+    <div id="contact" className="relative w-full bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
       <div className="absolute top-1/3 left-0 w-96 h-96 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#f89f29]/10 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-black text-gray-900 dark:text-white tracking-tight">
+          <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
             Get In TOUCH{' '}
           </h2>
-          <p className="text-gray-500 dark:text-white/60 text-sm mt-3 max-w-xl mx-auto">
+          <p className="text-gray-400 text-sm mt-3 max-w-xl mx-auto">
             Have a project, question, or just want to say hello? We'd love to hear from you.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           <div className="lg:col-span-5 space-y-8">
-            <p className="text-gray-500 dark:text-white/60 text-sm leading-relaxed max-w-sm">
+            <p className="text-gray-400 text-sm leading-relaxed max-w-sm">
               Whether you need a complex solution or have a simple question, we're here to help.
             </p>
 
@@ -33,27 +33,27 @@ export default function Contact() {
                 <motion.div
                   key={index}
                   whileHover={{ x: 5 }}
-                  className="flex items-center gap-5 p-4 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 group cursor-pointer hover:border-gray-300 dark:hover:border-white/20 transition-all shadow-lg shadow-black/5 dark:shadow-white/5"
+                  className="flex items-center gap-5 p-4 bg-white/5 border border-white/10 group cursor-pointer hover:border-white/20 transition-all shadow-lg shadow-white/5"
                 >
-                  <div className="w-12 h-12 bg-gray-200 dark:bg-white/10 flex items-center justify-center text-[#d3b104] group-hover:bg-[#e6aa05] group-hover:text-white transition-all duration-300">
+                  <div className="w-12 h-12 bg-white/10 flex items-center justify-center text-[#d3b104] group-hover:bg-[#e6aa05] group-hover:text-white transition-all duration-300">
                     {item.icon}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-white/70">{item.title}</p>
-                    <p className="text-sm font-bold text-gray-900 dark:text-white">{item.value}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{item.title}</p>
+                    <p className="text-sm font-bold text-white">{item.value}</p>
                   </div>
                 </motion.div>
               ))}
             </div>
 {/* 
-            <div className="flex items-center gap-4 p-4 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+            <div className="flex items-center gap-4 p-4 bg-white/5 border border-white/10">
               <div className="flex -space-x-2">
                 {[1, 2, 3].map(i => (
-                  <img key={i} src={`https://i.pravatar.cc/40?u=${i}`} className="w-8 h-8 border-2 border-gray-100 dark:border-[#050505]" alt="" />
+                  <img key={i} src={`https://i.pravatar.cc/40?u=${i}`} className="w-8 h-8 border-2 border-white/5" alt="" />
                 ))}
               </div>
-              <p className="text-[10px] font-bold text-gray-500 dark:text-white/60">
-                Trusted by <span className="text-gray-900 dark:text-white">500+</span> companies worldwide
+              <p className="text-[10px] font-bold text-gray-400">
+                Trusted by <span className="text-white">500+</span> companies worldwide
               </p>
             </div> */}
           </div>
@@ -63,32 +63,32 @@ export default function Contact() {
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-8 md:p-12 shadow-2xl shadow-black/5 dark:shadow-white/5"
+              className="bg-white/5 border border-white/10 p-8 md:p-12 shadow-2xl shadow-white/5"
             >
               <form className="space-y-6" onSubmit={e => e.preventDefault()}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-white/70 mb-2 block">Full Name</label>
-                    <input type="text" placeholder="John Doe" className="w-full px-4 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20" />
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Full Name</label>
+                    <input type="text" placeholder="John Doe" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-white/70 mb-2 block">Email</label>
-                    <input type="email" placeholder="hello@example.com" className="w-full px-4 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20" />
+                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Email</label>
+                    <input type="email" placeholder="hello@example.com" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-white/70 mb-2 block">Subject</label>
-                  <input type="text" placeholder="How can we help?" className="w-full px-4 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Subject</label>
+                  <input type="text" placeholder="How can we help?" className="w-full px-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20" />
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 dark:text-white/70 mb-2 block">Message</label>
-                  <textarea rows={4} placeholder="Tell us more about your project..." className="w-full px-4 py-3.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-gray-400 dark:placeholder:text-white/20 resize-none" />
+                  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Message</label>
+                  <textarea rows={4} placeholder="Tell us more about your project..." className="w-full px-4 py-3.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#15c8fb]/50 transition-all placeholder:text-white/20 resize-none" />
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-                  <div className="flex items-center gap-2 text-[10px] font-bold text-gray-500 dark:text-white/70 uppercase tracking-wider">
+                  <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                     Encrypted & Secure
                   </div>
                   <motion.button

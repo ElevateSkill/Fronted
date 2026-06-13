@@ -5,16 +5,16 @@ import {
   ArrowLeft, BarChart3, BookOpen, CheckCircle, Clock, CreditCard, Edit3, FileText,
   GraduationCap, HelpCircle, Image, Loader, LogOut, Megaphone, Menu,
   Newspaper, Plus, RefreshCw, Save, Search, Settings, Star, Tags, Trash2,
-  User, UserPlus, Users, X, XCircle, AlertTriangle, Sun, Moon
+  User, UserPlus, Users, X, XCircle, AlertTriangle, Shield
 } from 'lucide-react';
 import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import logoSrc from '../../assets/logo.jpg';
+import AnnouncementBar from '../../components/AnnouncementBar';
+
 
 const accent = {
-  button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white shadow-lg shadow-[#15c8fb]/20 hover:shadow-xl hover:shadow-[#15c8fb]/30 active:scale-[0.97] transition-all duration-200',
-  panel: 'border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-white to-[#f89f29]/5',
+  button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white font-black hover:brightness-110 active:scale-[0.97] transition-all duration-200 shadow-lg shadow-[#15c8fb]/20',
+  panel: 'border-[#15c8fb]/20 bg-surface',
 };
 
 const tabs = [
@@ -89,22 +89,22 @@ function Badge({ children }) {
 function Field({ label, children }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-500">{label}</span>
+      <span className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">{label}</span>
       {children}
     </label>
   );
 }
 
 function TextInput(props) {
-  return <input {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 ${props.className || ''}`} />;
+  return <input {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function TextArea(props) {
-  return <textarea {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 placeholder:text-gray-400 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 ${props.className || ''}`} />;
+  return <textarea {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none placeholder:text-gray-400 dark:placeholder:text-gray-600 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function Select(props) {
-  return <select {...props} className={`w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-[#15c8fb]/50 transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-2 focus:ring-[#15c8fb]/10 ${props.className || ''}`} />;
+  return <select {...props} className={`w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal px-4 py-3 text-sm text-gray-900 dark:text-white outline-none transition-all duration-200 focus:border-[#15c8fb]/50 focus:ring-4 focus:ring-[#15c8fb]/10 shadow-sm ${props.className || ''}`} />;
 }
 
 function AnimatedCounter({ value }) {
@@ -137,28 +137,28 @@ const statTones = {
     text: 'text-[#15c8fb]',
     border: 'border-[#15c8fb]/20',
     cardBorder: 'border-[#15c8fb]/20',
-    gradient: 'from-[#15c8fb]/5 via-white to-white',
+    gradient: 'from-[#15c8fb]/5 via-surface to-surface',
   },
   orange: {
     bg: 'bg-[#f89f29]/10',
     text: 'text-[#f89f29]',
     border: 'border-[#f89f29]/20',
     cardBorder: 'border-[#f89f29]/20',
-    gradient: 'from-[#f89f29]/5 via-white to-white',
+    gradient: 'from-[#f89f29]/5 via-surface to-surface',
   },
   green: {
-    bg: 'bg-emerald-100',
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    cardBorder: 'border-emerald-200',
-    gradient: 'from-emerald-50 via-white to-white',
+    bg: 'bg-emerald-500/15',
+    text: 'text-emerald-400',
+    border: 'border-emerald-500/20',
+    cardBorder: 'border-emerald-500/20',
+    gradient: 'from-emerald-500/5 via-surface to-surface',
   },
   rose: {
-    bg: 'bg-rose-100',
-    text: 'text-rose-600',
-    border: 'border-rose-200',
-    cardBorder: 'border-rose-200',
-    gradient: 'from-rose-50 via-white to-white',
+    bg: 'bg-rose-500/15',
+    text: 'text-rose-400',
+    border: 'border-rose-500/20',
+    cardBorder: 'border-rose-500/20',
+    gradient: 'from-rose-500/5 via-surface to-surface',
   },
 };
 
@@ -174,10 +174,10 @@ function StatCard({ label, value, icon: Icon, tone = 'red' }) {
       <div className={`mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border ${t.border} ${t.bg}`}>
         <Icon size={22} className={t.text} />
       </div>
-      <p className="text-3xl font-black text-gray-900">
+      <p className="text-3xl font-black text-gray-900 dark:text-white">
         <AnimatedCounter value={value} />
       </p>
-      <p className="mt-1 text-sm font-medium text-gray-500">{label}</p>
+      <p className="mt-1 text-sm font-medium text-gray-500 dark:text-gray-400">{label}</p>
     </motion.div>
   );
 }
@@ -197,15 +197,15 @@ function Modal({ open, title, message, confirmLabel, onConfirm, onCancel }) {
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl"
+        className="relative w-full max-w-md rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-2xl"
       >
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-rose-100 text-rose-600">
           <AlertTriangle size={24} />
         </div>
-        <h3 className="text-lg font-black text-gray-900">{title || 'Confirm'}</h3>
+        <h3 className="text-lg font-black text-gray-900 dark:text-white">{title || 'Confirm'}</h3>
         <p className="mt-2 text-sm text-gray-600">{message}</p>
         <div className="mt-6 flex justify-end gap-3">
-          <button onClick={onCancel} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
+          <button onClick={onCancel} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-2.5 text-sm font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">Cancel</button>
           <button onClick={onConfirm} className="rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-rose-700 transition-colors">{confirmLabel || 'Delete'}</button>
         </div>
       </motion.div>
@@ -272,7 +272,6 @@ function apiError(err, fallback) {
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
-  const { darkMode, toggleDark } = useTheme();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [loading, setLoading] = useState(true);
@@ -389,6 +388,14 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadAdminData();
   }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      const published = announcements.filter(a => a.is_published);
+      localStorage.setItem('elevateskill_public_announcements', JSON.stringify(published));
+      window.dispatchEvent(new Event('announcements-updated'));
+    }
+  }, [announcements, loading]);
 
   useEffect(() => {
     if (mobileSidebar) document.body.style.overflow = 'hidden';
@@ -692,8 +699,8 @@ export default function AdminDashboard() {
   const sidebarContent = (
     <div className="flex h-full flex-col">
       <div className="mb-6 sm:mb-8 flex items-center gap-3">
-        <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center overflow-hidden rounded-xl bg-surface shadow-lg shadow-[#dc2626]/10 ring-1 ring-white/10">
-          <img src={logoSrc} alt="ElevateSkill" className="h-8 sm:h-9 w-8 sm:w-9 object-contain" />
+        <div className="flex h-9 sm:h-10 w-9 sm:w-10 items-center justify-center overflow-hidden rounded-xl bg-surface shadow-lg shadow-black/10 ring-1 ring-white/10">
+          <div className="h-8 sm:h-9 w-8 sm:w-9 rounded-lg bg-gradient-to-br from-[#15c8fb] to-[#f89f29] flex items-center justify-center text-white text-[10px] font-black">ES</div>
         </div>
         <div className="min-w-0">
           <p className="font-black text-white text-sm sm:text-base truncate">ElevateSkill</p>
@@ -707,7 +714,7 @@ export default function AdminDashboard() {
             onClick={() => { setActiveTab(id); setMobileSidebar(false); }}
             className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 sm:py-2.5 text-sm font-bold transition-all duration-200 ${
               activeTab === id
-                ? 'bg-white/10 text-white'
+                ? 'bg-[#15c8fb]/10 text-white'
                 : 'text-white/60 hover:bg-white/5 hover:text-white'
             }`}
           >
@@ -721,7 +728,7 @@ export default function AdminDashboard() {
             </span>
             <span className="flex-1 text-left">{label}</span>
             {id === 'payments' && pendingPayments.length > 0 && (
-              <span className="rounded-full bg-[#f89f29] px-2 py-0.5 text-[10px] font-black text-white shadow-sm">{pendingPayments.length}</span>
+              <span className="rounded-full bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-2 py-0.5 text-[10px] font-black text-white shadow-sm">{pendingPayments.length}</span>
             )}
           </button>
         ))}
@@ -752,12 +759,14 @@ export default function AdminDashboard() {
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`rounded-xl border p-6 shadow-sm ${accent.panel}`}
+        className="relative overflow-hidden rounded-xl border p-6 shadow-sm bg-gradient-to-br from-[#15c8fb]/5 via-surface to-[#15c8fb]/5 border-[#15c8fb]/20"
       >
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#15c8fb]/10 to-transparent blur-3xl" />
+        <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#15c8fb]/10 to-transparent blur-3xl" />
+        <div className="relative flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-wider text-[#f89f29]">Platform health</p>
-            <h2 className="mt-1 text-2xl font-black text-gray-900">Live admin overview</h2>
+            <p className="text-xs font-black uppercase tracking-wider text-[#15c8fb]">Platform health</p>
+            <h2 className="mt-1 text-2xl font-black text-gray-900 dark:text-white">Live admin overview</h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-600">Real-time metrics from the backend. Student data, course stats, enrollment activity, and payment summaries — all served live from the API.</p>
           </div>
           <button onClick={() => setActiveTab('payments')} className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black ${accent.button}`}>
@@ -793,9 +802,9 @@ export default function AdminDashboard() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-4 text-lg font-black text-gray-900">Recent enrollments</h2>
+        <h2 className="mb-4 text-lg font-black text-gray-900 dark:text-white">Recent enrollments</h2>
         <div className="overflow-x-auto rounded-lg border border-gray-100">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
@@ -807,9 +816,9 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {metrics.recent_enrollments?.map((item, i) => (
+               {metrics.recent_enrollments?.map((item) => (
                 <tr key={item.id} className="transition-colors hover:bg-gray-50">
-                  <td className="px-4 py-3.5 font-semibold text-gray-900">{item.student_full_name || item.student_username}</td>
+                  <td className="px-4 py-3.5 font-semibold text-gray-900 dark:text-white">{item.student_full_name || item.student_username}</td>
                   <td className="px-4 py-3.5 text-gray-600">{item.course_title}</td>
                   <td className="px-4 py-3.5"><Badge>{item.status}</Badge></td>
                   <td className="px-4 py-3.5 text-gray-500">{formatDate(item.enrolled_at)}</td>
@@ -830,14 +839,14 @@ export default function AdminDashboard() {
       <motion.section
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-black text-gray-900">Course management</h2>
+            <h2 className="text-lg font-black text-gray-900 dark:text-white">Course management</h2>
             <p className="text-sm text-gray-500">Create, edit, publish, hide, and manage course content.</p>
           </div>
-          <label className="flex items-center gap-2 rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-gray-500 transition-all duration-200 focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
+          <label className="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-2.5 text-sm text-gray-500 dark:text-gray-400 transition-all duration-200 focus-within:border-[#15c8fb]/40 focus-within:ring-2 focus-within:ring-[#15c8fb]/10">
             <Search size={16} className="shrink-0" />
             <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search courses..." className="w-full bg-transparent outline-none" />
           </label>
@@ -850,7 +859,7 @@ export default function AdminDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.03 }}
               whileHover={{ y: -2 }}
-              className="group overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-300"
+              className="group overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface shadow-sm hover:shadow-md transition-all duration-300"
             >
               <div className="relative h-40 w-full overflow-hidden">
                 <img
@@ -860,23 +869,23 @@ export default function AdminDashboard() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                  <span className="rounded-lg bg-white/90 px-2.5 py-1 text-xs font-black uppercase text-[#15c8fb] backdrop-blur">{course.category?.name || 'Uncategorized'}</span>
+                  <span className="rounded-lg bg-gradient-to-r from-[#15c8fb]/90 to-[#f89f29]/90 px-2.5 py-1 text-xs font-black uppercase text-white backdrop-blur">{course.category?.name || 'Uncategorized'}</span>
                   <Badge>{course.is_published && course.is_active ? 'published' : course.is_active ? 'draft' : 'inactive'}</Badge>
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-black text-gray-900">{course.title}</h3>
+                <h3 className="font-black text-gray-900 dark:text-white">{course.title}</h3>
                 <p className="mt-1 line-clamp-2 text-sm leading-6 text-gray-500">{course.short_description || course.description}</p>
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
-                  <span className="font-semibold text-gray-900">{course.price} ETB</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{course.price} ETB</span>
                   <span>{course.lessons || 0} lessons</span>
                   <span>{course.instructor || 'No instructor'}</span>
                   <span>{course.duration || 'No duration'}</span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
                   <button onClick={() => editCourse(course)} className="inline-flex items-center gap-1.5 rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10 hover:border-[#15c8fb]/50"><Edit3 size={14} /> Edit</button>
-                  <button onClick={() => patchCourse(course, { is_published: !course.is_published })} className="rounded-lg border border-[#f89f29]/30 px-3 py-2 text-xs font-bold text-[#f89f29] transition-all hover:bg-[#f89f29]/10">{course.is_published ? 'Unpublish' : 'Publish'}</button>
-                  <button onClick={() => patchCourse(course, { is_active: !course.is_active })} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 transition-all hover:bg-gray-50">{course.is_active ? 'Deactivate' : 'Activate'}</button>
+                  <button onClick={() => patchCourse(course, { is_published: !course.is_published })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">{course.is_published ? 'Unpublish' : 'Publish'}</button>
+                  <button onClick={() => patchCourse(course, { is_active: !course.is_active })} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">{course.is_active ? 'Deactivate' : 'Activate'}</button>
                   <button onClick={() => deleteCourse(course.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50"><Trash2 size={14} /> Delete</button>
                 </div>
               </div>
@@ -895,9 +904,9 @@ export default function AdminDashboard() {
         initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
         onSubmit={saveCourse}
-        className="h-fit rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="h-fit rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
           {editingCourseId ? <Edit3 size={18} className="text-[#15c8fb]" /> : <Plus size={18} className="text-[#15c8fb]" />}
           {editingCourseId ? 'Edit course' : 'Add course'}
         </h2>
@@ -921,10 +930,10 @@ export default function AdminDashboard() {
           <Field label="Learning outcomes"><TextArea value={courseForm.learning_outcomes} onChange={(e) => setCourseForm({ ...courseForm, learning_outcomes: e.target.value })} rows="2" /></Field>
           <Field label="Thumbnail"><TextInput type="file" accept="image/*" onChange={(e) => setCourseForm({ ...courseForm, thumbnail: e.target.files?.[0] || null })} /></Field>
           <div className="grid grid-cols-2 gap-3">
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-600 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={courseForm.is_active} onChange={(e) => setCourseForm({ ...courseForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active
             </label>
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-600 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={courseForm.is_published} onChange={(e) => setCourseForm({ ...courseForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Published
             </label>
           </div>
@@ -932,7 +941,7 @@ export default function AdminDashboard() {
             <button disabled={saving} className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />} Save
             </button>
-            {editingCourseId && <button type="button" onClick={resetCourseForm} className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-black text-gray-600 transition-all hover:bg-gray-50">Cancel</button>}
+            {editingCourseId && <button type="button" onClick={resetCourseForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
           </div>
         </div>
       </motion.form>
@@ -945,9 +954,9 @@ export default function AdminDashboard() {
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
         onSubmit={saveCategory}
-        className="h-fit rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="h-fit rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
           <Tags size={18} className="text-[#15c8fb]" />
           {editingCategory ? 'Edit category' : 'Create category'}
         </h2>
@@ -956,16 +965,16 @@ export default function AdminDashboard() {
         </Field>
         <div className="mt-5 flex gap-2">
           <button disabled={saving} className={`flex-1 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save category</button>
-          {editingCategory && <button type="button" onClick={() => { setEditingCategory(null); setCategoryName(''); }} className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-black text-gray-600 transition-all hover:bg-gray-50">Cancel</button>}
+          {editingCategory && <button type="button" onClick={() => { setEditingCategory(null); setCategoryName(''); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-black text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
         </div>
       </motion.form>
 
       <motion.section
         initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
-        className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-5 text-lg font-black text-gray-900">Categories used by courses</h2>
+        <h2 className="mb-5 text-lg font-black text-gray-900 dark:text-white">Categories used by courses</h2>
         <div className="grid gap-3 md:grid-cols-2">
           {categories.map((cat) => {
             const count = courses.filter((course) => course.category?.id === cat.id).length;
@@ -975,11 +984,11 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ y: -1 }}
-                className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-sm"
+                className="rounded-xl border border-gray-200 dark:border-white/10 p-4 transition-shadow hover:shadow-sm"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="font-black text-gray-900">{cat.name}</h3>
+                    <h3 className="font-black text-gray-900 dark:text-white">{cat.name}</h3>
                     <p className="mt-0.5 text-xs text-gray-500">/{cat.slug} &middot; {count} course{count !== 1 ? 's' : ''}</p>
                   </div>
                   <div className="flex shrink-0 gap-2">
@@ -1005,10 +1014,10 @@ export default function AdminDashboard() {
     <motion.section
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+      className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
     >
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-lg font-black text-gray-900">Payment review</h2>
+        <h2 className="text-lg font-black text-gray-900 dark:text-white">Payment review</h2>
         <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">{pendingPayments.length} pending</span>
       </div>
       <div className="overflow-x-auto rounded-lg border border-gray-100">
@@ -1027,7 +1036,7 @@ export default function AdminDashboard() {
             {payments.map((payment) => (
               <tr key={payment.id} className="transition-colors hover:bg-gray-50">
                 <td className="px-4 py-3.5">
-                  <p className="font-semibold text-gray-900">{payment.full_name || payment.student_username}</p>
+                  <p className="font-semibold text-gray-900 dark:text-white">{payment.full_name || payment.student_username}</p>
                   <p className="text-xs text-gray-500">{formatDate(payment.submitted_at)}</p>
                 </td>
                 <td className="px-4 py-3.5 text-gray-600">{payment.course_title}</td>
@@ -1079,15 +1088,15 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           onSubmit={saveAnnouncement}
-          className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
         >
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
             <Megaphone size={18} className="text-[#15c8fb]" /> Announcement
           </h2>
           <Field label="Title"><TextInput required value={announcementForm.title} onChange={(e) => setAnnouncementForm({ ...announcementForm, title: e.target.value })} placeholder="Announcement title" /></Field>
           <Field label="Content"><TextArea required value={announcementForm.content} onChange={(e) => setAnnouncementForm({ ...announcementForm, content: e.target.value })} rows="5" placeholder="Write your announcement..." /></Field>
-          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-600 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
-            <input type="checkbox" checked={announcementForm.is_published} onChange={(e) => setAnnouncementForm({ ...announcementForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Publish to students
+          <label className="mb-5 mt-3 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/20 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <input type="checkbox" checked={announcementForm.is_published} onChange={(e) => setAnnouncementForm({ ...announcementForm, is_published: e.target.checked })} className="h-4 w-4 rounded border-gray-300 dark:border-white/20 text-[#15c8fb] focus:ring-[#15c8fb]" /> Publish to students
           </label>
           <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save announcement</button>
         </motion.form>
@@ -1097,9 +1106,9 @@ export default function AdminDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           onSubmit={saveNews}
-          className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
         >
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
             <Newspaper size={18} className="text-[#15c8fb]" /> News post
           </h2>
           <Field label="Title"><TextInput required value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} placeholder="News title" /></Field>
@@ -1111,7 +1120,7 @@ export default function AdminDashboard() {
               <option value="draft">Draft</option>
             </Select>
           </Field>
-          <Field label="Image"><TextInput type="file" accept="image/*" onChange={(e) => setNewsForm({ ...newsForm, image: e.target.files?.[0] || null })} /></Field>
+          <Field label="Image"><TextInput type="file" accept="image/*" onChange={(e) => setNewsForm({ ...newsForm, image: e.target.files?.[0] || null })} className="file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#15c8fb]/10 file:text-[#15c8fb] hover:file:bg-[#15c8fb]/20" /></Field>
           <button disabled={saving} className={`mt-4 w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save news</button>
         </motion.form>
       </div>
@@ -1121,25 +1130,25 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
         >
-          <h2 className="mb-5 text-lg font-black text-gray-900">Announcements</h2>
+          <h2 className="mb-5 text-lg font-black text-gray-900 dark:text-white">Announcements</h2>
           <div className="space-y-3">
             {announcements.map((item) => (
-              <article key={item.id} className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-sm">
+              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/30 p-4 transition-all hover:shadow-md">
                 <div className="mb-2 flex items-start justify-between gap-2">
-                  <h3 className="font-black text-gray-900 text-sm sm:text-base">{item.title}</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white text-sm sm:text-base">{item.title}</h3>
                   <Badge>{item.is_published ? 'published' : 'draft'}</Badge>
                 </div>
-                <p className="text-sm leading-6 text-gray-600 line-clamp-3">{item.content}</p>
+                <p className="text-sm leading-6 text-gray-600 dark:text-gray-300 line-clamp-3">{item.content}</p>
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => patchAnnouncement(item, { is_published: !item.is_published })} className="rounded-lg border border-[#f89f29]/30 px-3 py-2 text-xs font-bold text-[#f89f29] transition-all hover:bg-[#f89f29]/10">{item.is_published ? 'Unpublish' : 'Publish'}</button>
-                  <button onClick={() => deleteAnnouncement(item.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50">Delete</button>
+                  <button onClick={() => patchAnnouncement(item, { is_published: !item.is_published })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">{item.is_published ? 'Unpublish' : 'Publish'}</button>
+                  <button onClick={() => deleteAnnouncement(item.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 transition-all hover:bg-rose-50 dark:hover:bg-rose-500/10">Delete</button>
                 </div>
               </article>
             ))}
             {!announcements.length && (
-              <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+              <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
                 <Megaphone size={36} className="mb-2 opacity-30" />
                 <p className="text-sm">No announcements yet</p>
               </div>
@@ -1151,25 +1160,25 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
-          className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+          className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
         >
-          <h2 className="mb-5 text-lg font-black text-gray-900">News posts</h2>
+          <h2 className="mb-5 text-lg font-black text-gray-900 dark:text-white">News posts</h2>
           <div className="space-y-3">
             {news.map((item) => (
-              <article key={item.id} className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-sm">
+              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-charcoal/30 p-4 transition-all hover:shadow-md">
                 <div className="mb-2 flex items-start justify-between gap-3">
-                  <h3 className="font-black text-gray-900">{item.title}</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white">{item.title}</h3>
                   <Badge>{item.status}</Badge>
                 </div>
-                <p className="text-sm leading-6 text-gray-600 line-clamp-2">{item.excerpt}</p>
+                <p className="text-sm leading-6 text-gray-600 dark:text-gray-300 line-clamp-2">{item.excerpt}</p>
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => patchNews(item, { status: item.status === 'published' ? 'draft' : 'published' })} className="rounded-lg border border-[#f89f29]/30 px-3 py-2 text-xs font-bold text-[#f89f29] transition-all hover:bg-[#f89f29]/10">{item.status === 'published' ? 'Move to draft' : 'Publish'}</button>
-                  <button onClick={() => deleteNews(item.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50">Delete</button>
+                  <button onClick={() => patchNews(item, { status: item.status === 'published' ? 'draft' : 'published' })} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">{item.status === 'published' ? 'Move to draft' : 'Publish'}</button>
+                  <button onClick={() => deleteNews(item.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 dark:text-rose-400 transition-all hover:bg-rose-50 dark:hover:bg-rose-500/10">Delete</button>
                 </div>
               </article>
             ))}
             {!news.length && (
-              <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+              <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
                 <Newspaper size={36} className="mb-2 opacity-30" />
                 <p className="text-sm">No news posts yet</p>
               </div>
@@ -1187,8 +1196,8 @@ export default function AdminDashboard() {
         animate={{ opacity: 1, y: 0 }}
         className="grid gap-6 xl:grid-cols-3"
       >
-        <form onSubmit={saveHero} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900"><Image size={18} className="text-[#15c8fb]" /> Hero</h2>
+        <form onSubmit={saveHero} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white"><Image size={18} className="text-[#15c8fb]" /> Hero</h2>
           <Field label="Title"><TextInput value={heroForm.title} onChange={(e) => setHeroForm({ ...heroForm, title: e.target.value })} placeholder="Welcome to Elevate Skill" /></Field>
           <Field label="Subtitle"><TextArea value={heroForm.subtitle} onChange={(e) => setHeroForm({ ...heroForm, subtitle: e.target.value })} rows="3" placeholder="Grow your skills today" /></Field>
           <Field label="CTA text"><TextInput value={heroForm.cta_text} onChange={(e) => setHeroForm({ ...heroForm, cta_text: e.target.value })} placeholder="Explore Courses" /></Field>
@@ -1197,16 +1206,16 @@ export default function AdminDashboard() {
           <button disabled={saving} className={`mt-4 w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save hero</button>
         </form>
 
-        <form onSubmit={saveAbout} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900"><FileText size={18} className="text-[#15c8fb]" /> About</h2>
+        <form onSubmit={saveAbout} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white"><FileText size={18} className="text-[#15c8fb]" /> About</h2>
           <Field label="Title"><TextInput value={aboutForm.title} onChange={(e) => setAboutForm({ ...aboutForm, title: e.target.value })} placeholder="About Elevate Skill" /></Field>
           <Field label="Content"><TextArea value={aboutForm.content} onChange={(e) => setAboutForm({ ...aboutForm, content: e.target.value })} rows="8" placeholder="Tell your story..." /></Field>
           <Field label="Image"><TextInput type="file" accept="image/*" onChange={(e) => setAboutForm({ ...aboutForm, image: e.target.files?.[0] || null })} /></Field>
           <button disabled={saving} className={`mt-4 w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save about</button>
         </form>
 
-        <form onSubmit={saveSettings} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900"><Settings size={18} className="text-[#15c8fb]" /> Site settings</h2>
+        <form onSubmit={saveSettings} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
+          <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white"><Settings size={18} className="text-[#15c8fb]" /> Site settings</h2>
           <Field label="Site name"><TextInput value={settingsForm.site_name} onChange={(e) => setSettingsForm({ ...settingsForm, site_name: e.target.value })} placeholder="Elevate Skill LMS" /></Field>
           <Field label="Contact info"><TextArea value={settingsForm.contact_info} onChange={(e) => setSettingsForm({ ...settingsForm, contact_info: e.target.value })} rows="3" placeholder="support@elevateskill.com" /></Field>
           <Field label="Bank details"><TextArea value={settingsForm.bank_details} onChange={(e) => setSettingsForm({ ...settingsForm, bank_details: e.target.value })} rows="3" /></Field>
@@ -1221,29 +1230,29 @@ export default function AdminDashboard() {
         transition={{ delay: 0.05 }}
         className="grid gap-6 xl:grid-cols-2"
       >
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
           <form onSubmit={saveTestimonial}>
-            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900"><Star size={18} className="text-[#15c8fb]" /> Testimonials</h2>
+            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white"><Star size={18} className="text-[#15c8fb]" /> Testimonials</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <Field label="Student name"><TextInput required value={testimonialForm.student_name} onChange={(e) => setTestimonialForm({ ...testimonialForm, student_name: e.target.value })} /></Field>
               <Field label="Rating (1-5)"><TextInput type="number" min="1" max="5" value={testimonialForm.rating} onChange={(e) => setTestimonialForm({ ...testimonialForm, rating: Number(e.target.value) })} /></Field>
             </div>
             <Field label="Message"><TextArea required value={testimonialForm.message} onChange={(e) => setTestimonialForm({ ...testimonialForm, message: e.target.value })} rows="3" /></Field>
             <Field label="Student image"><TextInput type="file" accept="image/*" onChange={(e) => setTestimonialForm({ ...testimonialForm, student_image: e.target.files?.[0] || null })} /></Field>
-            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-600 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={testimonialForm.is_active} onChange={(e) => setTestimonialForm({ ...testimonialForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active on homepage
             </label>
             <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save testimonial</button>
           </form>
           <div className="mt-6 space-y-3">
             {testimonials.map((item) => (
-              <article key={item.id} className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-sm">
+              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 p-4 transition-shadow hover:shadow-sm">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#15c8fb]/20 to-[#f89f29]/20 text-xs font-black text-gray-600">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#15c8fb]/20 to-[#15c8fb]/20 text-xs font-black text-gray-600">
                       {item.student_name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
-                    <h3 className="font-black text-gray-900">{item.student_name}</h3>
+                    <h3 className="font-black text-gray-900 dark:text-white">{item.student_name}</h3>
                   </div>
                   <Badge>{item.is_active ? 'active' : 'inactive'}</Badge>
                 </div>
@@ -1263,22 +1272,22 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+        <section className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
           <form onSubmit={saveFaq}>
-            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900"><HelpCircle size={18} className="text-[#15c8fb]" /> FAQs</h2>
+            <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white"><HelpCircle size={18} className="text-[#15c8fb]" /> FAQs</h2>
             <Field label="Question"><TextInput required value={faqForm.question} onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })} /></Field>
             <Field label="Answer"><TextArea required value={faqForm.answer} onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })} rows="3" /></Field>
             <Field label="Order"><TextInput type="number" value={faqForm.order} onChange={(e) => setFaqForm({ ...faqForm, order: Number(e.target.value) })} /></Field>
-            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-600 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+            <label className="mt-3 mb-4 flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
               <input type="checkbox" checked={faqForm.is_active} onChange={(e) => setFaqForm({ ...faqForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active on homepage
             </label>
             <button disabled={saving} className={`w-full rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save FAQ</button>
           </form>
           <div className="mt-6 space-y-3">
             {faqs.map((item) => (
-              <article key={item.id} className="rounded-xl border border-gray-200 p-4 transition-shadow hover:shadow-sm">
+              <article key={item.id} className="rounded-xl border border-gray-200 dark:border-white/10 p-4 transition-shadow hover:shadow-sm">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="font-black text-gray-900">{item.question}</h3>
+                  <h3 className="font-black text-gray-900 dark:text-white">{item.question}</h3>
                   <Badge>{item.is_active ? 'active' : 'inactive'}</Badge>
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-2">{item.answer}</p>
@@ -1304,7 +1313,7 @@ export default function AdminDashboard() {
         transition={{ delay: 0.1 }}
         className={`rounded-xl border p-6 shadow-sm ${accent.panel}`}
       >
-        <h2 className="text-lg font-black text-gray-900">Homepage preview counts</h2>
+        <h2 className="text-lg font-black text-gray-900 dark:text-white">Homepage preview counts</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">
           {homepage?.testimonials?.length || 0} active testimonials and {homepage?.faqs?.length || 0} active FAQs are currently returned by the public homepage endpoint.
         </p>
@@ -1334,7 +1343,7 @@ export default function AdminDashboard() {
     const payload = { ...profileForm };
     if (!payload.password) delete payload.password;
     api.put('/profile/', payload)
-      .then((res) => {
+      .then(() => {
         refreshProfile();
         showToast('Profile updated successfully.', 'success');
         setProfileForm((prev) => ({ ...prev, password: '' }));
@@ -1349,8 +1358,8 @@ export default function AdminDashboard() {
       animate={{ opacity: 1, y: 0 }}
       className="max-w-2xl"
     >
-      <form onSubmit={saveProfile} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+      <form onSubmit={saveProfile} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
           <User size={18} className="text-[#15c8fb]" /> Profile settings
         </h2>
         <div className="space-y-4">
@@ -1359,7 +1368,7 @@ export default function AdminDashboard() {
               {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
             </div>
             <div>
-              <p className="font-black text-gray-900 text-lg">{user?.full_name || user?.username}</p>
+              <p className="font-black text-gray-900 dark:text-white text-lg">{user?.full_name || user?.username}</p>
               <p className="text-sm text-gray-500">{user?.email} · {user?.role}</p>
             </div>
           </div>
@@ -1387,16 +1396,16 @@ export default function AdminDashboard() {
        <motion.section
          initial={{ opacity: 0, x: -16 }}
          animate={{ opacity: 1, x: 0 }}
-         className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
-       >
-         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-           <div>
-             <h2 className="text-lg font-black text-gray-900">User management</h2>
+        className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
+      >
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-black text-gray-900 dark:text-white">User management</h2>
              <p className="text-sm text-gray-500">Manage students and admins across the platform.</p>
            </div>
            <div className="flex gap-2">
             <span className="rounded-full bg-[#15c8fb]/10 px-3 py-1 text-xs font-bold text-[#15c8fb]">{students.length} students</span>
-            <span className="rounded-full bg-[#f89f29]/10 px-3 py-1 text-xs font-bold text-[#f89f29]">{admins.length} admins</span>
+            <span className="rounded-full bg-[#15c8fb]/10 px-3 py-1 text-xs font-bold text-[#15c8fb]">{admins.length} admins</span>
            </div>
          </div>
           <div className="mb-4 flex gap-2 border-b border-gray-100 pb-3">
@@ -1424,11 +1433,11 @@ export default function AdminDashboard() {
                  <tr key={u.id} className="transition-colors hover:bg-gray-50">
                    <td className="px-4 py-3.5">
                      <div className="flex items-center gap-3">
-                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white">
                          {(u.full_name || u.username)?.charAt(0)?.toUpperCase() || '?'}
                        </div>
                        <div>
-                         <p className="font-semibold text-gray-900">{u.full_name || u.username}</p>
+                          <p className="font-semibold text-gray-900 dark:text-white">{u.full_name || u.username}</p>
                          <p className="text-xs text-gray-500">@{u.username}</p>
                       </div>
                     </div>
@@ -1436,9 +1445,9 @@ export default function AdminDashboard() {
                    <td className="px-4 py-3.5 text-gray-600">{u.email}</td>
                   <td className="px-4 py-3.5">
                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold capitalize ${
-                       u.role === 'admin' ? 'bg-[#f89f29]/10 text-[#f89f29] border border-[#f89f29]/20' : 'bg-[#15c8fb]/10 text-[#15c8fb] border border-[#15c8fb]/20'
+                       u.role === 'admin' ? 'bg-[#15c8fb]/10 text-[#15c8fb] border border-[#15c8fb]/20' : 'bg-[#15c8fb]/10 text-[#15c8fb] border border-[#15c8fb]/20'
                      }`}>
-                       <span className={`h-1.5 w-1.5 rounded-full ${u.role === 'admin' ? 'bg-[#f89f29]' : 'bg-[#15c8fb]'}`} />
+                       <span className={`h-1.5 w-1.5 rounded-full ${u.role === 'admin' ? 'bg-[#15c8fb]' : 'bg-[#15c8fb]'}`} />
                       {u.role}
                     </span>
                   </td>
@@ -1454,12 +1463,12 @@ export default function AdminDashboard() {
                         {u.is_active ? 'Deactivate' : 'Activate'}
                       </button>
                       {u.role !== 'admin' && (
-                        <button onClick={() => changeUserRole(u, 'admin')} className="rounded-lg border border-[#f89f29]/30 px-3 py-2 text-xs font-bold text-[#f89f29] transition-all hover:bg-[#f89f29]/10">
+                        <button onClick={() => changeUserRole(u, 'admin')} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">
                           Make admin
                         </button>
                       )}
                       {u.role === 'admin' && (
-                        <button onClick={() => changeUserRole(u, 'student')} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-bold text-gray-600 transition-all hover:bg-gray-50">
+                        <button onClick={() => changeUserRole(u, 'student')} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">
                           Make student
                         </button>
                       )}
@@ -1482,9 +1491,9 @@ export default function AdminDashboard() {
         initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
         onSubmit={saveUser}
-        className="h-fit rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+        className="h-fit rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900">
+        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
           {editingUserId ? <Edit3 size={18} className="text-[#15c8fb]" /> : <UserPlus size={18} className="text-[#15c8fb]" />}
           {editingUserId ? 'Edit user' : 'Add user'}
         </h2>
@@ -1502,14 +1511,14 @@ export default function AdminDashboard() {
               <option value="admin">Admin</option>
             </Select>
           </Field>
-          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 px-3.5 py-3 text-sm font-bold text-gray-600 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
+          <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 dark:border-white/10 px-3.5 py-3 text-sm font-bold text-gray-600 dark:text-gray-300 transition-all hover:border-[#15c8fb]/30 hover:bg-[#15c8fb]/5">
             <input type="checkbox" checked={userForm.is_active} onChange={(e) => setUserForm({ ...userForm, is_active: e.target.checked })} className="h-4 w-4 rounded border-gray-300 text-[#15c8fb] focus:ring-[#15c8fb]" /> Active
           </label>
           <div className="flex gap-2 pt-1">
             <button disabled={saving} className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />} Save
             </button>
-            {editingUserId && <button type="button" onClick={resetUserForm} className="rounded-xl border border-gray-200 px-5 py-3 text-sm font-black text-gray-600 transition-all hover:bg-gray-50">Cancel</button>}
+            {editingUserId && <button type="button" onClick={resetUserForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-600 dark:text-gray-300 transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
           </div>
         </div>
       </motion.form>
@@ -1525,7 +1534,7 @@ export default function AdminDashboard() {
       className="space-y-6"
     >
       <div className={`rounded-xl border p-6 shadow-sm ${accent.panel}`}>
-        <h2 className="text-lg font-black text-gray-900">Export platform data</h2>
+        <h2 className="text-lg font-black text-gray-900 dark:text-white">Export platform data</h2>
         <p className="mt-1 text-sm text-gray-600 max-w-2xl">Download CSV reports of your platform data. Backend does not provide export endpoints — these are generated client-side from live API data.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -1610,7 +1619,7 @@ export default function AdminDashboard() {
           }))}
         />
       </div>
-      <div className="rounded-xl border border-gray-200 bg-white p-5 text-sm text-gray-500 shadow-sm">
+      <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 text-sm text-gray-500 dark:text-gray-400 shadow-sm">
         <strong>Note:</strong> All exports are generated from live data. For large datasets, pagination may limit results. This is a <strong>client-side</strong> CSV generation — no backend export API exists.
       </div>
     </motion.div>
@@ -1631,11 +1640,11 @@ export default function AdminDashboard() {
     };
 
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-200">
+      <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 shadow-sm hover:shadow-md transition-all duration-200">
         <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#15c8fb]/20 bg-[#15c8fb]/10 text-[#15c8fb]">
           <Icon size={22} />
         </div>
-        <h3 className="font-black text-gray-900">{label}</h3>
+        <h3 className="font-black text-gray-900 dark:text-white">{label}</h3>
         <p className="mt-1 text-xs text-gray-500 leading-relaxed">{description}</p>
         <div className="mt-4">
           <button
@@ -1652,7 +1661,8 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-charcoal text-gray-900 dark:text-white transition-colors duration-300">
+      <AnnouncementBar />
       <AnimatePresence>
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />
       </AnimatePresence>
@@ -1699,35 +1709,21 @@ export default function AdminDashboard() {
       </AnimatePresence>
 
       <main className="lg:pl-68">
-        <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/90 px-4 py-4 backdrop-blur-lg lg:px-6">
+        <header className="sticky top-[40px] z-20 border-b border-gray-200 dark:border-white/10 bg-white/90 dark:bg-surface/90 px-4 py-4 backdrop-blur-lg lg:px-6 transition-colors duration-300">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 transition-all hover:text-[#15c8fb]" title="Go home">
+              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition-all hover:text-[#15c8fb]" title="Go home">
                 <ArrowLeft size={20} />
               </button>
-              <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden">
+              <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 lg:hidden">
                 <Menu size={20} />
               </button>
               <div>
-                <p className="text-[11px] font-black uppercase tracking-wider text-[#f89f29]">Real backend controls</p>
-                <h1 className="text-xl sm:text-2xl font-black text-gray-900">Admin dashboard</h1>
+                <p className="text-[11px] font-black uppercase tracking-wider text-[#15c8fb]">Real backend controls</p>
+                <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">Admin dashboard</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={toggleDark}
-                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-50 shadow-sm"
-                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {darkMode ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
-              <button onClick={loadAdminData} className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-bold text-gray-600 transition-all hover:bg-gray-50 hover:shadow-sm">
-                <RefreshCw size={16} /> Refresh
-              </button>
-              <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-3.5 py-2.5 text-sm font-bold text-white transition-all hover:brightness-110">
-                <LogOut size={16} /> Logout
-              </button>
-            </div>
+            <div className="flex items-center gap-2"></div>
           </div>
           <div className="mt-4 flex gap-2 overflow-x-auto lg:hidden">
             {tabs.map(({ id, label }) => (
@@ -1735,7 +1731,7 @@ export default function AdminDashboard() {
                 key={id}
                 onClick={() => setActiveTab(id)}
                 className={`shrink-0 rounded-xl px-3.5 py-2 text-sm font-bold transition-all ${
-                  activeTab === id ? accent.button : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+                  activeTab === id ? accent.button : 'bg-white dark:bg-surface text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-gray-700'
                 }`}
               >
                 {label}
@@ -1748,23 +1744,23 @@ export default function AdminDashboard() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 rounded-xl border border-[#15c8fb]/20 bg-gradient-to-r from-[#15c8fb]/5 to-[#f89f29]/5 p-3 sm:p-4 text-sm text-gray-600 shadow-sm"
+            className="mb-6 rounded-xl border border-[#15c8fb]/20 dark:border-[#15c8fb]/10 bg-gradient-to-r from-[#15c8fb]/5 to-[#15c8fb]/5 p-3 sm:p-4 text-sm text-gray-600 dark:text-gray-400 shadow-sm"
           >
-            Signed in as <strong className="text-gray-900">{user?.full_name || user?.username}</strong>. All controls map to documented backend endpoints.
+            Signed in as <strong className="text-gray-900 dark:text-white">{user?.full_name || user?.username}</strong>. All controls map to documented backend endpoints.
           </motion.div>
 
           {loading ? (
             <div className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                  <div key={i} className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 shadow-sm">
                     <Skeleton className="mb-4 h-11 w-11" />
                     <Skeleton className="mb-2 h-8 w-20" />
                     <Skeleton className="h-4 w-24" />
                   </div>
                 ))}
               </div>
-              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
                 <Skeleton className="mb-4 h-6 w-48" />
                 <Skeleton className="h-40 w-full" />
               </div>

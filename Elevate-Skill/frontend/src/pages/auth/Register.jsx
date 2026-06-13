@@ -23,7 +23,7 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={span ? 'md:col-span-2' : ''}>
-      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
+      <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">
         {label}
       </label>
       <div className="relative group">
@@ -38,13 +38,13 @@ function InputField({ name, label, type = 'text', Icon, placeholder, span = fals
           required
           autoComplete={name === 'password' ? 'new-password' : name === 'email' ? 'email' : 'off'}
           placeholder={placeholder}
-          className={`w-full border border-slate-200 bg-white py-3.5 text-base text-slate-900 outline-none transition focus:border-[red] focus:ring-2 focus:ring-[red]/20 dark:border-white/10 dark:bg-white/[0.04] dark:text-white dark:placeholder:text-slate-500 ${Icon ? 'pl-11' : 'pl-4'} ${isShowable ? 'pr-11' : 'pr-4'}`}
+          className={`w-full border border-white/10 bg-white/[0.04] py-3.5 text-base text-white outline-none transition focus:border-[red] focus:ring-2 focus:ring-[red]/20 placeholder:text-slate-500 ${Icon ? 'pl-11' : 'pl-4'} ${isShowable ? 'pr-11' : 'pr-4'}`}
         />
         {isShowable && (
           <button
             type="button"
             onClick={() => setLocalShow(!localShow)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-700 dark:hover:text-slate-200"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-slate-200"
           >
             {localShow ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -193,8 +193,8 @@ export default function Register() {
   const canSubmit = currentStep === 3;
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#eef5fb] via-[#e5edf6] to-[#d8e2f0] text-slate-900 dark:from-[#07090d] dark:via-[#0a0e14] dark:to-[#111827] dark:text-white">
-      <button onClick={() => navigate('/')} className="absolute top-4 left-4 z-20 flex items-center justify-center h-9 w-9 rounded-xl bg-white/90 dark:bg-white/10 border border-gray-200 dark:border-white/20 text-gray-700 dark:text-white hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626] transition-all shadow-sm" title="Go home">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#07090d] via-[#0a0e14] to-[#111827] text-white">
+      <button onClick={() => navigate('/')} className="absolute top-4 left-4 z-20 flex items-center justify-center h-9 w-9 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-[#dc2626] hover:text-white hover:border-[#dc2626] transition-all shadow-sm" title="Go home">
         <ArrowLeft size={18} />
       </button>
       <div className="absolute inset-0 pointer-events-none">
@@ -205,24 +205,24 @@ export default function Register() {
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl items-center justify-center px-4 py-10 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="w-full">
-          <div className="relative overflow-hidden border border-white/40 bg-white/90 p-6 shadow-[0_30px_120px_rgba(15,23,42,0.16)] backdrop-blur-2xl dark:border-white/10 dark:bg-[#0c111b]/90 sm:p-8 md:p-10">
+          <div className="relative overflow-hidden border border-white/10 bg-[#0c111b]/90 p-6 shadow-[0_30px_120px_rgba(15,23,42,0.16)] backdrop-blur-2xl sm:p-8 md:p-10">
             <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[red] via-[#f89f29] to-[red]" />
             <div className="mb-8 flex flex-col gap-6 pt-10 md:flex-row md:items-end md:justify-between">
               <div>
                 {/* <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#15c8fb]/15 bg-[#15c8fb]/8 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#0f9bcf] dark:text-[#7edfff]">
                   <Sparkles size={14} /> 3-step registration
                 </div> */}
-                <h1 className="text-4xl font-black tracking-tight text-slate-950 dark:text-white sm:text-5xl">Join ElevateSkill</h1>
-                <p className="mt-3 max-w-2xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">
+                <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">Join ElevateSkill</h1>
+                <p className="mt-3 max-w-2xl text-sm text-slate-300 sm:text-base">
                   Create your account, secure it, then finish enrollment in one clear flow.
                 </p>
               </div>
 
-              <div className="border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
-                <div className="flex items-center gap-2 font-semibold text-slate-900 dark:text-white">
+              <div className="border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-slate-300">
+                <div className="flex items-center gap-2 font-semibold text-white">
                   <ShieldCheck size={16} className="text-[red]" /> Secure, guided signup
                 </div>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Save time by completing the form step by step.</p>
+                <p className="mt-1 text-xs text-slate-400">Save time by completing the form step by step.</p>
               </div>
             </div>
 
@@ -240,22 +240,22 @@ export default function Register() {
                       ? 'border-[red]/35 bg-[red]/10 shadow-[0_10px_30px_rgba(21,200,251,0.12)]'
                       : completed
                         ? 'border-[#f89f29]/25 bg-[#f89f29]/10'
-                        : 'border-slate-200 bg-white dark:border-white/10 dark:bg-white/[0.03]'
+                        : 'border-white/10 bg-white/[0.03]'
                       }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+                      <span className="text-xs font-bold uppercase tracking-[0.3em] text-slate-400">
                         {step.label}
                       </span>
                       {completed ? <Check size={16} className="text-[#f89f29]" /> : <span className="text-xs font-bold text-slate-400">0{step.id}</span>}
                     </div>
-                    <p className="mt-2 text-sm font-medium text-slate-900 dark:text-white">{step.note}</p>
+                    <p className="mt-2 text-sm font-medium text-white">{step.note}</p>
                   </button>
                 );
               })}
             </div>
 
-            <div className="mb-6 h-2 bg-slate-200 dark:bg-white/10">
+            <div className="mb-6 h-2 bg-white/10">
               <div
                 className="h-full bg-gradient-to-r from-[red] via-[#f89f29] to-[red] transition-all duration-500"
                 style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
@@ -269,9 +269,9 @@ export default function Register() {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className={`mb-6 flex gap-3 border p-4 text-sm ${msg.type === 'success'
-                    ? 'border-green-300 bg-green-50 text-green-700 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-300'
-                    : 'border-red-300 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300'
+                   className={`mb-6 flex gap-3 border p-4 text-sm ${msg.type === 'success'
+                    ? 'border-green-500/30 bg-green-500/10 text-green-300'
+                    : 'border-red-500/30 bg-red-500/10 text-red-300'
                     }`}
                 >
                   {msg.type === 'success' ? <CheckCircle size={20} className="mt-0.5 shrink-0" /> : <AlertTriangle size={20} className="mt-0.5 shrink-0" />}
@@ -296,8 +296,8 @@ export default function Register() {
                     <InputField name="password" label="Password" type="password" Icon={Lock} placeholder="••••••••" showToggle form={form} onChange={onChange} />
                     <InputField name="confirm_password" label="Confirm Password" type="password" Icon={Lock} placeholder="••••••••" showToggle form={form} onChange={onChange} />
 
-                    <div className="md:col-span-2 border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300">
-                      <p className="font-semibold text-slate-900 dark:text-white">Password tips</p>
+                    <div className="md:col-span-2 border border-white/10 bg-white/[0.03] p-5 text-sm text-slate-300">
+                      <p className="font-semibold text-white">Password tips</p>
                       <p className="mt-1">Use a password you can remember and keep it private. You will use it to sign in later.</p>
                     </div>
                   </motion.div>
@@ -307,13 +307,13 @@ export default function Register() {
                   <motion.div key="step-3" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} className="space-y-5">
                     <div className="grid gap-5 md:grid-cols-2">
                       <div className="space-y-2 md:col-span-2">
-                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">Course</label>
+                        <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Course</label>
                         <div className="relative">
                           <BookOpen size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                           <select
                             value={selectedCourseId}
                             onChange={(e) => setSelectedCourseId(e.target.value)}
-                            className="w-full appearance-none border border-slate-200 bg-white py-4 pl-11 pr-4 text-base text-slate-900 outline-none transition focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20 dark:border-white/10 dark:bg-white/[0.04] dark:text-white"
+                            className="w-full appearance-none border border-white/10 bg-white/[0.04] py-4 pl-11 pr-4 text-base text-white outline-none transition focus:border-[#f89f29] focus:ring-2 focus:ring-[#f89f29]/20"
                           >
                             <option value="">Select a course...</option>
                             {courses.map((course) => (
@@ -325,11 +325,11 @@ export default function Register() {
                         </div>
                       </div>
 
-                      <label className={`group flex items-center gap-4 border-2 border-dashed p-5 transition hover:border-[#f89f29] md:col-span-2 ${proofFile ? 'border-green-400 bg-green-50 dark:bg-green-500/5' : 'border-slate-200 bg-white dark:border-white/10 dark:bg-white/[0.03]'}`}>
+                      <label className={`group flex items-center gap-4 border-2 border-dashed p-5 transition hover:border-[#f89f29] md:col-span-2 ${proofFile ? 'border-green-400 bg-green-500/5' : 'border-white/10 bg-white/[0.03]'}`}>
                         <Upload size={28} className="text-slate-400 transition-colors group-hover:text-[#f89f29]" />
                         <div className="flex-1">
-                          <p className="font-medium text-slate-900 dark:text-white">{proofFile ? proofFile.name : 'Upload payment proof'}</p>
-                          <p className="text-xs text-slate-400 dark:text-slate-500">JPG, PNG or PDF • Max 5MB</p>
+                          <p className="font-medium text-white">{proofFile ? proofFile.name : 'Upload payment proof'}</p>
+                          <p className="text-xs text-slate-500">JPG, PNG or PDF • Max 5MB</p>
                         </div>
                         {proofFile && <CheckCircle size={24} className="text-green-500" />}
                         <input
@@ -342,17 +342,17 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-3">
-                      <div className="border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                      <div className="border border-white/10 bg-white/[0.03] p-4">
                         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Name</p>
-                        <p className="mt-2 font-semibold text-slate-900 dark:text-white">{form.full_name || 'Not set'}</p>
+                        <p className="mt-2 font-semibold text-white">{form.full_name || 'Not set'}</p>
                       </div>
-                      <div className="border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                      <div className="border border-white/10 bg-white/[0.03] p-4">
                         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Course</p>
-                        <p className="mt-2 font-semibold text-slate-900 dark:text-white">{selectedCourse?.title || 'Not selected'}</p>
+                        <p className="mt-2 font-semibold text-white">{selectedCourse?.title || 'Not selected'}</p>
                       </div>
-                      <div className="border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.03]">
+                      <div className="border border-white/10 bg-white/[0.03] p-4">
                         <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-400">Proof</p>
-                        <p className="mt-2 font-semibold text-slate-900 dark:text-white">{proofFile ? 'Ready' : 'Missing'}</p>
+                        <p className="mt-2 font-semibold text-white">{proofFile ? 'Ready' : 'Missing'}</p>
                       </div>
                     </div>
                   </motion.div>
@@ -364,7 +364,7 @@ export default function Register() {
                   type="button"
                   onClick={handleBack}
                   disabled={currentStep === 1 || loading}
-                  className="border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-200"
+                  className="border border-white/10 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-slate-200 transition hover:border-slate-300 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Back
                 </button>
@@ -406,7 +406,7 @@ export default function Register() {
             </form>
 
             <div className="mt-8 text-center">
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-slate-400">
                 Already have an account?{' '}
                 <Link to="/login" className="font-bold text-[red] transition hover:text-[yellow]">
                   Sign in

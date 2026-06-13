@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, ArrowLeft, Sun, Moon } from 'lucide-react';
+import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import logoJpg from '../assets/logo.jpg';
 
 export default function Navbar() {
@@ -13,43 +12,35 @@ export default function Navbar() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [activeMega, setActiveMega] = useState(null);
   const { user, logout } = useAuth();
-  const { darkMode, toggleDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const showBack = location.pathname !== '/';
 
-  // Scroll logic
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 20);
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
-      setLastScrollY(currentScrollY);
+      const sY = window.scrollY;
+      setIsScrolled(sY > 20);
+      if (sY > lastScrollY && sY > 100) setIsVisible(false);
+      else setIsVisible(true);
+      setLastScrollY(sY);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  const handleLogout = () => { logout(); navigate('/'); };
 
   const navLinks = [
     { name: 'Home', href: '#home' },
-    { 
-      name: 'Courses', 
+    {
+      name: 'Courses',
       isMega: true,
       subItems: [
         { title: 'Web Development', desc: 'React, Node, and scalable architectures.', icon: <Code2 /> },
         { title: 'UI/UX Design', desc: 'Prototyping and user-centric systems.', icon: <Palette /> },
         { title: 'AI Engineering', desc: 'LLMs and Neural Networks.', icon: <BrainCircuit /> },
         { title: 'Cloud Systems', desc: 'Docker, K8s, and AWS.', icon: <Rocket /> },
-      ] 
+      ]
     },
     { name: 'Services', href: '#services' },
     { name: 'About', href: '/about' },
@@ -58,20 +49,22 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav 
+      <motion.nav
         initial={{ y: 0 }}
-        animate={{ y: isVisible ? 0 : -100 }}
+        animate={{ y: isVisible ? 0 : -120 }}
         transition={{ duration: 0.3 }}
         onMouseLeave={() => setActiveMega(null)}
-        className={`fixed top-0 w-full z-50 transition-all duration-300 px-4 sm:px-10 ${
+        className={`fixed top-[40px] w-full z-50 transition-all duration-300 ${
           isScrolled || activeMega || mobileMenu
-            ? 'bg-black/95 backdrop-blur-lg border-b border-[#dc2626]/10 py-3' 
-            : 'bg-transparent py-5'
+            ? 'bg-black/95 backdrop-blur-lg border-b border-[#dc2626]/10'
+            : 'bg-transparent'
         }`}
       >
-        <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
-          
-          {/* BACK BUTTON */}
+        <div className={`px-4 sm:px-10 transition-all duration-300 ${
+          isScrolled || activeMega || mobileMenu ? 'py-3' : 'py-5'
+        }`}>
+          <div className="max-w-screen-2xl mx-auto flex justify-between items-center">
+
           {showBack && (
             <motion.button
               initial={{ opacity: 0, x: -10 }}
@@ -86,30 +79,21 @@ export default function Navbar() {
             </motion.button>
           )}
 
-          {/* LOGO */}
           <Link to="/" className="relative z-[71] flex items-center gap-3 group">
             <div className="relative">
-              <img 
-                src={logoJpg} 
-                className="h-10 sm:h-12 w-auto rounded-xl shadow-lg shadow-black/10 object-cover" 
+              <img
+                src={logoJpg}
+                className="h-10 sm:h-12 w-auto rounded-xl shadow-lg shadow-black/10 object-cover"
                 alt='ELEVATE'
               />
             </div>
           </Link>
 
-          {/* DESKTOP NAV */}
           <div className="hidden lg:flex items-center gap-8">
-            <button
-              onClick={toggleDark}
-              className="p-2 rounded-lg transition-all hover:bg-white/10"
-              title={darkMode ? 'Light mode' : 'Dark mode'}
-            >
-              {darkMode ? <Sun size={18} className="text-[#f89f29]" /> : <Moon size={18} className="text-gray-400" />}
-            </button>
             <div className="flex gap-8">
               {navLinks.map((link) => (
-                <div 
-                  key={link.name} 
+                <div
+                  key={link.name}
                   className="relative py-2"
                   onMouseEnter={() => link.isMega ? setActiveMega(link.name) : setActiveMega(null)}
                 >
@@ -124,14 +108,14 @@ export default function Navbar() {
             <div className="flex items-center gap-4 border-l border-white/10 pl-6">
               {user ? (
                 <div className="flex items-center gap-3">
-                  <Link 
+                  <Link
                     to={user.role === 'admin' ? '/admin' : '/dashboard'}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#15c8fb]/10 to-[#f89f29]/10 text-[#2a23b9] font-black text-[10px] tracking-widest rounded-md hover:from-[#15c8fb]/20 hover:to-[#f89f29]/20 transition-all uppercase"
                   >
                     {user.role === 'admin' ? <Shield size={14} /> : <User size={14} />}
                     {user.full_name || user.username}
                   </Link>
-                  <button 
+                  <button
                     onClick={handleLogout}
                     className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-all"
                   >
@@ -140,6 +124,9 @@ export default function Navbar() {
                 </div>
               ) : (
                 <>
+                  <Link to="/login" className="px-5 py-2 bg-gradient-to-r from-[#f89f29] to-[#f07000] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase shadow-lg shadow-[#f89f29]/20">
+                    Sign In
+                  </Link>
                   <Link to="/register" className="px-5 py-2 bg-gradient-to-r from-[#2a0765] to-[#1f1656] text-white font-black text-[10px] tracking-widest rounded-md hover:brightness-110 transition-all uppercase shadow-lg shadow-[#15c8fb]/20">
                     Portal
                   </Link>
@@ -148,15 +135,14 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* MOBILE CONTROLS */}
           <div className="lg:hidden flex items-center gap-3">
             <button onClick={() => setMobileMenu(!mobileMenu)} className="p-2 rounded-lg text-white bg-white/10 relative z-[71]">
               {mobileMenu ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
+        </div>
 
-        {/* MEGA MENU (DESKTOP) */}
         <AnimatePresence>
           {activeMega && (
             <motion.div
@@ -175,10 +161,9 @@ export default function Navbar() {
           )}
         </AnimatePresence>
 
-        {/* MOBILE MENU */}
         <AnimatePresence>
           {mobileMenu && (
-            <motion.div 
+            <motion.div
               initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
               transition={{ type: 'tween', duration: 0.4 }}
               className="fixed inset-0 h-screen w-screen bg-black z-[70] p-8 pt-24 flex flex-col"
@@ -186,8 +171,8 @@ export default function Navbar() {
               <div className="flex flex-col gap-6 overflow-y-auto">
                 {navLinks.map((link) => (
                   <div key={link.name} className="border-b border-white/10 pb-4">
-                    <a 
-                      href={link.href} 
+                    <a
+                      href={link.href}
                       onClick={() => setMobileMenu(false)}
                       className="text-3xl font-black text-white uppercase tracking-tighter hover:text-[#dc2626] transition-colors"
                     >
@@ -197,14 +182,14 @@ export default function Navbar() {
                 ))}
                 {user ? (
                   <>
-                    <Link 
+                    <Link
                       to={user.role === 'admin' ? '/admin' : '/dashboard'}
                       onClick={() => setMobileMenu(false)}
                       className="mt-4 w-full py-4 bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
                     >
                       Dashboard
                     </Link>
-                    <button 
+                    <button
                       onClick={() => { handleLogout(); setMobileMenu(false); }}
                       className="w-full py-4 bg-red-500/10 text-red-400 text-center font-black rounded-lg uppercase tracking-widest"
                     >
@@ -213,8 +198,15 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Link 
-                      to="/register" 
+                    <Link
+                      to="/login"
+                      onClick={() => setMobileMenu(false)}
+                      className="w-full py-4 bg-gradient-to-r from-[#f89f29] to-[#f07000] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      to="/register"
                       onClick={() => setMobileMenu(false)}
                       className="w-full py-4 bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white text-center font-black rounded-lg uppercase tracking-widest shadow-lg"
                     >
