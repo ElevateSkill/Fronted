@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle } from 'lucide-react';
+import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle, Code, Megaphone, Video, Palette, Headphones, Smartphone, Sparkles, Timer, Tag, Gift } from 'lucide-react';
 import { api, unwrapResults, getMediaUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -93,6 +93,78 @@ export default function Courses() {
             Industry-driven curriculum designed to take you from beginner to job-ready professional.
           </motion.p>
         </div>
+
+        {/* — Winter Training Promotion — */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="relative mb-14 overflow-hidden rounded-2xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-[#dc2626]/5 to-black p-[2px]"
+        >
+          <div className="relative bg-black p-6 md:p-8">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#f89f29]/10 rounded-full blur-[80px]" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#dc2626]/10 rounded-full blur-[80px]" />
+
+            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+              <div className="space-y-4 flex-1">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-wider">
+                    <Timer size={11} /> 15hr left
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f89f29]/10 border border-[#f89f29]/20 text-[#f89f29] text-[10px] font-black uppercase tracking-wider">
+                    <Sparkles size={11} /> Registration close
+                  </span>
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                  የክረምት ስልጠና <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#f89f29] to-[#dc2626]">Winter Training</span>
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5">
+                  {[
+                    { icon: Code, label: 'Website Development (Backend & Frontend)' },
+                    { icon: Megaphone, label: 'Digital Marketing' },
+                    { icon: Video, label: 'Video Editing' },
+                    { icon: Palette, label: 'Graphics Design' },
+                    { icon: Headphones, label: 'Virtual Assistance' },
+                    { icon: Smartphone, label: 'Application Development' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2.5 text-sm text-white/80">
+                      <item.icon size={15} className="text-[#f89f29] shrink-0" />
+                      {item.label}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <div className="flex items-center gap-2">
+                    <Tag size={16} className="text-green-400" />
+                    <span className="text-green-400 font-black text-lg">950 ETB</span>
+                    <span className="text-white/40 text-xs line-through">2,999 ETB</span>
+                  </div>
+                  <span className="text-white/30 text-[11px]">per course · after Jun 12 full price</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 w-full lg:w-auto shrink-0">
+                <motion.a
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  href="https://elevate-skill-hazel.vercel.app/register?ref=ELEVATEC73BC490"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#f89f29] to-[#dc2626] text-white font-black text-sm rounded-xl shadow-xl hover:brightness-110 transition-all"
+                >
+                  Register Now <Gift size={16} />
+                </motion.a>
+                <div className="flex items-center gap-3 text-[10px] text-white/40">
+                  <span>📞 +251 981 80 7055</span>
+                  <span>✉️ elevateskill369@gmail.com</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
 
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
