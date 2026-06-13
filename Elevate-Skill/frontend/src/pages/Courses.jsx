@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Users, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle, User } from 'lucide-react';
+import { BookOpen, Clock, ArrowRight, ChevronRight, Award, Loader, CheckCircle, User, X, Target, FileText, Calendar } from 'lucide-react';
 import { api, unwrapResults, getMediaUrl } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,6 +15,9 @@ export default function Courses() {
   const [loading, setLoading] = useState(true);
   const [enrollingId, setEnrollingId] = useState(null);
   const [enrollSuccessId, setEnrollSuccessId] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [courseDetail, setCourseDetail] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -24,6 +27,7 @@ export default function Courses() {
         setCourses(data.map((c, i) => ({
           id: c.id,
           title: c.title,
+          slug: c.slug,
           category: c.category?.name || c.category || '',
           desc: c.short_description || '',
           instructor: c.instructor || '',
@@ -38,6 +42,20 @@ export default function Courses() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const openDetail = async (course) => {
+    setSelectedCourse(course);
+    setDetailLoading(true);
+    try {
+      const res = await api.get(`/courses/${course.id}/`);
+      setCourseDetail(res.data);
+    } catch {
+      setCourseDetail(null);
+    }
+    setDetailLoading(false);
+  };
+
+  const closeDetail = () => { setSelectedCourse(null); setCourseDetail(null); };
 
   const handleEnroll = async (course) => {
     if (!user) {
@@ -153,19 +171,27 @@ export default function Courses() {
                     <span className="text-lg font-black text-white block leading-none">{course.price}</span>
                     <span className="block text-[10px] text-gray-500 uppercase tracking-wider">{course.lessons > 1 ? `${course.lessons} lessons` : ''}</span>
                   </div>
-                  <button
-                    onClick={() => handleEnroll(course)}
-                    disabled={enrollingId === (course.id || course.title)}
-                    className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white font-black text-[10px] hover:brightness-110 transition-all duration-300 uppercase tracking-wider shadow-md disabled:opacity-50"
-                  >
-                    {enrollSuccessId === (course.id || course.title) ? (
-                      <><CheckCircle size={13} /> Enrolled</>
-                    ) : enrollingId === (course.id || course.title) ? (
-                      <><Loader size={13} className="animate-spin" /> Enrolling</>
-                    ) : (
-                      <><ChevronRight size={13} /> Enroll</>
-                    )}
-                  </button>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => openDetail(course)}
+                      className="flex items-center gap-1 px-3 py-2 rounded-lg border border-white/10 text-white/70 text-[10px] font-bold hover:border-[#15c8fb]/40 hover:text-[#15c8fb] transition-all"
+                    >
+                      <FileText size={11} /> Details
+                    </button>
+                    <button
+                      onClick={() => handleEnroll(course)}
+                      disabled={enrollingId === (course.id || course.title)}
+                      className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white font-black text-[10px] hover:brightness-110 transition-all duration-300 uppercase tracking-wider shadow-md disabled:opacity-50 rounded-lg"
+                    >
+                      {enrollSuccessId === (course.id || course.title) ? (
+                        <><CheckCircle size={13} /> Enrolled</>
+                      ) : enrollingId === (course.id || course.title) ? (
+                        <><Loader size={13} className="animate-spin" /> Enrolling</>
+                      ) : (
+                        <><ChevronRight size={13} /> Enroll</>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -184,6 +210,95 @@ export default function Courses() {
           </button>
         </motion.div>
       </div>
+
+      {/* Course Detail Modal */}
+      <AnimatePresence>
+        {selectedCourse && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeDetail}
+              className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 40 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            >
+              <div className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border border-white/10 bg-black/95 shadow-2xl">
+                <div className="sticky top-0 flex items-center justify-between bg-black/90 backdrop-blur-md p-5 border-b border-white/10 z-10">
+                  <h3 className="text-lg font-black text-white pr-8">{selectedCourse.title}</h3>
+                  <button onClick={closeDetail} className="p-1.5 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-all">
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {detailLoading ? (
+                  <div className="flex items-center justify-center py-20">
+                    <Loader size={24} className="animate-spin text-white/40" />
+                  </div>
+                ) : courseDetail ? (
+                  <div className="p-5 space-y-6">
+                    <div className="flex flex-wrap gap-3 text-xs">
+                      <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70">
+                        <strong className="text-white">Price:</strong> {courseDetail.price} ETB
+                      </span>
+                      <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70">
+                        <strong className="text-white">Duration:</strong> {courseDetail.duration}h
+                      </span>
+                      <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70">
+                        <strong className="text-white">Lessons:</strong> {courseDetail.lessons}
+                      </span>
+                      <span className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white/70">
+                        <strong className="text-white">Instructor:</strong> {courseDetail.instructor || '—'}
+                      </span>
+                    </div>
+
+                    {courseDetail.description && (
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-[#15c8fb] mb-2 flex items-center gap-1.5"><FileText size={13} /> Full Description</h4>
+                        <p className="text-sm text-gray-300 leading-relaxed">{courseDetail.description}</p>
+                      </div>
+                    )}
+
+                    {courseDetail.requirements && (
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-amber-400 mb-2 flex items-center gap-1.5"><Target size={13} /> Requirements</h4>
+                        <p className="text-sm text-gray-300 leading-relaxed">{courseDetail.requirements}</p>
+                      </div>
+                    )}
+
+                    {courseDetail.learning_outcomes && (
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-green-400 mb-2 flex items-center gap-1.5"><Award size={13} /> Learning Outcomes</h4>
+                        <p className="text-sm text-gray-300 leading-relaxed">{courseDetail.learning_outcomes}</p>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-4 border-t border-white/10 text-[11px] text-white/40">
+                      <span className="flex items-center gap-1"><Calendar size={12} /> Created: {new Date(courseDetail.created_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      <span className="flex items-center gap-1"><Calendar size={12} /> Updated: {new Date(courseDetail.updated_at).toLocaleDateString('en', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    </div>
+
+                    <button
+                      onClick={() => { closeDetail(); handleEnroll(selectedCourse); }}
+                      disabled={enrollingId === selectedCourse.id}
+                      className="w-full py-3.5 bg-gradient-to-r from-[#dc2626] to-[#f89f29] text-white font-black text-xs rounded-xl hover:brightness-110 transition-all uppercase tracking-wider shadow-lg disabled:opacity-50"
+                    >
+                      {enrollingId === selectedCourse.id ? <span className="flex items-center justify-center gap-2"><Loader size={14} className="animate-spin" /> Enrolling...</span> : 'Enroll Now'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-white/40 text-sm">Failed to load course details.</div>
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
