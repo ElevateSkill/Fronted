@@ -176,27 +176,27 @@ export default function UsersSection() {
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-black text-gray-900 dark:text-white">User management</h2>
-            <p className="text-sm text-gray-500">Create, edit, and manage users. Role/status changes are local.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Create, edit, and manage users. Role/status changes are local.</p>
           </div>
           <div className="flex gap-2">
             <span className="rounded-full bg-[#15c8fb]/10 px-3 py-1 text-xs font-bold text-[#15c8fb]">{students.length} students</span>
             <span className="rounded-full bg-[#15c8fb]/10 px-3 py-1 text-xs font-bold text-[#15c8fb]">{admins.length} admins</span>
           </div>
         </div>
-        <div className="mb-4 flex gap-2 border-b border-gray-100 pb-3">
+        <div className="mb-4 flex gap-2 border-b border-gray-100 dark:border-white/10 pb-3">
           {['student', 'admin', 'all'].map((role) => (
             <button key={role} onClick={() => setUserRoleFilter(role)}
               className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
-                userRoleFilter === role ? 'bg-[#15c8fb] text-white shadow-sm' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                userRoleFilter === role ? 'bg-[#15c8fb] text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
               }`}>
               {role === 'all' ? `All (${users.length})` : `${role}s (${role === 'student' ? students.length : admins.length})`}
             </button>
           ))}
         </div>
-        <div className="overflow-x-auto rounded-lg border border-gray-100">
+        <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-white/10">
           <table className="w-full min-w-[700px] text-left text-sm">
             <thead>
-              <tr className="bg-gray-100 text-xs uppercase tracking-wider text-gray-700">
+              <tr className="bg-gray-100 dark:bg-white/[0.08] text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300">
                 <th className="px-4 py-3.5 font-bold">Name</th>
                 <th className="px-4 py-3.5 font-bold">Email</th>
                 <th className="px-4 py-3.5 font-bold">Phone</th>
@@ -205,9 +205,9 @@ export default function UsersSection() {
                 <th className="px-4 py-3.5 font-bold">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/10">
               {filtered.map((u) => (
-                <tr key={u.id} className="transition-colors hover:bg-gray-50">
+                <tr key={u.id} className="transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.03]">
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white">
@@ -215,12 +215,12 @@ export default function UsersSection() {
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900 dark:text-white">{u.full_name || u.username}</p>
-                        <p className="text-xs text-gray-500">@{u.username}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">@{u.username}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3.5 text-gray-600">{u.email}</td>
-                  <td className="px-4 py-3.5 text-gray-500 text-xs">{u.phone_number || '—'}</td>
+                  <td className="px-4 py-3.5 text-gray-600 dark:text-gray-400">{u.email}</td>
+                  <td className="px-4 py-3.5 text-gray-500 dark:text-gray-400 text-xs">{u.phone_number || '—'}</td>
                   <td className="px-4 py-3.5">
                     <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold capitalize bg-[#15c8fb]/10 text-[#15c8fb] border border-[#15c8fb]/20">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#15c8fb]" />{u.role}
@@ -231,21 +231,21 @@ export default function UsersSection() {
                     <div className="flex flex-wrap gap-1.5">
                       <button onClick={() => editUser(u)} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10"><Edit3 size={14} /></button>
                       <button onClick={() => toggleUserStatus(u)} className={`rounded-lg border px-3 py-2 text-xs font-bold transition-all ${
-                        u.is_active ? 'border-[#15c8fb]/30 text-[#15c8fb] hover:bg-[#15c8fb]/10' : 'border-emerald-300 text-emerald-600 hover:bg-emerald-50'
+                        u.is_active ? 'border-[#15c8fb]/30 text-[#15c8fb] hover:bg-[#15c8fb]/10' : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
                       }`}>{u.is_active ? 'Deactivate' : 'Activate'}</button>
                       {u.role !== 'admin' && (
                         <button onClick={() => changeUserRole(u, 'admin')} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">Make admin</button>
                       )}
                       {u.role === 'admin' && (
-                        <button onClick={() => changeUserRole(u, 'student')} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-900 transition-all hover:bg-gray-50">Make student</button>
+                        <button onClick={() => changeUserRole(u, 'student')} className="rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-xs font-bold text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">Make student</button>
                       )}
-                      <button onClick={() => deleteUser(u.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50"><Trash2 size={14} /></button>
+                      <button onClick={() => deleteUser(u.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-500 transition-all hover:bg-rose-500/10"><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
               ))}
               {!users.length && (
-                <tr><td colSpan="6" className="px-4 py-12 text-center text-sm text-gray-500">No users found.</td></tr>
+                <tr><td colSpan="6" className="px-4 py-12 text-center text-sm text-gray-500 dark:text-gray-400">No users found.</td></tr>
               )}
             </tbody>
           </table>
@@ -280,7 +280,7 @@ export default function UsersSection() {
             <button disabled={saving} className={`inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />} Save
             </button>
-            {editingUserId && <button type="button" onClick={resetUserForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white transition-all hover:bg-gray-50">Cancel</button>}
+            {editingUserId && <button type="button" onClick={resetUserForm} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
           </div>
         </div>
       </motion.form>

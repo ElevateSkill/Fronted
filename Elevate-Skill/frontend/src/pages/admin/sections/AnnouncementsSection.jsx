@@ -245,13 +245,13 @@ export default function AnnouncementsSection() {
                     {item.is_published ? 'Unpublish' : 'Publish'}
                   </button>
                   <button onClick={() => deleteAnnouncement(item.id)}
-                    className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50 ml-auto">Delete</button>
+                    className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-500 transition-all hover:bg-rose-500/10 ml-auto">Delete</button>
                 </div>
               </article>
             ))}
             {!announcements.length && (
-              <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-                <Megaphone size={36} className="mb-2 text-gray-300" />
+              <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
+                <Megaphone size={36} className="mb-2 text-gray-300 dark:text-gray-600" />
                 <p className="text-sm">No announcements yet</p>
               </div>
             )}
@@ -279,13 +279,13 @@ export default function AnnouncementsSection() {
                     {item.status === 'published' ? 'Move to draft' : 'Publish'}
                   </button>
                   <button onClick={() => deleteNews(item.id)}
-                    className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50 ml-auto">Delete</button>
+                    className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-500 transition-all hover:bg-rose-500/10 ml-auto">Delete</button>
                 </div>
               </article>
             ))}
             {!news.length && (
-              <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-                <Newspaper size={36} className="mb-2 text-gray-300" />
+              <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-gray-400">
+                <Newspaper size={36} className="mb-2 text-gray-300 dark:text-gray-600" />
                 <p className="text-sm">No news posts yet</p>
               </div>
             )}
@@ -327,7 +327,7 @@ export default function AnnouncementsSection() {
                       {editingAnnouncement ? 'Update Announcement' : 'Create Announcement'}
                     </button>
                     <button type="button" onClick={() => { setShowAnnModal(false); setEditingAnnouncement(null); setAnnouncementForm(emptyAnnouncement); }}
-                      className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 transition-all">Cancel</button>
+                      className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
                   </div>
                 </form>
               </div>
@@ -380,7 +380,7 @@ export default function AnnouncementsSection() {
                       {editingNews ? 'Update News' : 'Create News'}
                     </button>
                     <button type="button" onClick={() => { setShowNewsModal(false); setEditingNews(null); setNewsForm(emptyNews); }}
-                      className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 transition-all">Cancel</button>
+                      className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
                   </div>
                 </form>
               </div>

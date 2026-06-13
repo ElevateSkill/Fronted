@@ -183,7 +183,7 @@ export default function PaymentsSection() {
             <span className="text-xs text-amber-500/80 font-bold">{Math.round(statusCounts.pending/total*100)}%</span>
           </div>
           <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-amber-500 rounded-full" style={{width:`${statusCounts.pending/total*100}%`}} /></div>
-          <p className="mt-2 text-sm font-medium text-gray-600">Pending</p>
+          <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-300">Pending</p>
         </div>
         <div className="rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/5 via-surface to-surface p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -191,7 +191,7 @@ export default function PaymentsSection() {
             <span className="text-xs text-emerald-500/80 font-bold">{Math.round(statusCounts.approved/total*100)}%</span>
           </div>
           <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 rounded-full" style={{width:`${statusCounts.approved/total*100}%`}} /></div>
-          <p className="mt-2 text-sm font-medium text-gray-600">Approved</p>
+          <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-300">Approved</p>
         </div>
         <div className="rounded-xl border border-rose-500/20 bg-gradient-to-br from-rose-500/5 via-surface to-surface p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -199,7 +199,7 @@ export default function PaymentsSection() {
             <span className="text-xs text-rose-500/80 font-bold">{Math.round(statusCounts.rejected/total*100)}%</span>
           </div>
           <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-rose-500 rounded-full" style={{width:`${statusCounts.rejected/total*100}%`}} /></div>
-          <p className="mt-2 text-sm font-medium text-gray-600">Rejected</p>
+          <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-300">Rejected</p>
         </div>
         <div className="rounded-xl border border-[#15c8fb]/20 bg-gradient-to-br from-[#15c8fb]/5 via-surface to-surface p-5 shadow-sm">
           <div className="flex items-center justify-between mb-3">
@@ -207,7 +207,7 @@ export default function PaymentsSection() {
             <span className="text-xs text-[#15c8fb]/80 font-bold">100%</span>
           </div>
           <div className="h-1.5 bg-white/5 rounded-full overflow-hidden"><div className="h-full bg-[#15c8fb] rounded-full" style={{width:'100%'}} /></div>
-          <p className="mt-2 text-sm font-medium text-gray-600">Total Payments</p>
+          <p className="mt-2 text-sm font-medium text-gray-600 dark:text-gray-300">Total Payments</p>
         </div>
       </motion.div>
 
@@ -246,7 +246,7 @@ export default function PaymentsSection() {
               className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
                 paymentStatusFilter === status
                   ? 'bg-[#15c8fb] text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
               }`}
             >
               {status === 'all' ? `All (${statusCounts.all})` : `${status} (${statusCounts[status]})`}
@@ -295,12 +295,12 @@ export default function PaymentsSection() {
                   <td className="px-4 py-3.5" onClick={(e) => e.stopPropagation()}>
                     <div className="flex gap-1.5">
                       <button disabled={saving || payment.status !== 'pending'} onClick={() => updatePayment(payment, 'approve')}
-                        className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-emerald-700 disabled:opacity-30 disabled:cursor-not-allowed" title="Approve">
-                        <CheckCircle size={14} />
+                        className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-black text-white transition-all hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/30 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5" title="Approve">
+                        <CheckCircle size={15} /> Approve
                       </button>
                       <button disabled={saving || payment.status !== 'pending'} onClick={() => updatePayment(payment, 'reject')}
-                        className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-bold text-white transition-all hover:bg-rose-700 disabled:opacity-30 disabled:cursor-not-allowed" title="Reject">
-                        <XCircle size={14} />
+                        className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-black text-white transition-all hover:bg-rose-700 hover:shadow-lg hover:shadow-rose-600/30 disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-1.5" title="Reject">
+                        <XCircle size={15} /> Reject
                       </button>
                       <button onClick={() => confirmThen(() => {
                         setPayments((prev) => {
@@ -309,7 +309,7 @@ export default function PaymentsSection() {
                           return filtered;
                         });
                         showToast('Payment record removed.', 'success');
-                      })} className="rounded-lg border border-rose-500/30 px-2 py-2 text-xs font-bold text-rose-500 transition-all hover:bg-rose-50">
+                      })} className="rounded-lg border border-rose-500/30 px-2 py-2 text-xs font-bold text-rose-500 transition-all hover:bg-rose-500/10">
                         <Trash2 size={13} />
                       </button>
                     </div>
@@ -332,7 +332,7 @@ export default function PaymentsSection() {
             </tbody>
           </table>
         </div>
-        <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+        <div className="mt-4 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>Showing {filteredPayments.length} of {payments.length} payments</span>
           <span className="hidden sm:inline">Click any row for details</span>
         </div>
@@ -349,7 +349,7 @@ export default function PaymentsSection() {
               <div className="relative w-full max-w-lg rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-2xl">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-black text-gray-900 dark:text-white">Payment Details</h3>
-                  <button onClick={() => setShowPaymentModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500">
+                  <button onClick={() => setShowPaymentModal(false)} className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400">
                     <X size={18} />
                   </button>
                 </div>
@@ -382,12 +382,12 @@ export default function PaymentsSection() {
                   {selectedPayment.status === 'pending' && (
                     <div className="flex gap-3 pt-4 border-t border-gray-100 dark:border-white/10">
                       <button disabled={saving} onClick={() => { updatePayment(selectedPayment, 'approve'); setShowPaymentModal(false); }}
-                        className="flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-black text-white hover:bg-emerald-700 disabled:opacity-50">
-                        <CheckCircle size={16} className="inline mr-2" />Approve
+                        className="flex-1 rounded-xl bg-emerald-600 px-5 py-3.5 text-sm font-black text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/30 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                        <CheckCircle size={18} /> Approve
                       </button>
                       <button disabled={saving} onClick={() => { updatePayment(selectedPayment, 'reject'); setShowPaymentModal(false); }}
-                        className="flex-1 rounded-xl bg-rose-600 px-4 py-3 text-sm font-black text-white hover:bg-rose-700 disabled:opacity-50">
-                        <XCircle size={16} className="inline mr-2" />Reject
+                        className="flex-1 rounded-xl bg-rose-600 px-5 py-3.5 text-sm font-black text-white hover:bg-rose-700 hover:shadow-lg hover:shadow-rose-600/30 disabled:opacity-50 transition-all flex items-center justify-center gap-2">
+                        <XCircle size={18} /> Reject
                       </button>
                     </div>
                   )}
@@ -444,7 +444,7 @@ export default function PaymentsSection() {
                     <button type="submit" className="flex-1 rounded-xl bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-3 text-sm font-black text-white hover:brightness-110 transition-all">
                       <Plus size={16} className="inline mr-2" />Create Record
                     </button>
-                    <button type="button" onClick={() => setShowManualPayment(false)} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 transition-all">Cancel</button>
+                    <button type="button" onClick={() => setShowManualPayment(false)} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
                   </div>
                 </form>
               </div>
@@ -478,7 +478,7 @@ export default function PaymentsSection() {
                   </div>
                 </div>
                 <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                  account.is_active ? 'bg-blue-100 text-blue-700 border border-blue-200' : 'bg-gray-200 text-gray-700 border border-gray-300'
+                  account.is_active ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20' : 'bg-gray-500/15 text-gray-400 border border-gray-500/20'
                 }`}>{account.is_active ? 'Active' : 'Inactive'}</span>
               </div>
               <div className="mb-3">
@@ -498,8 +498,8 @@ export default function PaymentsSection() {
                   <span className="text-[10px] font-semibold text-gray-500">Active</span>
                 </label>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => editBank(account)} className="rounded-lg p-1.5 text-gray-500 hover:text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all" title="Edit"><Edit3 size={13} /></button>
-                  <button onClick={() => deleteBank(account.id)} className="rounded-lg p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 transition-all" title="Delete"><Trash2 size={13} /></button>
+                  <button onClick={() => editBank(account)} className="rounded-lg p-1.5 text-gray-500 dark:text-gray-400 hover:text-[#15c8fb] hover:bg-[#15c8fb]/10 transition-all" title="Edit"><Edit3 size={13} /></button>
+                  <button onClick={() => deleteBank(account.id)} className="rounded-lg p-1.5 text-gray-500 dark:text-gray-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all" title="Delete"><Trash2 size={13} /></button>
                 </div>
               </div>
             </div>
@@ -539,7 +539,7 @@ export default function PaymentsSection() {
                       {saving ? <Loader className="animate-spin inline mr-2" size={16} /> : <Save size={16} className="inline mr-2" />}
                       {editingBankId ? 'Update' : 'Create'}
                     </button>
-                    <button type="button" onClick={() => { setShowBankModal(false); resetBankForm(); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 transition-all">Cancel</button>
+                    <button type="button" onClick={() => { setShowBankModal(false); resetBankForm(); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-5 py-3 text-sm font-black text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 transition-all">Cancel</button>
                   </div>
                 </form>
               </div>

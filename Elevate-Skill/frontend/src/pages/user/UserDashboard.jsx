@@ -742,11 +742,11 @@ export default function UserDashboard() {
                     <th className="px-4 py-3 font-bold">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-white/10">
                   {payments.map((payment) => (
                     <tr key={payment.id} className="hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-3 font-semibold text-white max-w-[180px] truncate" title={payment.course_title}>
-                        {payment.course_title}
+                      <td className="px-4 py-3 font-semibold text-white max-w-[180px] truncate" title={payment.course_title || payment.course?.title}>
+                        {payment.course_title || payment.course?.title || '—'}
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-400">
                         {payment.payment_method || '—'}
@@ -771,6 +771,7 @@ export default function UserDashboard() {
             <div className="flex flex-col items-center justify-center py-12 text-gray-400">
               <CreditCard size={40} className="mb-2 opacity-30" />
               <p className="text-sm">No payment records yet</p>
+              <p className="mt-2 text-xs text-gray-500">Payments appear here after you submit proof for an enrollment.</p>
             </div>
           )}
         </motion.section>
@@ -1028,7 +1029,7 @@ export default function UserDashboard() {
         <header className="sticky top-[40px] z-20 border-b border-white/10 bg-surface/90 px-4 py-4 backdrop-blur-lg lg:px-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/')} className="rounded-lg p-2 text-gray-400 hover:bg-white/5 transition-all hover:text-[#f89f29]" title="Go home">
+              <button onClick={() => navigate('/dashboard')} className="rounded-lg p-2 text-gray-400 hover:bg-white/5 transition-all hover:text-[#f89f29]" title="Back to Dashboard">
                 <ArrowLeft size={20} />
               </button>
               <button onClick={() => setMobileSidebar(true)} className="rounded-lg p-2 text-gray-400 hover:bg-white/5 lg:hidden">
