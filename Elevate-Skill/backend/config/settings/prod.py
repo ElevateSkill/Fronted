@@ -46,7 +46,7 @@ STORAGES = {
 }
 
 # ── CORS ──────────────────────────────────────────────────
-CORS_ALLOW_ALL_ORIGINS = True     # lock down once frontend URL is known
+# CORS_ALLOW_ALL_ORIGINS = True     # lock down once frontend URL is known
 
 # ── Security ──────────────────────────────────────────────
 SECURE_CONTENT_TYPE_NOSNIFF = True

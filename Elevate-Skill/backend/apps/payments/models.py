@@ -3,7 +3,7 @@ from django.db import models
 
 from apps.courses.models import Course
 from apps.enrollments.models import Enrollment
-
+from apps.bank.models import BankAccountDetail
 
 class Payment(models.Model):
     STATUS_PENDING = "pending"
@@ -38,7 +38,12 @@ class Payment(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
     submitted_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    payment_method = models.ForeignKey(
+        BankAccountDetail,
+        on_delete=models.PROTECT,
+        related_name="payments"
+    )
+    
     class Meta:
         indexes = [
             models.Index(fields=['student', 'status']),

@@ -17,8 +17,6 @@ services:
         value: elevate-lms-api.onrender.com
       - key: DEBUG
         value: "False"
-      - key: CORS_ALLOWED_ORIGINS
-        value: https://elevateskill.vercel.app
       - key: CACHE_BACKEND
         value: locmem
       # Backblaze B2 — paste values manually in Render dashboard, never commit to git

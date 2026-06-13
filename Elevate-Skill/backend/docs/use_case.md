@@ -82,7 +82,7 @@ Student flow:
 
 1. Student logs in and creates an enrollment for an active, published course.
 2. Student submits payment proof with `POST /api/v1/payments/` using `multipart/form-data`.
-3. Include `enrollment_id`, `full_name`, `email`, `phone`, and `proof_file`.
+3. Include `enrollment_id`, `full_name`, `email`, `phone`, and `proof_file`, `payment method`.
    - **Input sanitization**: Text fields (`full_name`, `email`, `phone`) are sanitized to strip HTML.
 4. The backend validates that the enrollment belongs to the student and is still `pending`.
 5. The backend accepts only PDF, JPG, or PNG files up to 5MB.
@@ -120,7 +120,21 @@ Flow:
 4. FAQs are ordered by `order` ascending, then `created_at`.
 5. **Caching**: The entire homepage response is cached for 5 minutes.
 
-### 5b. Static Content Management (Admin)
+### 5b. Bank Account Detail Management (Admin)
+- Actors: Admin user (must have `role == 'admin'`)
+- Purpose: Manage bank account details used for payment instructions.
+Flow:
+1. Admin obtains JWT via `POST /api/v1/auth/login/` (login as admin).
+2. Retrieve Bank Details: Admin calls `GET /api/v1/admin/bank-account/
+` to view current bank account information.
+   - Note: If no record exists, the service layer initializes a default singleton record and returns it.
+3. Update Bank Details: Admin calls `PUT /api/v1/admin/bank-account/` to update fields like `bank_name`, `account_holder_name`, and `account_number`.
+   - Note: The singleton pattern ensures only one bank account record exists; attempts to create additional records are blocked.
+Auth rules:
+- All admin CMS endpoints require JWT + `role == 'admin'`. Anonymous users get
+401 Unauthorized, and student users get 403 Forbidden.
+
+### 5c. Static Content Management (Admin)
 
 - Actors: Admin user (must have `role == 'admin'`)
 - Purpose: Manage static content of the website (Hero section, About section, and Site Settings) through singleton instances.
@@ -134,7 +148,7 @@ Flow:
    - Note: Background images and illustrations are uploaded via multipart form data requests.
    - Any attempt to create another record is blocked by the singleton model pattern (the database always holds a single row with ID = 1).
 
-### 5c. Testimonial Management (Admin)
+### 5d. Testimonial Management (Admin)
 
 - Actors: Admin user (must have `role == 'admin'`)
 - Purpose: Manage student testimonials displayed on the homepage.
@@ -154,7 +168,7 @@ Notes:
 - **Input sanitization**: Text fields (`student_name`, `message`) are sanitized to strip HTML.
 - **Pagination**: The admin list endpoint returns a paginated envelope.
 
-### 5d. FAQ Management (Admin)
+### 5e. FAQ Management (Admin)
 
 - Actors: Admin user (must have `role == 'admin'`)
 - Purpose: Manage frequently asked questions displayed on the homepage.

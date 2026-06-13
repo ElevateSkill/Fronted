@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     "apps.cms",
     "apps.announcements",
     "apps.dashboard",
+    "apps.bank",
 ]
 
 MIDDLEWARE = [

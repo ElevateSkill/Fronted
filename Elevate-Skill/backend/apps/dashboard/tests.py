@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.courses.models import Category, Course
 from apps.enrollments.models import Enrollment
 from apps.payments.models import Payment
+from apps.bank.models import BankAccountDetail
 
 User = get_user_model()
 
@@ -24,6 +25,7 @@ class DashboardPermissionTests(APITestCase):
             username="admin1", email="a@test.com",
             password="pass123", full_name="Admin One", role="admin",
         )
+
 
     def auth_as(self, user):
         refresh = RefreshToken.for_user(user)
@@ -79,6 +81,15 @@ class DashboardMetricsTests(APITestCase):
             price="19.99", is_active=True, is_published=False,
         )
 
+        self.bank_account = (
+            BankAccountDetail.objects.create(
+                bank_name="CBE",
+                account_holder_name="Light Institute",
+                account_number="100001",
+                is_active=True,
+            )
+        )
+
     def test_response_contains_all_keys(self):
         resp = self.client.get(self.url)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -109,12 +120,12 @@ class DashboardMetricsTests(APITestCase):
         Payment.objects.create(
             student=self.s1, course=self.c1, enrollment=e1,
             full_name="S1", email="s1@t.com", phone="123",
-            proof_file="payments/proofs/test.pdf", status="pending",
-        )
+            proof_file="payments/proofs/test.pdf", payment_method=self.bank_account, status="pending",
+        )   
         Payment.objects.create(
             student=self.s2, course=self.c1, enrollment=e2,
             full_name="S2", email="s2@t.com", phone="456",
-            proof_file="payments/proofs/test2.pdf", status="approved",
+            proof_file="payments/proofs/test2.pdf", payment_method=self.bank_account, status="approved",
         )
         resp = self.client.get(self.url)
         self.assertEqual(resp.data["payments"]["pending"], 1)

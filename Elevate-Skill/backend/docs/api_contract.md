@@ -33,6 +33,9 @@ The API enforces role-based access control (RBAC) across endpoints:
 - `GET|PUT|PATCH|DELETE /api/v1/admin/testimonials/{id}/` — Testimonial management
 - `GET|POST /api/v1/admin/faqs/` — List/create FAQs
 - `GET|PUT|PATCH|DELETE /api/v1/admin/faqs/{id}/` — FAQ management
+- `GET|POST /api/v1/admin/bank-accounts/create/` — Create bank account details
+- `GET|PUT|PATCH /api/v1/admin/bank-accounts/{id}/update/` — Bank account detail management
+- `GET|DELETE /api/v1/admin/bank-accounts/{id}/delete/ — Delete a bank account detail
 
 ### Student Endpoints (requires JWT + `IsStudent` permission)
 - `POST /api/v1/enrollments/` — Enroll in a course
@@ -56,6 +59,8 @@ The API enforces role-based access control (RBAC) across endpoints:
 - `GET /api/v1/news/` — List published news posts
 - `GET /api/v1/news/{id}/` — View published news post detail
 - `GET /api/v1/homepage/` — Public homepage CMS data
+- `GET /api/v1/bank-accounts/` - Public payment method options list
+- `GET /api/v1/bank-accounts/<int:pk>/` - Public payment method detail 
 
 ## Global Conventions
 
@@ -148,6 +153,15 @@ Summary of available endpoints (by area):
     - `PUT /api/v1/admin/payments/{id}/approve/` — approve a pending payment and activate its enrollment
     - `PUT /api/v1/admin/payments/{id}/reject/` — reject a pending payment and cancel its enrollment
 
+- Bank account 
+  - Public
+    - `GET /api/v1/bank-accounts/` — list active bank account details
+    - `GET /api/v1/bank-accounts/{id}/` — retrieve active bank account detail
+  - Admin (requires JWT + user.role == 'admin')
+    - `GET|POST /api/v1/admin/bank-accounts/create/` — list/create bank account details
+    - `GET|PUT|PATCH /api/v1/admin/bank-accounts/{id}/update/` — retrieve/update bank account detail
+    - `GET|DELETE /api/v1/admin/bank-accounts/{id}/delete/` — delete a bank account detail
+
 - CMS
   - Public
     - `GET /api/v1/homepage/` — aggregated homepage data (hero, about, settings, testimonials, FAQs)
@@ -225,7 +239,7 @@ Detailed endpoint descriptions, request/response examples and behaviour
 
 - Method: POST
 - URL: `/api/v1/auth/login/`
-- Body: `{ "Email": "...", "password": "..." }`
+- Body: `{ "username": "...", "password": "..." }`
 - Response 200: `{ "access": "...", "refresh": "...", "user": {...} }`
 - Errors: 401 for invalid credentials.
 - **Rate limit**: 10 requests / hour per IP. Exceeding returns `429`.
@@ -400,6 +414,7 @@ full_name: Student One
 email: student1@example.com
 phone: 1234567890
 proof_file: <file>
+payment_method: payment method
 ```
 
 - Accepted proof file types: PDF, JPG, PNG
@@ -452,6 +467,101 @@ proof_file: <file>
 - Response 200 OK: updated payment object
 
 ---
+
+## Bank Account Detail
+### List Bank Accounts (Public)
+- Method: GET
+- URL: `/api/v1/bank-accounts/`
+- Auth: None (Public endpoint)
+- Response 200 OK: array of active bank account details
+```json
+[
+  {
+    "id": 1,
+    "bank_name": "CBE",
+    "account_holder_name": "Light Institute",
+    "account_number": "100001",
+    "is_active": true,
+    "created_at": "2026-06-06T09:19:35Z"
+  }
+]
+```
+- Notes: returns only `is_active=True` bank account details.
+
+### Retrieve Bank Accounts (Public)
+- Method: GET
+- URL: `/api/v1/bank-accounts/{id}/`
+- Auth: None (Public endpoint)
+- Response 200 OK: bank account detail object
+```json
+{
+  "id": 1,
+  "bank_name": "CBE",
+  "account_holder_name": "Light Institute",
+  "account_number": "100001",
+  "is_active": true,
+  "created_at": "2026-06-06T09:19:35Z"
+}
+```
+- Notes: returns the bank account detail if it is active; otherwise returns 404 Not Found.
+
+### Update Bank Account (Admin)
+- Method: GET, PUT, PATCH
+- URL: `/api/v1/admin/bank-accounts/{id}/update/`
+- Auth: Bearer access token (admin role required)
+- Request Body (PUT/PATCH, JSON):
+```json
+{
+  "bank_name": "CBE",
+  "account_holder_name": "Light Institute",
+  "account_number": "100001",
+  "is_active": true
+}
+```
+- Response 200 OK: updated bank account detail object
+```json
+{
+  "id": 1,
+  "bank_name": "CBE",
+  "account_holder_name": "Light Institute",
+  "account_number": "100001",
+  "is_active": true,
+  "created_at": "2026-06-06T09:19:35Z"
+}
+```
+- Notes: all fields are optional in the update; partial updates are allowed with PATCH.
+
+### Delete Bank Account (Admin)
+- Method: GET, DELETE
+- URL: `/api/v1/admin/bank-accounts/{id}/delete/`
+- Auth: Bearer access token (admin role required)
+- Behaviour: deletes the specified bank account detail.
+- Response 204 No Content on successful deletion.
+
+### Create Bank Account (Admin)
+- Method: GET, POST
+- URL: `/api/v1/admin/bank-accounts/create/`
+- Auth: Bearer access token (admin role required)
+- Request Body (POST, JSON):
+```json
+{
+  "bank_name": "CBE",
+  "account_holder_name": "Light Institute",
+  "account_number": "100001",
+  "is_active": true
+}
+```
+- Response 201 Created: created bank account detail object
+```json
+{
+  "id": 1,
+  "bank_name": "CBE",
+  "account_holder_name": "Light Institute",
+  "account_number": "100001",
+  "is_active": true,
+  "created_at": "2026-06-06T09:19:35Z"
+}
+```
 
 ## CMS
 
