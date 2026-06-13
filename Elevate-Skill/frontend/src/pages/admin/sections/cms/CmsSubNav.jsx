@@ -1,10 +1,11 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Image, FileText, Settings, Star, HelpCircle, LayoutDashboard } from 'lucide-react';
+import { Image, FileText, Settings, Star, HelpCircle, LayoutDashboard, Eye } from 'lucide-react';
 
 const cmsTabs = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard, path: '/admin/cms' },
   { id: 'hero', label: 'Hero', icon: Image, path: '/admin/cms/hero' },
   { id: 'about', label: 'About', icon: FileText, path: '/admin/cms/about' },
+  { id: 'visibility', label: 'Visibility', icon: Eye, path: '/admin/cms/visibility' },
   { id: 'settings', label: 'Settings', icon: Settings, path: '/admin/cms/settings' },
   { id: 'testimonials', label: 'Testimonials', icon: Star, path: '/admin/cms/testimonials' },
   { id: 'faqs', label: 'FAQs', icon: HelpCircle, path: '/admin/cms/faqs' },

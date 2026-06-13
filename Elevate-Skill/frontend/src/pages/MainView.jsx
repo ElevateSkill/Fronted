@@ -8,10 +8,25 @@ import Contact from "./Contact";
 import Courses from "./Courses";
 import Blog from "./Blog";
 import LatestNewsSection from "../components/LatestNewsSection";
+import HomeAboutSection from "../components/HomeAboutSection";
+
+const VISIBILITY_KEY = 'elevateskill_section_visibility';
+
+function isSectionVisible(section) {
+  try {
+    const raw = localStorage.getItem(VISIBILITY_KEY);
+    if (raw) {
+      const vis = JSON.parse(raw);
+      return vis[section] !== false;
+    }
+  } catch {}
+  return true;
+}
 
 export default function MainView() {
   const [liveHomepage, setLiveHomepage] = useState(null);
   const [latestNews, setLatestNews] = useState([]);
+  const [visibility, setVisibility] = useState({ about: true, contact: true });
 
   useEffect(() => {
     const fetchAndCacheAnnouncements = async () => {
@@ -57,6 +72,20 @@ export default function MainView() {
     api.get('/homepage/')
       .then(res => setLiveHomepage(res.data))
       .catch(() => {});
+
+    setVisibility({
+      about: isSectionVisible('about'),
+      contact: isSectionVisible('contact'),
+    });
+
+    const handleStorage = () => {
+      setVisibility({
+        about: isSectionVisible('about'),
+        contact: isSectionVisible('contact'),
+      });
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   return (
@@ -68,7 +97,8 @@ export default function MainView() {
       <Testimonals testimonials={liveHomepage?.testimonials} />
       <FAQ faqs={liveHomepage?.faqs || []} />
       <section id="blog"><Blog /></section>
-      <section id="contact"><Contact /></section>
+      {visibility.about && <HomeAboutSection aboutData={liveHomepage?.about} />}
+      {visibility.contact && <section id="contact"><Contact /></section>}
     </>
   );
 }

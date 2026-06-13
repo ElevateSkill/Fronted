@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Image, FileText, Settings as SettingsIcon, Star, HelpCircle, ArrowRight, Loader } from 'lucide-react';
+import { Image, FileText, Settings as SettingsIcon, Star, HelpCircle, Eye, ArrowRight, Loader } from 'lucide-react';
 import { api, unwrapResults } from '../../../../services/api';
 import CmsSubNav from './CmsSubNav';
 import { accent } from '../../components/AdminShared';
@@ -12,6 +12,7 @@ const cards = [
   { label: 'Site Settings', desc: 'Configure site name, contact info, and payment details', icon: SettingsIcon, path: '/admin/cms/settings', color: 'from-[#6366f1] to-[#8b5cf6]' },
   { label: 'Testimonials', desc: 'Manage student testimonials and reviews', icon: Star, path: '/admin/cms/testimonials', color: 'from-[#f59e0b] to-[#eab308]' },
   { label: 'FAQs', desc: 'Create and manage frequently asked questions', icon: HelpCircle, path: '/admin/cms/faqs', color: 'from-[#10b981] to-[#14b8a6]' },
+  { label: 'Section Visibility', desc: 'Show or hide homepage sections like About and Contact', icon: Eye, path: '/admin/cms/visibility', color: 'from-[#8b5cf6] to-[#a855f7]' },
 ];
 
 export default function CmsOverview() {

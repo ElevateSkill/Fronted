@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useHomepageData, useAnnouncements, useLatestNews } from "../hooks/useHomepageData";
 import Landing from "./Landing";
 import Services from "./Service";
@@ -7,7 +8,21 @@ import Contact from "./Contact";
 import Courses from "./Courses";
 import Blog from "./Blog";
 import LatestNewsSection from "../components/LatestNewsSection";
+import HomeAboutSection from "../components/HomeAboutSection";
 import LoadingSpinner from "../components/LoadingSpinner";
+
+const VISIBILITY_KEY = 'elevateskill_section_visibility';
+
+function isSectionVisible(section) {
+  try {
+    const raw = localStorage.getItem(VISIBILITY_KEY);
+    if (raw) {
+      const vis = JSON.parse(raw);
+      return vis[section] !== false;
+    }
+  } catch {}
+  return true;
+}
 
 /**
  * Enhanced MainView with custom hooks for better code organization
@@ -26,18 +41,22 @@ export default function MainViewEnhanced() {
   const { data: liveHomepage, loading: homepageLoading } = useHomepageData();
   const { announcements } = useAnnouncements();
   const { news: latestNews } = useLatestNews();
+  const [visibility, setVisibility] = useState({ about: true, contact: true });
 
-  // Optional: Show loading spinner while fetching initial data
-  // Comment out if you prefer to show static content immediately
-  /*
-  if (homepageLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <LoadingSpinner message="Loading homepage..." />
-      </div>
-    );
-  }
-  */
+  useEffect(() => {
+    setVisibility({
+      about: isSectionVisible('about'),
+      contact: isSectionVisible('contact'),
+    });
+    const handleStorage = () => {
+      setVisibility({
+        about: isSectionVisible('about'),
+        contact: isSectionVisible('contact'),
+      });
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   return (
     <>
@@ -62,10 +81,14 @@ export default function MainViewEnhanced() {
       <section id="blog">
         <Blog />
       </section>
+
+      {visibility.about && <HomeAboutSection aboutData={liveHomepage?.about} />}
       
-      <section id="contact">
-        <Contact />
-      </section>
+      {visibility.contact && (
+        <section id="contact">
+          <Contact />
+        </section>
+      )}
     </>
   );
 }

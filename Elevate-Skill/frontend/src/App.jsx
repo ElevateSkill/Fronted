@@ -21,6 +21,7 @@ import AboutSection from "./pages/admin/sections/cms/AboutSection";
 import SettingsSection from "./pages/admin/sections/cms/SettingsSection";
 import TestimonialsSection from "./pages/admin/sections/cms/TestimonialsSection";
 import FaqsSection from "./pages/admin/sections/cms/FaqsSection";
+import SectionsVisibility from "./pages/admin/sections/cms/SectionsVisibility";
 import ExportSection from "./pages/admin/sections/ExportSection";
 import ProfileSection from "./pages/admin/sections/ProfileSection";
 import UsersSection from "./pages/admin/sections/UsersSection";
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="cms/settings" element={<SettingsSection />} />
             <Route path="cms/testimonials" element={<TestimonialsSection />} />
             <Route path="cms/faqs" element={<FaqsSection />} />
+            <Route path="cms/visibility" element={<SectionsVisibility />} />
             <Route path="export" element={<ExportSection />} />
             <Route path="profile" element={<ProfileSection />} />
             <Route path="users" element={<UsersSection />} />
