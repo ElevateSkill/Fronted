@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { api, unwrapResults } from '../services/api';
 import logoJpg from '../assets/logo.jpg';
 
-export default function Navbar() {
+export default function Navbar({ hasAnnouncements }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -70,9 +70,9 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ANNOUNCEMENT BANNER (compact top) */}
+      {/* ANNOUNCEMENT BANNER (compact top) — hidden when AnnouncementBar is visible */}
       <AnimatePresence>
-        {showAnnBanner && announcements.length > 0 && (
+        {!hasAnnouncements && showAnnBanner && announcements.length > 0 && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -96,7 +96,9 @@ export default function Navbar() {
         animate={{ y: isVisible ? 0 : -100 }}
         transition={{ duration: 0.3 }}
         onMouseLeave={() => setActiveMega(null)}
-        className={`fixed top-0 w-full z-50 transition-all duration-300 px-4 sm:px-10 ${
+        className={`fixed w-full z-50 transition-all duration-300 px-4 sm:px-10 ${
+          hasAnnouncements ? 'top-10' : 'top-0'
+        } ${
           showAnnBanner && announcements.length > 0 ? 'mt-8' : 'mt-0'
         } ${
           isScrolled || activeMega || mobileMenu
