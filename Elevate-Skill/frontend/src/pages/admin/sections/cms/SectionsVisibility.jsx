@@ -25,7 +25,7 @@ function loadVisibility() {
       const parsed = JSON.parse(raw);
       return { ...defaultVisibility, ...parsed };
     }
-  } catch {}
+  } catch (e) { console.error('Failed to load visibility:', e); }
   return { ...defaultVisibility };
 }
 

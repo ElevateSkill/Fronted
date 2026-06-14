@@ -5,7 +5,7 @@ import { api, unwrapResults } from '../../../../services/api';
 import CmsSubNav from './CmsSubNav';
 import {
   Field, TextInput, TextArea, Badge, Modal, ToastMessage,
-  useToast, useConfirmDelete, accent, objectToFormData, apiError
+  useToast, useConfirmDelete, accent, apiError
 } from '../../components/AdminShared';
 
 const emptyForm = { question: '', answer: '', order: 0, is_active: true, category: '' };

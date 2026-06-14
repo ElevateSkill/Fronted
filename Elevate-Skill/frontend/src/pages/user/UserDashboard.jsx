@@ -236,21 +236,6 @@ export default function UserDashboard() {
     return map;
   }, [payments]);
 
-  const enrollInCourse = async (courseId) => {
-    setSaving(true);
-    setError('');
-    try {
-      await api.post('/enrollments/', { course: courseId });
-      showToast('Enrolled! Upload payment proof to activate.', 'success');
-      setActiveTab('payments');
-      await loadStudentData();
-    } catch (err) {
-      showToast(err?.response?.data?.detail || 'Could not enroll.', 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const submitPayment = async (event) => {
     event.preventDefault();
     if (!selectedEnrollment || !proofFile || !selectedBankId) {

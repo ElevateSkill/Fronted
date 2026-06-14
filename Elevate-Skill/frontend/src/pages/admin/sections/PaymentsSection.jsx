@@ -4,7 +4,7 @@ import { CreditCard, CheckCircle, XCircle, Search, Plus, Trash2, X, FileText, Bu
 import { api, getMediaUrl, unwrapResults } from '../../../services/api';
 import {
   Badge, Modal, ToastMessage, AnimatedCounter, Field, TextInput,
-  useToast, useConfirmDelete, accent, formatDate, apiError
+  useToast, useConfirmDelete, formatDate, apiError
 } from '../components/AdminShared';
 
 export default function PaymentsSection() {

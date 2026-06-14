@@ -4,7 +4,6 @@ import {
   AlertTriangle, CheckCircle, X, Loader, Users, BookOpen, GraduationCap,
   BarChart3, Tags, CreditCard, Megaphone, Settings, FileText, UserPlus, User
 } from 'lucide-react';
-import { api } from '../../../services/api';
 
 export const accent = {
   button: 'bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white font-black hover:brightness-110 active:scale-[0.97] transition-all duration-200 shadow-lg shadow-[#15c8fb]/20',

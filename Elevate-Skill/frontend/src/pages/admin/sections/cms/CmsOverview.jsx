@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Image, FileText, Settings as SettingsIcon, Star, HelpCircle, Eye, ArrowRight, Loader } from 'lucide-react';
 import { api, unwrapResults } from '../../../../services/api';
 import CmsSubNav from './CmsSubNav';
-import { accent } from '../../components/AdminShared';
 
 const cards = [
   { label: 'Hero Content', desc: 'Edit hero title, subtitle, CTA, and background image', icon: Image, path: '/admin/cms/hero', color: 'from-[#15c8fb] to-[#3b82f6]' },
