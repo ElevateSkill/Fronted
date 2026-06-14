@@ -1,14 +1,31 @@
 import { motion } from 'framer-motion';
-import { Calendar, Newspaper } from 'lucide-react';
+import { Calendar, Newspaper, Clock, ChevronRight } from 'lucide-react';
 import { getMediaUrl } from '../services/api';
+import photo1 from '../assets/photo1.jpg';
+import photo2 from '../assets/photo2.jpg';
+import gr1 from '../assets/gr1.jpg';
+import grad2 from '../assets/grad2.jpg';
+import elevate1 from '../assets/people/elevate1.jpg';
 
-const fallbackImage = 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=900';
+const fallbackImages = [photo1, gr1, grad2, photo2, elevate1];
 
 function formatDate(value) {
   if (!value) return 'Just now';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Just now';
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
+}
+
+function timeAgo(value) {
+  if (!value) return '';
+  const now = new Date();
+  const date = new Date(value);
+  const diff = Math.floor((now - date) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  if (diff < 2592000) return `${Math.floor(diff / 86400)}d ago`;
+  return formatDate(value);
 }
 
 export default function LatestNewsSection({ items = [] }) {
@@ -52,26 +69,24 @@ export default function LatestNewsSection({ items = [] }) {
             transition={{ duration: 0.35 }}
             className="group overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-xl shadow-black/25 lg:col-span-2"
           >
-            <div className="relative h-56 overflow-hidden border-b border-white/10 sm:h-64">
+            <div className="relative h-56 overflow-hidden sm:h-64">
               <img
-                src={getMediaUrl(featured.image) || fallbackImage}
+                src={getMediaUrl(featured.image) || fallbackImages[0]}
                 alt={featured.title}
                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
-              <span className="absolute left-4 top-4 rounded-full border border-[#f89f29]/40 bg-[#f89f29]/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#f89f29]">
-                New
-              </span>
-            </div>
-            <div className="p-5 sm:p-6">
-              <div className="mb-3 flex items-center gap-2 text-xs text-white/60">
-                <Calendar size={13} />
-                {formatDate(featured.created_at)}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f89f29]/40 bg-[#f89f29]/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#f89f29] backdrop-blur-sm mb-3">
+                  <Clock size={10} />
+                  {featured.created_at ? timeAgo(featured.created_at) : 'Recent'}
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black leading-tight text-white drop-shadow-lg">{featured.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/80 line-clamp-2 drop-shadow">
+                  {featured.excerpt || featured.content}
+                </p>
               </div>
-              <h3 className="text-xl font-black leading-tight text-white">{featured.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-white/70 line-clamp-3">
-                {featured.excerpt || featured.content}
-              </p>
             </div>
           </motion.article>
 
@@ -83,16 +98,30 @@ export default function LatestNewsSection({ items = [] }) {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ delay: index * 0.08, duration: 0.3 }}
-                className="rounded-xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm"
+                className="group relative overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm hover:border-[#15c8fb]/30 transition-all duration-300"
               >
-                <div className="mb-2 flex items-center gap-2 text-[11px] text-white/55">
-                  <Calendar size={12} />
-                  {formatDate(item.created_at)}
+                <div className="flex gap-3">
+                  <div className="hidden sm:block w-16 h-16 shrink-0 rounded-lg overflow-hidden">
+                    <img
+                      src={getMediaUrl(item.image) || fallbackImages[(index + 1) % fallbackImages.length]}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 text-[11px] text-white/55 mb-1">
+                      <Calendar size={10} />
+                      {formatDate(item.created_at)}
+                    </div>
+                    <h4 className="text-sm font-black text-white line-clamp-2 group-hover:text-[#15c8fb] transition-colors">{item.title}</h4>
+                    <p className="mt-1 text-xs leading-5 text-white/65 line-clamp-1">
+                      {item.excerpt || item.content}
+                    </p>
+                  </div>
                 </div>
-                <h4 className="text-sm font-black text-white line-clamp-2">{item.title}</h4>
-                <p className="mt-2 text-xs leading-5 text-white/65 line-clamp-2">
-                  {item.excerpt || item.content}
-                </p>
+                <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-[#15c8fb] opacity-0 group-hover:opacity-100 transition-opacity">
+                  Read more <ChevronRight size={10} />
+                </div>
               </motion.article>
             ))}
           </div>

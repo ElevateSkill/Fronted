@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Megaphone, Newspaper, Edit3, Loader, Plus, Trash2, CheckCircle, XCircle, Eye, EyeOff, Save, X, Calendar, Clock, FileText, Image, RefreshCw } from 'lucide-react';
+import { Megaphone, Newspaper, Edit3, Loader, Plus, Trash2, CheckCircle, XCircle, Eye, EyeOff, Save, X, Calendar, Clock, FileText, Image, RefreshCw, ImageUp } from 'lucide-react';
 import { api, unwrapResults } from '../../../services/api';
 import {
   Field, TextInput, TextArea, Select, Badge, Modal, ToastMessage,
@@ -305,8 +305,25 @@ export default function AnnouncementsSection() {
                   </Select>
                 </Field>
                 <Field label="Image">
-                  <input type="file" accept="image/*" onChange={(e) => setNewsForm({ ...newsForm, image: e.target.files?.[0] || null })}
-                    className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:bg-[#15c8fb]/10 file:text-[#15c8fb] hover:file:bg-[#15c8fb]/20" />
+                  <div className="space-y-2">
+                    <input type="file" accept="image/*" onChange={(e) => setNewsForm({ ...newsForm, image: e.target.files?.[0] || null })}
+                      className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:bg-[#15c8fb]/10 file:text-[#15c8fb] hover:file:bg-[#15c8fb]/20" />
+                    {newsForm.image && typeof newsForm.image !== 'string' && (
+                      <div className="relative rounded-lg overflow-hidden border border-white/10 h-32">
+                        <img src={URL.createObjectURL(newsForm.image)} alt="Preview" className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => setNewsForm({ ...newsForm, image: null })}
+                          className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white hover:bg-black/80 transition-all">
+                          <X size={12} />
+                        </button>
+                      </div>
+                    )}
+                    {editingNews && !(newsForm.image instanceof File) && (
+                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <ImageUp size={14} className="text-[#15c8fb]" />
+                        Upload a new image to replace the current one.
+                      </div>
+                    )}
+                  </div>
                 </Field>
               </div>
               <button disabled={saving} className={`w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3.5 text-sm font-black disabled:opacity-60 shadow-lg ${accent.button}`}>
@@ -402,30 +419,41 @@ export default function AnnouncementsSection() {
                   className="group relative overflow-hidden rounded-xl border border-gray-100 dark:border-white/10 bg-white dark:bg-gray-900/20 p-4 hover:shadow-md transition-all duration-300"
                 >
                   <div className={`absolute left-0 top-0 bottom-0 w-0.5 ${item.status === 'published' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-                  <div className="pl-3">
-                    <div className="mb-2 flex items-start justify-between gap-2">
-                      <h4 className="font-black text-gray-900 dark:text-white text-sm group-hover:text-[#15c8fb] transition-colors line-clamp-1">{item.title}</h4>
-                      <Badge>{item.status}</Badge>
+                  <div className="flex gap-3 pl-3">
+                    <div className="hidden sm:block w-14 h-14 shrink-0 rounded-lg overflow-hidden border border-white/10">
+                      {item.image ? (
+                        <img src={item.image} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                          <Image size={16} className="text-gray-400" />
+                        </div>
+                      )}
                     </div>
-                    <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400 line-clamp-2">{item.excerpt || item.content}</p>
-                    <div className="mt-3 flex items-center gap-2">
-                      <button onClick={() => openEditNews(item)}
-                        className="rounded-lg border border-[#15c8fb]/30 px-2.5 py-1.5 text-[10px] font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10 inline-flex items-center gap-1">
-                        <Edit3 size={11} /> Edit
-                      </button>
-                      <button onClick={() => patchNews(item, { status: item.status === 'published' ? 'draft' : 'published' })}
-                        className={`rounded-lg border px-2.5 py-1.5 text-[10px] font-bold transition-all inline-flex items-center gap-1 ${
-                          item.status === 'published'
-                            ? 'border-amber-500/30 text-amber-400 hover:bg-amber-500/10'
-                            : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
-                        }`}>
-                        {item.status === 'published' ? <EyeOff size={11} /> : <Eye size={11} />}
-                        {item.status === 'published' ? 'To Draft' : 'Publish'}
-                      </button>
-                      <button onClick={() => deleteNews(item.id)}
-                        className="rounded-lg border border-rose-500/30 px-2.5 py-1.5 text-[10px] font-bold text-rose-500 transition-all hover:bg-rose-500/10 inline-flex items-center gap-1 ml-auto">
-                        <Trash2 size={11} /> Delete
-                      </button>
+                    <div className="flex-1 min-w-0">
+                      <div className="mb-1 flex items-start justify-between gap-2">
+                        <h4 className="font-black text-gray-900 dark:text-white text-sm group-hover:text-[#15c8fb] transition-colors line-clamp-1">{item.title}</h4>
+                        <Badge>{item.status}</Badge>
+                      </div>
+                      <p className="text-xs leading-relaxed text-gray-600 dark:text-gray-400 line-clamp-2">{item.excerpt || item.content}</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <button onClick={() => openEditNews(item)}
+                          className="rounded-lg border border-[#15c8fb]/30 px-2.5 py-1.5 text-[10px] font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10 inline-flex items-center gap-1">
+                          <Edit3 size={11} /> Edit
+                        </button>
+                        <button onClick={() => patchNews(item, { status: item.status === 'published' ? 'draft' : 'published' })}
+                          className={`rounded-lg border px-2.5 py-1.5 text-[10px] font-bold transition-all inline-flex items-center gap-1 ${
+                            item.status === 'published'
+                              ? 'border-amber-500/30 text-amber-400 hover:bg-amber-500/10'
+                              : 'border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10'
+                          }`}>
+                          {item.status === 'published' ? <EyeOff size={11} /> : <Eye size={11} />}
+                          {item.status === 'published' ? 'To Draft' : 'Publish'}
+                        </button>
+                        <button onClick={() => deleteNews(item.id)}
+                          className="rounded-lg border border-rose-500/30 px-2.5 py-1.5 text-[10px] font-bold text-rose-500 transition-all hover:bg-rose-500/10 inline-flex items-center gap-1 ml-auto">
+                          <Trash2 size={11} /> Delete
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </motion.article>
@@ -532,8 +560,19 @@ export default function AnnouncementsSection() {
                       </Select>
                     </Field>
                     <Field label="Image">
-                      <input type="file" accept="image/*" onChange={(e) => setNewsForm({ ...newsForm, image: e.target.files?.[0] || null })}
-                        className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:bg-[#15c8fb]/10 file:text-[#15c8fb] hover:file:bg-[#15c8fb]/20" />
+                      <div className="space-y-2">
+                        <input type="file" accept="image/*" onChange={(e) => setNewsForm({ ...newsForm, image: e.target.files?.[0] || null })}
+                          className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-600 dark:text-gray-300 file:mr-4 file:rounded-lg file:border-0 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:bg-[#15c8fb]/10 file:text-[#15c8fb] hover:file:bg-[#15c8fb]/20" />
+                        {newsForm.image && typeof newsForm.image !== 'string' && (
+                          <div className="relative rounded-lg overflow-hidden border border-white/10 h-32">
+                            <img src={URL.createObjectURL(newsForm.image)} alt="Preview" className="w-full h-full object-cover" />
+                            <button type="button" onClick={() => setNewsForm({ ...newsForm, image: null })}
+                              className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white hover:bg-black/80 transition-all">
+                              <X size={12} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </Field>
                   </div>
                   <div className="flex gap-3 pt-2">

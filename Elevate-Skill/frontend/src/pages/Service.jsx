@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   ChevronDown, Lightbulb, PenTool, Target,
-  Users, Star, ArrowRight, CheckCircle2, Sparkles
+  Users, Star, ArrowRight, CheckCircle2, Sparkles,
+  Newspaper, Calendar, Clock, ChevronRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { api, unwrapResults, getMediaUrl } from '../services/api';
 
 import mentorship from '../assets/service/mentorship.jpg'
 import online_class from '../assets/service/online-class.jpg'
@@ -14,6 +16,15 @@ import student01 from '../assets/people/elevate-student01.jpg'
 import graduate from '../assets/people/elevate-graduate.jpg'
 import staff from '../assets/people/elevate-staff.jpg'
 import prof from '../assets/people/prof-melaku.jpg'
+import gr1 from '../assets/gr1.jpg'
+import gr3 from '../assets/gr3.jpg'
+import grad2 from '../assets/grad2.jpg'
+import photo1 from '../assets/photo1.jpg'
+import photo2 from '../assets/photo2.jpg'
+import elevate1 from '../assets/people/elevate1.jpg'
+import partnership from '../assets/people/partnership.jpg'
+import celebrations from '../assets/gallery/celebrations.jpg'
+import meeting from '../assets/gallery/meeting.jpg'
 
 import AIG from '../assets/partners/AIG.jpg'
 import alpha_code from '../assets/partners/alpha-code.png'
@@ -121,6 +132,7 @@ export default function Services() {
 
   const [activeService] = useState();
   const [count, setCount] = useState(0);
+  const [news, setNews] = useState([]);
 
   useEffect(() => {
     const target = 2000;
@@ -135,6 +147,20 @@ export default function Services() {
     };
     requestAnimationFrame(animate);
   }, []);
+
+  useEffect(() => {
+    api.get('/news/')
+      .then(res => {
+        const data = unwrapResults(res.data)
+          .filter(n => n.status === 'published' || n.is_published !== false)
+          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+          .slice(0, 4);
+        setNews(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const newsImages = [photo1, gr1, grad2, photo2];
 
   const navigate = useNavigate();
 
@@ -298,6 +324,64 @@ export default function Services() {
           ))}
         </div>
 
+        {news.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20 md:mt-28"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f89f29]/35 bg-[#f89f29]/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[#f89f29]">
+                <Newspaper size={12} />
+                Latest Updates
+              </span>
+            </div>
+            <h3 className="text-3xl sm:text-4xl font-black text-white mb-2">News & Updates</h3>
+            <p className="text-white/50 text-sm mb-8 max-w-xl">Stay informed with the latest from Elevate Skill.</p>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {news.map((item, idx) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ delay: idx * 0.08 }}
+                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] hover:border-[#f89f29]/30 transition-all duration-500"
+                >
+                  <div className="relative h-44 overflow-hidden">
+                    <img
+                      src={getMediaUrl(item.image) || newsImages[idx % newsImages.length]}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">
+                      News
+                    </span>
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 text-[11px] text-white/50 mb-2">
+                      <Calendar size={10} />
+                      {item.created_at ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(item.created_at)) : 'Recent'}
+                    </div>
+                    <h4 className="text-sm font-black text-white line-clamp-2 group-hover:text-[#f89f29] transition-colors">
+                      {item.title}
+                    </h4>
+                    <p className="mt-2 text-xs text-white/60 line-clamp-2 leading-relaxed">
+                      {item.excerpt || item.content}
+                    </p>
+                    <div className="mt-3 flex items-center gap-1 text-[11px] font-bold text-[#f89f29] opacity-0 group-hover:opacity-100 transition-opacity">
+                      Read more <ChevronRight size={12} />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -311,7 +395,7 @@ export default function Services() {
 
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
               <button  
-              onClick={() => navigate('/register')} // navigate to register
+              onClick={() => navigate('/register')}
               className="group w-full sm:w-auto px-10 py-6 bg-gradient-to-r from-[#f9a215] to-[#f15805] text-[white] font-black text-sm tracking-[0.2em] hover:scale-105 active:scale-95 hover:shadow-2xl hover:shadow-[#15c8fb]/20 transition-all duration-300 flex items-center justify-center gap-3 shadow-2xl">
                 GET STARTED NOW
                 <ArrowRight className="group-hover:rotate-[-45deg] transition-transform" />
