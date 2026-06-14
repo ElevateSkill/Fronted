@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 
 from apps.accounts.api.serializers import (
@@ -17,6 +18,7 @@ from apps.accounts.api.serializers import (
 )
 
 from utils.ratelimit import api_ratelimit
+from apps.announcements.permissions import IsAdmin
 
 User = get_user_model()
 
@@ -110,3 +112,26 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         if self.request.method in ("PUT", "PATCH"):
             return ProfileUpdateSerializer
         return UserSerializer
+
+
+@extend_schema(tags=["Account"])
+class AdminUserListView(generics.ListAPIView):
+    """
+    GET /api/v1/admin/users/ - List all users with search & role filter (admin only).
+    """
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+
+    def get_queryset(self):
+        qs = User.objects.all().order_by("-date_joined")
+        role = self.request.query_params.get("role")
+        search = self.request.query_params.get("search")
+        if role:
+            qs = qs.filter(role=role)
+        if search:
+            qs = qs.filter(
+                Q(full_name__icontains=search)
+                | Q(username__icontains=search)
+                | Q(email__icontains=search)
+            )
+        return qs
