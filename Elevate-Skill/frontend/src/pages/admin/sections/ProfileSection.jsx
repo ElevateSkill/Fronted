@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Save, Loader, Eye, EyeOff, Globe, GlobeOff } from 'lucide-react';
+import { User, Save, Loader, Eye, EyeOff, Globe, GlobeX } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 import { Field, TextInput, useToast, ToastMessage, accent, apiError } from '../components/AdminShared';
@@ -90,7 +90,7 @@ export default function ProfileSection() {
                     : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-white/10'
                 }`}
               >
-                {profileVisibility ? <Globe size={16} /> : <GlobeOff size={16} />}
+                {profileVisibility ? <Globe size={16} /> : <GlobeX size={16} />}
                 {profileVisibility ? 'Public' : 'Private'}
               </button>
               <span className="text-xs text-gray-500">Other users can see your profile when public.</span>

@@ -5,7 +5,7 @@ import {
   ArrowLeft, Bell, BookOpen, Building, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
   Home, Loader, LogOut, Mail, Megaphone, Menu, MessageCircle, Phone,
   RefreshCw, Save, Send, Settings, Shield, Upload, User, X, AlertTriangle,
-  Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff, Globe, GlobeOff
+  Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff, Globe, GlobeX
 } from 'lucide-react';
 import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -1034,7 +1034,7 @@ export default function UserDashboard() {
             </div>
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-3">
               <div className="flex items-center gap-2">
-                {profileVisibility ? <Globe size={16} className="text-emerald-400" /> : <GlobeOff size={16} className="text-gray-500" />}
+                {profileVisibility ? <Globe size={16} className="text-emerald-400" /> : <GlobeX size={16} className="text-gray-500" />}
                 <span className="text-sm font-bold text-white">Profile {profileVisibility ? 'Public' : 'Private'}</span>
               </div>
               <button
