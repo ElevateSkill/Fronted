@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { CreditCard, Users, BookOpen, GraduationCap, UserPlus, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { CreditCard, Users, BookOpen, GraduationCap, UserPlus, Clock, CheckCircle, XCircle, Sparkles } from 'lucide-react';
 import { api } from '../../../services/api';
-import { StatCard, Badge, Skeleton, formatDate, emptyMetrics, accent } from '../components/AdminShared';
+import { StatCard, Badge, Skeleton, formatDate, emptyMetrics, accent, StaggerContainer } from '../components/AdminShared';
 
 export default function OverviewSection() {
   const navigate = useNavigate();
@@ -51,17 +51,23 @@ export default function OverviewSection() {
   return (
     <div className="space-y-6">
       <motion.section
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-xl border border-[#15c8fb]/15 bg-white dark:bg-[#0d1117] p-6 shadow-sm"
+        className="relative overflow-hidden rounded-xl border border-[#15c8fb]/20 bg-white dark:bg-[#0d1117] p-6 shadow-lg"
       >
-        <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#15c8fb]/10 to-transparent blur-3xl" />
-        <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-gradient-to-br from-[#15c8fb]/10 to-transparent blur-3xl" />
+        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-gradient-to-br from-[#15c8fb]/10 to-transparent blur-3xl animate-float" />
+        <div className="absolute -bottom-20 -left-20 h-60 w-60 rounded-full bg-gradient-to-br from-[#f89f29]/10 to-transparent blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+        <div className="absolute inset-0 admin-grid-bg opacity-20" />
         <div className="relative flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-wider text-[#15c8fb]">Platform health</p>
-            <h2 className="mt-1 text-2xl font-black text-gray-900 dark:text-white">Live admin overview</h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-600">Real-time metrics from the backend. Student data, course stats, enrollment activity, and payment summaries — all served live from the API.</p>
+          <div className="flex items-start gap-4">
+            <div className="hidden sm:flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] shadow-lg shadow-[#15c8fb]/20">
+              <Sparkles size={24} className="text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-wider text-[#15c8fb]">Platform health</p>
+              <h2 className="mt-1 text-2xl font-black text-gray-900 dark:text-white">Live admin overview</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-600">Real-time metrics from the backend. Student data, course stats, enrollment activity, and payment summaries — all served live from the API.</p>
+            </div>
           </div>
           <button onClick={() => navigate('/admin/payments')} className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-black ${accent.button}`}>
             <CreditCard size={16} /> Review {pendingPayments} pending
@@ -69,28 +75,22 @@ export default function OverviewSection() {
         </div>
       </motion.section>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-      >
-        <StatCard label="Students" value={metrics.total_students} icon={Users} />
-        <StatCard label="Courses" value={metrics.total_courses} icon={BookOpen} tone="orange" />
-        <StatCard label="Active Courses" value={metrics.active_courses} icon={GraduationCap} />
-        <StatCard label="Enrollments" value={metrics.total_enrollments} icon={UserPlus} tone="green" />
-      </motion.div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StaggerContainer className="contents" delay={0.05}>
+          <StatCard label="Students" value={metrics.total_students} icon={Users} />
+          <StatCard label="Courses" value={metrics.total_courses} icon={BookOpen} tone="orange" />
+          <StatCard label="Active Courses" value={metrics.active_courses} icon={GraduationCap} />
+          <StatCard label="Enrollments" value={metrics.total_enrollments} icon={UserPlus} tone="green" />
+        </StaggerContainer>
+      </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-      >
-        <StatCard label="Pending Payments" value={metrics.payments?.pending || 0} icon={Clock} tone="orange" />
-        <StatCard label="Approved Payments" value={metrics.payments?.approved || 0} icon={CheckCircle} tone="green" />
-        <StatCard label="Rejected Payments" value={metrics.payments?.rejected || 0} icon={XCircle} tone="rose" />
-      </motion.div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer className="contents" delay={0.07}>
+          <StatCard label="Pending Payments" value={metrics.payments?.pending || 0} icon={Clock} tone="orange" />
+          <StatCard label="Approved Payments" value={metrics.payments?.approved || 0} icon={CheckCircle} tone="green" />
+          <StatCard label="Rejected Payments" value={metrics.payments?.rejected || 0} icon={XCircle} tone="rose" />
+        </StaggerContainer>
+      </div>
 
       <motion.section
         initial={{ opacity: 0, y: 16 }}

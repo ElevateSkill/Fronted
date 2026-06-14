@@ -237,6 +237,25 @@ export const pageVariants = {
   exit: { opacity: 0, y: -12, transition: { duration: 0.2 } },
 };
 
+export function StaggerContainer({ children, className = '', delay = 0.05 }) {
+  return (
+    <div className={className}>
+      {Array.isArray(children)
+        ? children.map((child, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: delay * i, duration: 0.3, ease: 'easeOut' }}
+            >
+              {child}
+            </motion.div>
+          ))
+        : children}
+    </div>
+  );
+}
+
 export function objectToFormData(values) {
   const formData = new FormData();
   Object.entries(values).forEach(([key, value]) => {

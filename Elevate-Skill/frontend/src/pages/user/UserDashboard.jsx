@@ -1031,7 +1031,12 @@ export default function UserDashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-charcoal text-white">
+    <div className="min-h-screen bg-charcoal text-white relative">
+      <div className="fixed inset-0 pointer-events-none admin-grid-bg opacity-30" />
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-[#f89f29]/5 blur-[120px] animate-float" />
+        <div className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-gradient-to-br from-[#f89f29]/5 to-[#f07000]/5 blur-[120px] animate-float" style={{ animationDelay: '2.5s' }} />
+      </div>
       <AnnouncementBar />
       <AnimatePresence>
         <Toast message={toast.message} type={toast.type} onClose={closeToast} />

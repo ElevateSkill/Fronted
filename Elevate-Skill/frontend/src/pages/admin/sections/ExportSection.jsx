@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, CreditCard, BookOpen, Megaphone, FileText, Tags, Loader } from 'lucide-react';
+import { Users, CreditCard, BookOpen, Megaphone, FileText, Tags, Loader, Download, Sparkles } from 'lucide-react';
 import { api, unwrapResults, exportToCSV } from '../../../services/api';
-import { useToast, ToastMessage, accent, apiError } from '../components/AdminShared';
+import { useToast, ToastMessage, accent, apiError, StaggerContainer } from '../components/AdminShared';
 
 function ExportCard({ icon: Icon, label, description, filename, data }) {
   const [exporting, setExporting] = useState(false);
@@ -25,23 +25,29 @@ function ExportCard({ icon: Icon, label, description, filename, data }) {
   }, []);
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 shadow-sm hover:shadow-md transition-all duration-200">
-      <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#15c8fb]/20 bg-[#15c8fb]/10 text-[#15c8fb]">
-        <Icon size={22} />
+    <motion.div
+      whileHover={{ y: -3, transition: { duration: 0.2 } }}
+      className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 shadow-sm hover:shadow-lg transition-all duration-300"
+    >
+      <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-[#15c8fb]/5 to-[#f89f29]/5 transition-all duration-500 group-hover:scale-[2.5]" />
+      <div className="relative">
+        <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[#15c8fb]/20 bg-[#15c8fb]/10 text-[#15c8fb] group-hover:scale-110 group-hover:bg-[#15c8fb]/20 transition-all duration-300">
+          <Icon size={22} />
+        </div>
+        <h3 className="font-black text-gray-900 dark:text-white group-hover:text-[#15c8fb] transition-colors">{label}</h3>
+        <p className="mt-1 text-xs text-gray-500 leading-relaxed">{description}</p>
+        <div className="mt-4">
+          <button
+            onClick={handleExport}
+            disabled={exporting || !data || data.length === 0}
+            className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-40 active:scale-95"
+          >
+            {exporting ? <Loader size={13} className="animate-spin" /> : <FileText size={13} />}
+            Export CSV {data ? `(${data.length})` : ''}
+          </button>
+        </div>
       </div>
-      <h3 className="font-black text-gray-900 dark:text-white">{label}</h3>
-      <p className="mt-1 text-xs text-gray-500 leading-relaxed">{description}</p>
-      <div className="mt-4">
-        <button
-          onClick={handleExport}
-          disabled={exporting || !data || data.length === 0}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#15c8fb] to-[#f89f29] px-4 py-2 text-xs font-bold text-white hover:brightness-110 transition-all disabled:opacity-40"
-        >
-          {exporting ? <Loader size={13} className="animate-spin" /> : <FileText size={13} />}
-          Export CSV {data ? `(${data.length})` : ''}
-        </button>
-      </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -86,13 +92,22 @@ export default function ExportSection() {
         <ToastMessage message={toast.message} type={toast.type} onClose={closeToast} />
       </AnimatePresence>
 
-      <div className={`rounded-xl border p-6 shadow-sm ${accent.panel}`}>
-        <h2 className="text-lg font-black text-gray-900 dark:text-white">Export platform data</h2>
-        <p className="mt-1 text-sm text-gray-600 max-w-2xl">Download CSV reports of your platform data. These are generated client-side from live API data.</p>
+      <div className={`relative overflow-hidden rounded-xl border p-6 shadow-sm ${accent.panel}`}>
+        <div className="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-gradient-to-br from-[#15c8fb]/8 to-transparent blur-2xl" />
+        <div className="relative flex items-start gap-4">
+          <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] shadow-lg">
+            <Download size={20} className="text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-black text-gray-900 dark:text-white">Export platform data</h2>
+            <p className="mt-1 text-sm text-gray-600 max-w-2xl">Download CSV reports of your platform data. These are generated client-side from live API data.</p>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        <ExportCard
+        <StaggerContainer className="contents" delay={0.06}>
+          <ExportCard
           icon={Users}
           label="Students"
           description="Export all student records with names, emails, phone numbers, and enrollment status."
@@ -169,6 +184,7 @@ export default function ExportSection() {
             courses_count: courses.filter((co) => co.category?.id === c.id).length,
           }))}
         />
+        </StaggerContainer>
       </div>
 
       <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-5 text-sm text-gray-900 dark:text-white shadow-sm">

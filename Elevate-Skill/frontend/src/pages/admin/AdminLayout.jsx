@@ -115,7 +115,12 @@ export default function AdminLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-[#0a0e14] text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-gray-50/50 dark:bg-[#0a0e14] text-gray-900 dark:text-white transition-colors duration-300 relative">
+      <div className="fixed inset-0 pointer-events-none admin-grid-bg opacity-50" />
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute -top-40 -left-40 h-80 w-80 rounded-full bg-[#15c8fb]/5 blur-[120px] animate-float" />
+        <div className="absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-[#f89f29]/5 blur-[120px] animate-float" style={{ animationDelay: '2s' }} />
+      </div>
       <AnnouncementBar />
 
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 border-r border-white/[0.06] bg-[#0d1117] p-4 overflow-y-auto flex flex-col lg:block">

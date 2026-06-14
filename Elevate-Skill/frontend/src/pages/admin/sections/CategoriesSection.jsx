@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tags, Loader } from 'lucide-react';
+import { Tags, Loader, Plus } from 'lucide-react';
 import { api, unwrapResults } from '../../../services/api';
 import {
   Field, TextInput, Modal, ToastMessage,
-  useToast, useConfirmDelete, accent, apiError
+  useToast, useConfirmDelete, accent, apiError, StaggerContainer
 } from '../components/AdminShared';
 
 export default function CategoriesSection() {
@@ -92,16 +92,26 @@ export default function CategoriesSection() {
         onSubmit={saveCategory}
         className="h-fit rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-5 flex items-center gap-2 text-lg font-black text-gray-900 dark:text-white">
-          <Tags size={18} className="text-[#15c8fb]" />
-          {editingCategory ? 'Edit category' : 'Create category'}
-        </h2>
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] shadow-lg shadow-[#15c8fb]/20">
+            <Plus size={18} className="text-white" />
+          </div>
+          <div>
+            <h2 className="text-lg font-black text-gray-900 dark:text-white">
+              {editingCategory ? 'Edit category' : 'Create category'}
+            </h2>
+            <p className="text-xs text-gray-500">{editingCategory ? 'Update the category name' : 'Add a new category for courses'}</p>
+          </div>
+        </div>
         <Field label="Category name">
           <TextInput required value={categoryName} onChange={(e) => setCategoryName(e.target.value)} placeholder="e.g. Web Development" />
         </Field>
         <div className="mt-5 flex gap-2">
-          <button disabled={saving} className={`flex-1 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>Save category</button>
-          {editingCategory && <button type="button" onClick={() => { setEditingCategory(null); setCategoryName(''); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-black text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5">Cancel</button>}
+          <button disabled={saving} className={`flex-1 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-60 ${accent.button}`}>
+            {saving ? <Loader className="animate-spin inline mr-2" size={16} /> : null}
+            {editingCategory ? 'Update' : 'Create'} category
+          </button>
+          {editingCategory && <button type="button" onClick={() => { setEditingCategory(null); setCategoryName(''); }} className="rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3 text-sm font-black text-gray-900 dark:text-white transition-all hover:bg-gray-50 dark:hover:bg-white/5 active:scale-95">Cancel</button>}
         </div>
       </motion.form>
 
@@ -110,31 +120,35 @@ export default function CategoriesSection() {
         animate={{ opacity: 1, x: 0 }}
         className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <h2 className="mb-5 text-lg font-black text-gray-900 dark:text-white">Categories used by courses</h2>
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-lg font-black text-gray-900 dark:text-white">Categories used by courses</h2>
+          <span className="rounded-full bg-gradient-to-r from-[#15c8fb]/20 to-[#f89f29]/20 px-3 py-1 text-xs font-bold text-[#15c8fb]">{categories.length} total</span>
+        </div>
         <div className="grid gap-3 md:grid-cols-2">
-          {categories.map((cat) => {
-            const count = courses.filter((course) => course.category?.id === cat.id).length;
-            return (
-              <motion.article
-                key={cat.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                whileHover={{ y: -1 }}
-                className="rounded-xl border border-gray-200 dark:border-white/10 p-4 transition-shadow hover:shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-black text-gray-900 dark:text-white">{cat.name}</h3>
-                    <p className="mt-0.5 text-xs text-gray-600 dark:text-gray-400">/{cat.slug} &middot; {count} course{count !== 1 ? 's' : ''}</p>
+          <StaggerContainer className="contents" delay={0.05}>
+            {categories.map((cat) => {
+              const count = courses.filter((course) => course.category?.id === cat.id).length;
+              return (
+                <motion.article
+                  key={cat.id}
+                  whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                  className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-white/10 p-4 transition-all hover:shadow-md hover:border-[#15c8fb]/30"
+                >
+                  <div className="absolute -right-6 -top-6 h-16 w-16 rounded-full bg-gradient-to-br from-[#15c8fb]/5 to-[#f89f29]/5 transition-all duration-500 group-hover:scale-[3]" />
+                  <div className="relative flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-black text-gray-900 dark:text-white group-hover:text-[#15c8fb] transition-colors">{cat.name}</h3>
+                      <p className="mt-0.5 text-xs text-gray-600 dark:text-gray-400">/{cat.slug} &middot; {count} course{count !== 1 ? 's' : ''}</p>
+                    </div>
+                    <div className="flex shrink-0 gap-2">
+                      <button onClick={() => { setEditingCategory(cat); setCategoryName(cat.name); }} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10 active:scale-95">Edit</button>
+                      <button onClick={() => deleteCategory(cat.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-500/10 active:scale-95">Delete</button>
+                    </div>
                   </div>
-                  <div className="flex shrink-0 gap-2">
-                    <button onClick={() => { setEditingCategory(cat); setCategoryName(cat.name); }} className="rounded-lg border border-[#15c8fb]/30 px-3 py-2 text-xs font-bold text-[#15c8fb] transition-all hover:bg-[#15c8fb]/10">Edit</button>
-                    <button onClick={() => deleteCategory(cat.id)} className="rounded-lg border border-rose-500/30 px-3 py-2 text-xs font-bold text-rose-600 transition-all hover:bg-rose-50">Delete</button>
-                  </div>
-                </div>
-              </motion.article>
-            );
-          })}
+                </motion.article>
+              );
+            })}
+          </StaggerContainer>
           {!categories.length && (
             <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
               <Tags size={40} className="mb-2 text-gray-300" />
