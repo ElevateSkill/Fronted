@@ -30,6 +30,7 @@ class HeroSection(SingletonModel):
     background_image = models.ImageField(upload_to="cms/hero/", null=True, blank=True)
     cta_text = models.CharField(max_length=100, blank=True, default="")
     cta_link = models.CharField(max_length=255, blank=True, default="")
+    is_published = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):

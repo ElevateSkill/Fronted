@@ -11,6 +11,7 @@ class HeroSectionSerializer(serializers.ModelSerializer):
             "background_image",
             "cta_text",
             "cta_link",
+            "is_published",
             "updated_at",
         ]
         read_only_fields = ["updated_at"]

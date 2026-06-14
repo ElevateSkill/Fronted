@@ -44,14 +44,13 @@ function Badge({ children }) {
   return <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold capitalize ${statusClass(children)}`}>{children || 'pending'}</span>;
 }
 
-function StatCard({ label, value, icon: Icon, tone = 'red' }) {
+function StatCard({ label, value, icon: Icon, tone = 'orange' }) {
   const tones = {
-    red: { bg: 'bg-[#f89f29]/10', text: 'text-[#f89f29]', border: 'border-[#f89f29]/20', gradient: 'from-[#f89f29]/5 via-surface to-surface' },
     orange: { bg: 'bg-[#f89f29]/10', text: 'text-[#f89f29]', border: 'border-[#f89f29]/20', gradient: 'from-[#f89f29]/5 via-surface to-surface' },
     green: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20', gradient: 'from-emerald-500/5 via-surface to-surface' },
     rose: { bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/20', gradient: 'from-rose-500/5 via-surface to-surface' },
   };
-  const t = tones[tone] || tones.red;
+  const t = tones[tone] || tones.orange;
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

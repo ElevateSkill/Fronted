@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertTriangle, CheckCircle, X, Loader, Users, BookOpen, GraduationCap,
-  Clock, XCircle, BarChart3, Tags, CreditCard, Megaphone, Settings, FileText, User, UserPlus
+  BarChart3, Tags, CreditCard, Megaphone, Settings, FileText, UserPlus
 } from 'lucide-react';
 import { api } from '../../../services/api';
 
@@ -84,7 +84,7 @@ export function AnimatedCounter({ value }) {
 }
 
 const statTones = {
-  red: {
+  cyan: {
     bg: 'bg-[#15c8fb]/10',
     text: 'text-[#15c8fb]',
     border: 'border-[#15c8fb]/20',
@@ -114,7 +114,7 @@ const statTones = {
   },
 };
 
-export function StatCard({ label, value, icon: Icon, tone = 'red' }) {
+export function StatCard({ label, value, icon: Icon, tone = 'cyan' }) {
   const t = statTones[tone];
   return (
     <motion.div

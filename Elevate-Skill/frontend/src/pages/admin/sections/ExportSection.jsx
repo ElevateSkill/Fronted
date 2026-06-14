@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, CreditCard, BookOpen, Megaphone, FileText, Tags, Loader, Download, Sparkles } from 'lucide-react';
+import { Users, CreditCard, BookOpen, Megaphone, FileText, Tags, Loader, Download, Sparkles, RefreshCw } from 'lucide-react';
 import { api, unwrapResults, exportToCSV } from '../../../services/api';
 import { useToast, ToastMessage, accent, apiError, StaggerContainer } from '../components/AdminShared';
 
@@ -98,9 +98,16 @@ export default function ExportSection() {
           <div className="hidden sm:flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#15c8fb] to-[#f89f29] shadow-lg">
             <Download size={20} className="text-white" />
           </div>
-          <div>
-            <h2 className="text-xl font-black text-gray-900 dark:text-white">Export platform data</h2>
-            <p className="mt-1 text-sm text-gray-600 max-w-2xl">Download CSV reports of your platform data. These are generated client-side from live API data.</p>
+          <div className="flex-1">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-gray-900 dark:text-white">Export platform data</h2>
+                <p className="mt-1 text-sm text-gray-600 max-w-2xl">Download CSV reports of your platform data. These are generated client-side from live API data.</p>
+              </div>
+              <button onClick={() => window.location.reload()} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]" title="Refresh data">
+                <RefreshCw size={15} />
+              </button>
+            </div>
           </div>
         </div>
       </div>

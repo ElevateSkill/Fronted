@@ -3,9 +3,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-aw#r2z^)dk9c73($r0c#%)8#ejvh#d9)u899h*(l@du!doyj$(")
-
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY and not DEBUG:
+    raise RuntimeError("SECRET_KEY environment variable is required in production")
+if not SECRET_KEY:
+    SECRET_KEY = "django-insecure-aw#r2z^)dk9c73($r0c#%)8#ejvh#d9)u899h*(l@du!doyj$("
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tags, Loader, Plus } from 'lucide-react';
+import { Tags, Loader, Plus, Search, RefreshCw } from 'lucide-react';
 import { api, unwrapResults } from '../../../services/api';
 import {
   Field, TextInput, Modal, ToastMessage,
@@ -14,8 +14,15 @@ export default function CategoriesSection() {
   const [saving, setSaving] = useState(false);
   const [categoryName, setCategoryName] = useState('');
   const [editingCategory, setEditingCategory] = useState(null);
+  const [search, setSearch] = useState('');
   const { toast, showToast, closeToast } = useToast();
   const { confirmDelete, confirmThen, setConfirmDelete } = useConfirmDelete();
+
+  const filteredCategories = useMemo(() => {
+    if (!search.trim()) return categories;
+    const q = search.toLowerCase();
+    return categories.filter((c) => c.name?.toLowerCase().includes(q));
+  }, [categories, search]);
 
   const loadData = async () => {
     try {
@@ -120,13 +127,26 @@ export default function CategoriesSection() {
         animate={{ opacity: 1, x: 0 }}
         className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm"
       >
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between gap-3 flex-wrap">
           <h2 className="text-lg font-black text-gray-900 dark:text-white">Categories used by courses</h2>
-          <span className="rounded-full bg-gradient-to-r from-[#15c8fb]/20 to-[#f89f29]/20 px-3 py-1 text-xs font-bold text-[#15c8fb]">{categories.length} total</span>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text" placeholder="Search categories..."
+                value={search} onChange={(e) => setSearch(e.target.value)}
+                className="w-48 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-900 py-2 pl-9 pr-3 text-xs font-medium text-gray-900 dark:text-white outline-none focus:border-[#15c8fb]/50 transition-colors placeholder:text-gray-400"
+              />
+            </div>
+            <button onClick={loadData} className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]" title="Refresh">
+              <RefreshCw size={14} />
+            </button>
+            <span className="rounded-full bg-gradient-to-r from-[#15c8fb]/20 to-[#f89f29]/20 px-3 py-1 text-xs font-bold text-[#15c8fb]">{filteredCategories.length} / {categories.length}</span>
+          </div>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <StaggerContainer className="contents" delay={0.05}>
-            {categories.map((cat) => {
+            {filteredCategories.map((cat) => {
               const count = courses.filter((course) => course.category?.id === cat.id).length;
               return (
                 <motion.article
@@ -149,12 +169,12 @@ export default function CategoriesSection() {
               );
             })}
           </StaggerContainer>
-          {!categories.length && (
-            <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
-              <Tags size={40} className="mb-2 text-gray-300" />
-              <p className="text-sm">No categories created yet</p>
-            </div>
-          )}
+            {!filteredCategories.length && (
+              <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-500">
+                <Tags size={40} className="mb-2 text-gray-300" />
+                <p className="text-sm">{search ? 'No categories match your search' : 'No categories created yet'}</p>
+              </div>
+            )}
         </div>
       </motion.section>
     </div>
