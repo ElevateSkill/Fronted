@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api, unwrapResults } from '../services/api';
 import { Megaphone, X, Sparkles } from 'lucide-react';
@@ -6,7 +6,8 @@ import { Megaphone, X, Sparkles } from 'lucide-react';
 export default function AnnouncementBar({ onAnnouncements }) {
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const hasReported = useRef(false);
 
   useEffect(() => {
     async function load() {
@@ -62,14 +63,27 @@ export default function AnnouncementBar({ onAnnouncements }) {
     return () => window.removeEventListener('announcements-updated', handler);
   }, [onAnnouncements]);
 
-  if (!visible || dismissed || announcements.length === 0) return null;
+  const handleDismiss = () => {
+    setExiting(true);
+    setVisible(false);
+  };
 
+  const handleExitComplete = () => {
+    setExiting(false);
+    if (!hasReported.current) {
+      hasReported.current = true;
+      onAnnouncements?.(false);
+    }
+  };
+
+  const show = visible && !exiting && announcements.length > 0;
   const item = announcements[0];
 
   return (
-    <AnimatePresence>
-      {visible && !dismissed && announcements.length > 0 && (
+    <AnimatePresence onExitComplete={handleExitComplete}>
+      {show && (
         <motion.div
+          key="announcement-bar"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
@@ -82,7 +96,6 @@ export default function AnnouncementBar({ onAnnouncements }) {
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="relative bg-gradient-to-r from-[#15c8fb] via-[#0ea5e9] to-[#f89f29] shadow-lg"
           >
-            {/* Decorative sparkles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <div className="absolute -top-4 -left-4 text-white/10">
                 <Sparkles size={60} />
@@ -90,7 +103,6 @@ export default function AnnouncementBar({ onAnnouncements }) {
               <div className="absolute -bottom-4 -right-4 text-white/10 rotate-12">
                 <Sparkles size={40} />
               </div>
-              {/* Shimmer line */}
               <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute -inset-[100%] animate-shimmer bg-gradient-to-r from-transparent via-white/15 to-transparent skew-x-[-45deg]" />
               </div>
@@ -137,7 +149,7 @@ export default function AnnouncementBar({ onAnnouncements }) {
               </div>
 
               <button
-                onClick={() => { setDismissed(true); setVisible(false); onAnnouncements?.(false); }}
+                onClick={handleDismiss}
                 className="shrink-0 flex items-center justify-center h-7 w-7 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all hover:scale-110 active:scale-90 backdrop-blur-sm"
                 aria-label="Dismiss announcements"
               >

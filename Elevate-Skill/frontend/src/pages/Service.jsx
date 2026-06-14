@@ -308,7 +308,7 @@ export default function Services() {
         </motion.div>
       </div>
 
-      <style jsx global>{`
+      <style>{`
         @keyframes loop-partners {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
