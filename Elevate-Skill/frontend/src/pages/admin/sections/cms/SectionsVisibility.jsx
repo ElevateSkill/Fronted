@@ -7,6 +7,13 @@ import { ToastMessage, useToast, accent } from '../../components/AdminShared';
 const STORAGE_KEY = 'elevateskill_section_visibility';
 
 const defaultVisibility = {
+  hero: true,
+  news: true,
+  services: true,
+  courses: true,
+  testimonials: true,
+  faq: true,
+  blog: true,
   about: true,
   contact: true,
 };
@@ -49,6 +56,41 @@ export default function SectionsVisibility() {
   };
 
   const sections = [
+    {
+      key: 'hero',
+      label: 'Hero / Landing',
+      desc: 'Show or hide the hero/landing section on the homepage.',
+    },
+    {
+      key: 'news',
+      label: 'Latest News',
+      desc: 'Show or hide the latest news section on the homepage.',
+    },
+    {
+      key: 'services',
+      label: 'Services',
+      desc: 'Show or hide the Services section (Solutions For GROWTH).',
+    },
+    {
+      key: 'courses',
+      label: 'Courses',
+      desc: 'Show or hide the Courses section on the homepage.',
+    },
+    {
+      key: 'testimonials',
+      label: 'Testimonials',
+      desc: 'Show or hide the Testimonials section on the homepage.',
+    },
+    {
+      key: 'faq',
+      label: 'FAQ',
+      desc: 'Show or hide the FAQ section on the homepage.',
+    },
+    {
+      key: 'blog',
+      label: 'Blog',
+      desc: 'Show or hide the Blog section on the homepage.',
+    },
     {
       key: 'about',
       label: 'About Section',

@@ -26,7 +26,22 @@ function isSectionVisible(section) {
 export default function MainView() {
   const [liveHomepage, setLiveHomepage] = useState(null);
   const [latestNews, setLatestNews] = useState([]);
-  const [visibility, setVisibility] = useState({ about: true, contact: true });
+  const [visibility, setVisibility] = useState({
+    hero: true, news: true, services: true, courses: true,
+    testimonials: true, faq: true, blog: true, about: true, contact: true,
+  });
+
+  const loadVisibility = () => ({
+    hero: isSectionVisible('hero'),
+    news: isSectionVisible('news'),
+    services: isSectionVisible('services'),
+    courses: isSectionVisible('courses'),
+    testimonials: isSectionVisible('testimonials'),
+    faq: isSectionVisible('faq'),
+    blog: isSectionVisible('blog'),
+    about: isSectionVisible('about'),
+    contact: isSectionVisible('contact'),
+  });
 
   useEffect(() => {
     const fetchAndCacheAnnouncements = async () => {
@@ -73,16 +88,10 @@ export default function MainView() {
       .then(res => setLiveHomepage(res.data))
       .catch(() => {});
 
-    setVisibility({
-      about: isSectionVisible('about'),
-      contact: isSectionVisible('contact'),
-    });
+    setVisibility(loadVisibility());
 
     const handleStorage = () => {
-      setVisibility({
-        about: isSectionVisible('about'),
-        contact: isSectionVisible('contact'),
-      });
+      setVisibility(loadVisibility());
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
@@ -90,13 +99,13 @@ export default function MainView() {
 
   return (
     <>
-      <section id="home"><Landing heroData={liveHomepage?.hero} /></section>
-      <LatestNewsSection items={latestNews} />
-      <section id="services"><Services /></section>
-      <section id="courses"><Courses /></section>
-      <Testimonals testimonials={liveHomepage?.testimonials} />
-      <FAQ faqs={liveHomepage?.faqs || []} />
-      <section id="blog"><Blog /></section>
+      {visibility.hero && <section id="home"><Landing heroData={liveHomepage?.hero} /></section>}
+      {visibility.news && <LatestNewsSection items={latestNews} />}
+      {visibility.services && <section id="services"><Services /></section>}
+      {visibility.courses && <section id="courses"><Courses /></section>}
+      {visibility.testimonials && <Testimonals testimonials={liveHomepage?.testimonials} />}
+      {visibility.faq && <FAQ faqs={liveHomepage?.faqs || []} />}
+      {visibility.blog && <section id="blog"><Blog /></section>}
       {visibility.about && <HomeAboutSection aboutData={liveHomepage?.about} />}
       {visibility.contact && <section id="contact"><Contact /></section>}
     </>

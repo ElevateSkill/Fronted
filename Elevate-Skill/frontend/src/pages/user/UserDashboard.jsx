@@ -5,7 +5,7 @@ import {
   ArrowLeft, Bell, BookOpen, Building, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
   Home, Loader, LogOut, Mail, Megaphone, Menu, MessageCircle, Phone,
   RefreshCw, Save, Send, Settings, Shield, Upload, User, X, AlertTriangle,
-  Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff
+  Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff, Globe, GlobeOff
 } from 'lucide-react';
 import { api, getMediaUrl, unwrapResults, exportToCSV } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -121,6 +121,9 @@ export default function UserDashboard() {
   const [paymentForm, setPaymentForm] = useState({ full_name: '', email: '', phone: '' });
   const [profile, setProfile] = useState({ full_name: '', email: '', phone_number: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [profileVisibility, setProfileVisibility] = useState(() => {
+    return localStorage.getItem('elevateskill_profile_visible') !== 'false';
+  });
   const [showEnrollModal, setShowEnrollModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [enrollForm, setEnrollForm] = useState({ full_name: '', email: '', phone: '' });
@@ -288,6 +291,7 @@ export default function UserDashboard() {
       setUser(res.data);
       setProfile((prev) => ({ ...prev, password: '' }));
       setShowPassword(false);
+      localStorage.setItem('elevateskill_profile_visible', profileVisibility);
       showToast('Profile updated successfully.', 'success');
     } catch (err) {
       showToast(err?.response?.data?.detail || 'Could not update profile.', 'error');
@@ -1027,6 +1031,23 @@ export default function UserDashboard() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-3">
+              <div className="flex items-center gap-2">
+                {profileVisibility ? <Globe size={16} className="text-emerald-400" /> : <GlobeOff size={16} className="text-gray-500" />}
+                <span className="text-sm font-bold text-white">Profile {profileVisibility ? 'Public' : 'Private'}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setProfileVisibility(!profileVisibility)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
+                  profileVisibility ? 'bg-emerald-500' : 'bg-white/20'
+                }`}
+              >
+                <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition ${
+                  profileVisibility ? 'translate-x-5' : 'translate-x-0'
+                }`} />
+              </button>
             </div>
             <button disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f89f29] to-[#f07000] px-6 py-3 text-sm font-black text-white hover:brightness-110 transition-all disabled:opacity-60 shadow-lg shadow-[#f89f29]/20">
               {saving ? <Loader className="animate-spin" size={16} /> : <Save size={16} />}

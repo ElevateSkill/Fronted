@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   AlertTriangle, CheckCircle, X, Loader, Users, BookOpen, GraduationCap,
-  BarChart3, Tags, CreditCard, Megaphone, Settings, FileText, UserPlus
+  BarChart3, Tags, CreditCard, Megaphone, Settings, FileText, UserPlus, User
 } from 'lucide-react';
 import { api } from '../../../services/api';
 
@@ -20,6 +20,7 @@ export const tabs = [
   { id: 'cms', label: 'Homepage CMS', icon: Settings, path: '/admin/cms' },
   { id: 'export', label: 'Export', icon: FileText, path: '/admin/export' },
   { id: 'users', label: 'Users', icon: UserPlus, path: '/admin/users' },
+  { id: 'profile', label: 'Profile', icon: User, path: '/admin/profile' },
 ];
 
 export function formatDate(value) {
