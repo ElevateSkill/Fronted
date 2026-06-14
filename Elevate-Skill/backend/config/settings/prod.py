@@ -46,7 +46,7 @@ STORAGES = {
 }
 
 # ── CORS ──────────────────────────────────────────────────
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', 'https://elevateskill-platform.vercel.app,http://localhost:3000').split(',')
+# CORS_ALLOW_ALL_ORIGINS = True     # lock down once frontend URL is known
 
 # ── Security ──────────────────────────────────────────────
 SECURE_CONTENT_TYPE_NOSNIFF = True
