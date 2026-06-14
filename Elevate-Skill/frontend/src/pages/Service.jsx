@@ -16,26 +16,65 @@ import graduate from '../assets/people/elevate-graduate.jpg'
 import staff from '../assets/people/elevate-staff.jpg'
 import prof from '../assets/people/prof-melaku.jpg'
 
+import AIG from '../assets/partners/AIG.jpg'
+import alpha_code from '../assets/partners/alpha-code.png'
+import alpha_soln from '../assets/partners/alpha-tech-solutions.png'
+import alpha from '../assets/partners/alpha.png'
+import hachalu_protocol from '../assets/partners/hachalu-protocol.jpg'
+import skillnet_ethiopia from '../assets/partners/skillnet-ethiopia.JPG'
+import VFE from '../assets/partners/VFE.jpg'
+
 const partners = [
   {
-    name: "Telebirr",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5QSx1OlYRx97RD-tL2RlsOEVH1cC03-FGRQ&s"
+    name: "KAMARA SCHOOL",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnmnsHuLxHB7KBkUfG-UJXXX71IVnAlXQv9s0-R_zXEg&s=10"
   },
   {
-    name: "Ethio Telecom",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSTDCFNUCLWzR6RnHyk5bOzGnzG_rcgwvaF7w&s"
+    name: "DEBRE BERHAN UNIVERSITY",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ4PLBJqXZWuljrEQ44T5xWUuz2sM8GBWLHSs-O40cpg&s=10"
   },
   {
-    name: "INSA",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4J-NYGjwxfcd__QckqaNtiwfZqh0DjasONg&s"
+    name: "AIG",
+    logo: AIG,
   },
   {
     name: "ASTU",
     logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRFeqX05EIfOZcZQtK_ICejDFf2NA9owk1d_g&s"
   },
   {
-    name: "MoI",
-    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_jpQpNR1h27E-Hfe7XCdrMIdyPDZBED2WUw&s"
+    name: "SKILLNET ETHIOPIA",
+    logo: skillnet_ethiopia
+  }, 
+
+  {
+    name: "ADAMA CITY ADMNISTRATION",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT70UKm3K8ZQXgTrp-PBpZQEMCfb2f5-0D-DuDAKHIATw&s=10"
+  },
+
+  {
+    name: "ALPHA",
+    logo: alpha,
+  },
+  {
+    name: "DEBRE BERHAN UNIVERSITY",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQ4PLBJqXZWuljrEQ44T5xWUuz2sM8GBWLHSs-O40cpg&s=10"
+  },
+  {
+    name: "ALPHA CODE",
+    logo: alpha_code,
+  },
+  {
+    name: "ALPHA TECH SOLUTIONS",
+    logo: alpha_soln
+  },
+  {
+    name: "HACHALU PROTOCOL",
+    logo: hachalu_protocol
+  }, 
+
+  {
+    name: "VFE",
+    logo: VFE
   }
 ];
 
