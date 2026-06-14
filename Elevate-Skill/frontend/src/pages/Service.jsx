@@ -171,7 +171,11 @@ export default function Services() {
                       <img
                         src={partner.logo}
                         alt={`${partner.name} logo`}
-                        className="h-auto max-h-full max-w-full object-contain filter brightness-75 transition-all group-hover:brightness-100 opacity-70 group-hover:opacity-100 drop-shadow-lg"
+                        className={`h-auto max-h-full max-w-full object-contain transition-all drop-shadow-lg ${
+                          partner.name === 'TELECOM'
+                            ? 'filter brightness-100 opacity-100 group-hover:brightness-110'
+                            : 'filter brightness-75 group-hover:brightness-100 opacity-70 group-hover:opacity-100'
+                        }`}
                       />
                     </motion.div>
                   ))}
