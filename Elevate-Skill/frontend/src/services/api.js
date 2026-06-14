@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const raw = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const raw = import.meta.env.VITE_API_URL || 'https://elevate-lms-api.onrender.com';
 const apiBaseUrl = raw.replace(/\/+$/, '').replace(/\/api\/v1$/, '') + '/api/v1';
 
 const api = axios.create({
