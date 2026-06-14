@@ -5,7 +5,6 @@ import {
   Users, Star, ArrowRight, CheckCircle2, Sparkles
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { api, unwrapResults } from '../services/api';
 
 import mentorship from '../assets/service/mentorship.jpg'
 import online_class from '../assets/service/online-class.jpg'
@@ -121,15 +120,20 @@ const mainServices = [
 export default function Services() {
 
   const [activeService] = useState();
-  const [courseCount, setCourseCount] = useState(null);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    api.get('/courses/')
-      .then(res => {
-        const data = unwrapResults(res.data);
-        setCourseCount(data.length);
-      })
-      .catch(() => setCourseCount(0));
+    const target = 2000;
+    const duration = 2000;
+    const startTime = performance.now();
+    const animate = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
   }, []);
 
   const navigate = useNavigate();
@@ -214,7 +218,7 @@ export default function Services() {
                   />
                 ))}
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#2c2260] to-[#291850] border-4 border-black flex items-center justify-center text-white text-[10px] md:text-xs font-bold shadow-xl">
-                  {courseCount ?? '...'}+
+                  {count}+
                 </div>
               </div>
             </div>
@@ -302,7 +306,7 @@ export default function Services() {
         >
           <div className="bg-black p-8 md:p-14 flex flex-col lg:flex-row items-center justify-between gap-10 shadow-slate-900/20">
             <div className="text-center lg:text-left">
-              <p className="text-gray-300 text-lg max-w-md">JOIN {courseCount ?? '...'}+ programs designed to scale your digital presence.</p>
+              <p className="text-gray-300 text-lg max-w-md">JOIN {count}+ programs designed to scale your digital presence.</p>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center gap-8 w-full lg:w-auto">
