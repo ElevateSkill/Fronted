@@ -1,15 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { api, unwrapResults } from '../services/api';
-import { Megaphone } from 'lucide-react';
+import { Megaphone, X, Sparkles } from 'lucide-react';
 
 export default function AnnouncementBar({ onAnnouncements }) {
   const [announcements, setAnnouncements] = useState([]);
   const [visible, setVisible] = useState(false);
-  const innerRef = useRef(null);
-  const [measuredHeight, setMeasuredHeight] = useState(0);
+  const [dismissed, setDismissed] = useState(false);
 
-  // ——— Load announcements ———
   useEffect(() => {
     async function load() {
       try {
@@ -30,9 +28,7 @@ export default function AnnouncementBar({ onAnnouncements }) {
         const has = data?.length > 0;
         if (has) {
           setAnnouncements(data);
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => setVisible(true));
-          });
+          requestAnimationFrame(() => setVisible(true));
         } else {
           setAnnouncements([]);
           setVisible(false);
@@ -47,7 +43,6 @@ export default function AnnouncementBar({ onAnnouncements }) {
 
     load();
 
-    // Listen for updates from MainView (merged as fallback)
     const handler = () => {
       const stored = localStorage.getItem('elevateskill_public_announcements');
       if (stored) {
@@ -55,13 +50,11 @@ export default function AnnouncementBar({ onAnnouncements }) {
           const data = JSON.parse(stored);
           if (data?.length > 0) {
             setAnnouncements(data);
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => setVisible(true));
-            });
+            requestAnimationFrame(() => setVisible(true));
             onAnnouncements?.(true);
           }
         } catch {
-          // ignore bad localStorage data
+          // ignore
         }
       }
     };
@@ -69,72 +62,87 @@ export default function AnnouncementBar({ onAnnouncements }) {
     return () => window.removeEventListener('announcements-updated', handler);
   }, [onAnnouncements]);
 
-  // ——— Measure inner content height ———
-  useEffect(() => {
-    if (innerRef.current) {
-      setMeasuredHeight(innerRef.current.scrollHeight);
-    }
-  }, [announcements]);
+  if (!visible || dismissed || announcements.length === 0) return null;
 
-  const marqueeItems = announcements.length > 1 ? [...announcements, ...announcements] : announcements;
-  const marqueeDuration = `${Math.max(18, announcements.length * 8)}s`;
+  const item = announcements[0];
 
   return (
-    <div
-      className="fixed top-0 left-0 right-0 z-[100] overflow-hidden transition-all duration-500 ease-out"
-      style={{ height: visible ? measuredHeight : 0 }}
-    >
-      {announcements.length > 0 && (
+    <AnimatePresence>
+      {visible && !dismissed && announcements.length > 0 && (
         <motion.div
-          ref={innerRef}
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="relative bg-gradient-to-r from-[#0a0a1a] via-[#1a0a2e] to-[#0a0a1a] border-b border-[#f89f29]/20 shadow-lg shadow-black/20"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="fixed top-0 left-0 right-0 z-[100] overflow-hidden"
         >
-          {/* Shimmer effect */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -inset-[100%] animate-shimmer bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-[-45deg]" />
-          </div>
-
-          <div className="relative max-w-screen-2xl mx-auto px-3 sm:px-6 py-2 flex items-center justify-between gap-3">
-            {/* Left: badge + rotating text */}
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              <span className="shrink-0 flex items-center gap-1.5 bg-gradient-to-r from-[#15c8fb] to-[#f89f29] text-white px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#15c8fb]/20">
-                <Megaphone size={12} className="animate-pulse" />
-                Update
-              </span>
-
-              {/* Sliding content */}
-              <div className="h-6 overflow-hidden flex items-center flex-1 min-w-0">
-                {announcements.length === 1 ? (
-                  <div className="truncate">
-                    <span className="text-xs sm:text-sm font-bold text-white">
-                      {announcements[0]?.title}
-                    </span>
-                    <span className="hidden sm:inline text-xs text-white/60 ml-2">
-                      — {announcements[0]?.content}
-                    </span>
-                  </div>
-                ) : (
-                  <div
-                    className="announcement-marquee flex min-w-max items-center gap-6 whitespace-nowrap"
-                    style={{ '--announcement-duration': marqueeDuration }}
-                  >
-                    {marqueeItems.map((item, idx) => (
-                      <span key={`${item.id || item.title}-${idx}`} className="inline-flex items-center gap-2">
-                        <span className="text-xs sm:text-sm font-bold text-white">{item.title}</span>
-                        <span className="hidden sm:inline text-xs text-white/65 max-w-[52ch] truncate">{item.content}</span>
-                        <span className="h-1.5 w-1.5 rounded-full bg-[#f89f29]/75" />
-                      </span>
-                    ))}
-                  </div>
-                )}
+          <motion.div
+            initial={{ y: -40 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="relative bg-gradient-to-r from-[#15c8fb] via-[#0ea5e9] to-[#f89f29] shadow-lg"
+          >
+            {/* Decorative sparkles */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute -top-4 -left-4 text-white/10">
+                <Sparkles size={60} />
+              </div>
+              <div className="absolute -bottom-4 -right-4 text-white/10 rotate-12">
+                <Sparkles size={40} />
+              </div>
+              {/* Shimmer line */}
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -inset-[100%] animate-shimmer bg-gradient-to-r from-transparent via-white/15 to-transparent skew-x-[-45deg]" />
               </div>
             </div>
-          </div>
+
+            <div className="relative max-w-screen-2xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <span className="shrink-0 flex items-center gap-1.5 bg-white/25 backdrop-blur-sm text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-inner">
+                  <Megaphone size={12} className="animate-pulse" />
+                  Update
+                </span>
+
+                <div className="h-6 overflow-hidden flex items-center flex-1 min-w-0">
+                  {announcements.length === 1 ? (
+                    <div className="truncate">
+                      <span className="text-xs sm:text-sm font-black text-white drop-shadow-sm">
+                        {item?.title}
+                      </span>
+                      <span className="hidden sm:inline text-xs text-white/80 ml-2 font-medium drop-shadow-sm">
+                        — {item?.content}
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      className="announcement-marquee flex min-w-max items-center gap-6 whitespace-nowrap"
+                      style={{ '--announcement-duration': `${Math.max(18, announcements.length * 8)}s` }}
+                    >
+                      {[...announcements, ...announcements].map((ann, idx) => (
+                        <span key={`${ann.id || ann.title}-${idx}`} className="inline-flex items-center gap-2">
+                          <span className="text-xs sm:text-sm font-black text-white drop-shadow-sm">{ann.title}</span>
+                          <span className="hidden sm:inline text-xs text-white/80 max-w-[52ch] truncate font-medium drop-shadow-sm">
+                            {ann.content}
+                          </span>
+                          <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button
+                onClick={() => { setDismissed(true); setVisible(false); onAnnouncements?.(false); }}
+                className="shrink-0 flex items-center justify-center h-7 w-7 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all hover:scale-110 active:scale-90 backdrop-blur-sm"
+                aria-label="Dismiss announcements"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </motion.div>
         </motion.div>
       )}
-    </div>
+    </AnimatePresence>
   );
 }
