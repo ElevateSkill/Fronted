@@ -19,7 +19,6 @@ export const tabs = [
   { id: 'announcements', label: 'Updates', icon: Megaphone, path: '/admin/announcements' },
   { id: 'cms', label: 'Homepage CMS', icon: Settings, path: '/admin/cms' },
   { id: 'export', label: 'Export', icon: FileText, path: '/admin/export' },
-  { id: 'profile', label: 'Profile', icon: User, path: '/admin/profile' },
   { id: 'users', label: 'Users', icon: UserPlus, path: '/admin/users' },
 ];
 

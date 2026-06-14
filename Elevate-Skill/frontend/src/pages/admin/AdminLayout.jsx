@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, LogOut, Menu, RefreshCw, X } from 'lucide-react';
+import { ArrowLeft, LogOut, Menu, RefreshCw, X, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import AnnouncementBar from '../../components/AnnouncementBar';
 import { tabs } from './components/AdminShared';
@@ -89,13 +89,19 @@ export default function AdminLayout() {
 
       <div className="mt-6 border-t border-white/[0.06] pt-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white shadow-sm">
-            {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-white">{user?.full_name || user?.username || 'Admin'}</p>
-            <p className="truncate text-[11px] font-medium text-white/60 capitalize">{user?.role || 'admin'}</p>
-          </div>
+          <button
+            onClick={() => navigate('/admin/profile')}
+            className="flex items-center gap-3 flex-1 min-w-0 rounded-lg p-1 hover:bg-white/5 transition-all"
+            title="Profile settings"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#15c8fb] to-[#f89f29] text-xs font-black text-white shadow-sm">
+              {user?.full_name?.charAt(0)?.toUpperCase() || user?.username?.charAt(0)?.toUpperCase() || 'A'}
+            </div>
+            <div className="min-w-0 flex-1 text-left">
+              <p className="truncate text-sm font-bold text-white">{user?.full_name || user?.username || 'Admin'}</p>
+              <p className="truncate text-[11px] font-medium text-white/60 capitalize">{user?.role || 'admin'}</p>
+            </div>
+          </button>
           <button
             onClick={handleLogout}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/60 hover:bg-white/10 hover:text-white transition-all"
@@ -159,6 +165,13 @@ export default function AdminLayout() {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={() => navigate('/admin/profile')}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]"
+                title="Profile"
+              >
+                <User size={15} />
+              </button>
               <button
                 onClick={() => window.location.reload()}
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 dark:text-white/40 hover:bg-gray-100 dark:hover:bg-white/10 transition-all hover:text-[#15c8fb]"

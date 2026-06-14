@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, Edit3, Trash2, Save, Loader } from 'lucide-react';
+import { UserPlus, Edit3, Trash2, Save, Loader, Search, X } from 'lucide-react';
 import { api, unwrapResults } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import {
-  Field, TextInput, Select, Badge,
-  useToast, ToastMessage, accent, apiError
+  Field, TextInput, Select, Badge, Modal,
+  useToast, useConfirmDelete, ToastMessage, accent, apiError
 } from '../components/AdminShared';
 
 const emptyUser = {
@@ -20,7 +20,9 @@ export default function UsersSection() {
   const [userForm, setUserForm] = useState(emptyUser);
   const [editingUserId, setEditingUserId] = useState(null);
   const [userRoleFilter, setUserRoleFilter] = useState('student');
+  const [searchTerm, setSearchTerm] = useState('');
   const { toast, showToast, closeToast } = useToast();
+  const { confirmDelete, confirmThen, setConfirmDelete } = useConfirmDelete();
 
   const loadData = async () => {
     try {
@@ -117,7 +119,17 @@ export default function UsersSection() {
 
   const students = users.filter((u) => u.role === 'student');
   const admins = users.filter((u) => u.role === 'admin');
-  const filtered = userRoleFilter === 'all' ? users : users.filter((u) => u.role === userRoleFilter);
+  const filtered = useMemo(() => {
+    const byRole = userRoleFilter === 'all' ? users : users.filter((u) => u.role === userRoleFilter);
+    if (!searchTerm.trim()) return byRole;
+    const q = searchTerm.toLowerCase();
+    return byRole.filter((u) =>
+      (u.full_name || '').toLowerCase().includes(q) ||
+      (u.username || '').toLowerCase().includes(q) ||
+      (u.email || '').toLowerCase().includes(q) ||
+      (u.phone_number || '').toLowerCase().includes(q)
+    );
+  }, [users, userRoleFilter, searchTerm]);
 
   const resetUserForm = () => {
     setUserForm(emptyUser);
@@ -195,17 +207,19 @@ export default function UsersSection() {
     }
   };
 
-  const deleteUser = async (id) => {
-    const isRealUser = !String(id).startsWith('student_') && !String(id).startsWith('enrolled_') && String(id) !== 'current_admin';
-    if (isRealUser) {
-      try {
-        await api.delete(`/admin/users/${id}/`);
-      } catch {
-        // Proceed with local removal even if API fails
+  const deleteUser = (id) => {
+    confirmThen(async () => {
+      const isRealUser = !String(id).startsWith('student_') && !String(id).startsWith('enrolled_') && String(id) !== 'current_admin';
+      if (isRealUser) {
+        try {
+          await api.delete(`/admin/users/${id}/`);
+        } catch {
+          // Proceed with local removal even if API fails
+        }
       }
-    }
-    setUsers((prev) => prev.filter((u) => u.id !== id));
-    showToast('User removed.', 'success');
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+      showToast('User removed.', 'success');
+    });
   };
 
   const toggleUserStatus = async (u) => {
@@ -248,28 +262,53 @@ export default function UsersSection() {
       <AnimatePresence>
         <ToastMessage message={toast.message} type={toast.type} onClose={closeToast} />
       </AnimatePresence>
+      <AnimatePresence>
+        <Modal
+          open={confirmDelete.open}
+          title="Delete user"
+          message="This user will be permanently removed. Are you sure?"
+          confirmLabel="Delete"
+          onConfirm={confirmDelete.action || (() => {})}
+          onCancel={() => setConfirmDelete({ open: false, action: null })}
+        />
+      </AnimatePresence>
 
       <motion.section initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }}
         className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-surface p-6 shadow-sm">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-black text-gray-900 dark:text-white">User management</h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Create, edit, and manage users. Role/status changes are local.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Create, edit, and manage users.</p>
           </div>
           <div className="flex gap-2">
             <span className="rounded-full bg-[#15c8fb]/10 px-3 py-1 text-xs font-bold text-[#15c8fb]">{students.length} students</span>
             <span className="rounded-full bg-[#15c8fb]/10 px-3 py-1 text-xs font-bold text-[#15c8fb]">{admins.length} admins</span>
           </div>
         </div>
-        <div className="mb-4 flex gap-2 border-b border-gray-100 dark:border-white/10 pb-3">
-          {['student', 'admin', 'all'].map((role) => (
-            <button key={role} onClick={() => setUserRoleFilter(role)}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
-                userRoleFilter === role ? 'bg-[#15c8fb] text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
-              }`}>
-              {role === 'all' ? `All (${users.length})` : `${role}s (${role === 'student' ? students.length : admins.length})`}
-            </button>
-          ))}
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 dark:border-white/10 pb-3">
+          <div className="flex gap-2">
+            {['student', 'admin', 'all'].map((role) => (
+              <button key={role} onClick={() => setUserRoleFilter(role)}
+                className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all ${
+                  userRoleFilter === role ? 'bg-[#15c8fb] text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
+                }`}>
+                {role === 'all' ? `All (${users.length})` : `${role}s (${role === 'student' ? students.length : admins.length})`}
+              </button>
+            ))}
+          </div>
+          <div className="relative w-full sm:w-56">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search users..."
+              className="w-full rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-gray-900 pl-9 pr-8 py-2 text-sm outline-none focus:border-[#15c8fb]/50 transition-all text-gray-900 dark:text-white placeholder:text-gray-400"
+            />
+            {searchTerm && (
+              <button onClick={() => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <X size={14} />
+              </button>
+            )}
+          </div>
         </div>
         <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-white/10">
           <table className="w-full min-w-[700px] text-left text-sm">
