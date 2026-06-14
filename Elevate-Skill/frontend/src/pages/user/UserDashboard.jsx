@@ -904,6 +904,18 @@ export default function UserDashboard() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
     >
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-black text-white">Updates & Announcements</h2>
+          <p className="text-sm text-gray-400 mt-1">Stay informed with the latest updates.</p>
+        </div>
+        {announcements.length > 0 && (
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#f89f29]/20 bg-[#f89f29]/10 px-3 py-1.5 text-[11px] font-bold text-[#f89f29]">
+            <Megaphone size={12} />
+            {announcements.length} update{announcements.length > 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
       {announcements.length > 0 ? (
         <div className="space-y-4">
           {announcements.map((item, i) => (
@@ -912,34 +924,61 @@ export default function UserDashboard() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="rounded-xl border border-white/10 bg-surface p-5 shadow-sm hover:shadow-md transition-all"
+              className="group relative overflow-hidden rounded-xl border border-white/10 bg-surface p-5 shadow-sm hover:shadow-md transition-all duration-300"
             >
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#f89f29]/20 to-[#f07000]/20">
-                    <Megaphone size={16} className="text-[#f89f29]" />
-                  </div>
-                  <div>
-                    <h2 className="font-black text-white">{item.title}</h2>
-                    <p className="text-xs text-gray-400">{formatDate(item.created_at || item.date)}</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#f89f29]/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-4">
+                    <div className="relative shrink-0">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#f89f29] to-[#f07000] shadow-lg shadow-[#f89f29]/20">
+                        <Megaphone size={18} className="text-white" />
+                      </div>
+                      <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-[#f89f29] animate-pulse border-2 border-surface" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-black text-white group-hover:text-[#f89f29] transition-colors">{item.title}</h3>
+                        {i === 0 && (
+                          <span className="shrink-0 rounded-full bg-[#f89f29]/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#f89f29] border border-[#f89f29]/20">New</span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-400 flex items-center gap-1.5">
+                        <Calendar size={11} />
+                        {formatDate(item.created_at || item.date)}
+                        {item.created_by && (
+                          <>· Posted by {item.created_by?.full_name || item.created_by?.username || 'Admin'}</>
+                        )}
+                      </p>
+                    </div>
                   </div>
                 </div>
+                {item.content && (
+                  <div className="mt-3 pl-14">
+                    <p className="text-sm leading-relaxed text-gray-300 relative pl-4 border-l-2 border-[#f89f29]/20 group-hover:border-[#f89f29]/40 transition-colors">
+                      {item.content}
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="text-sm leading-relaxed text-gray-300">{item.content}</p>
-              {item.created_by && (
-                <p className="mt-3 text-xs text-gray-400 border-t border-white/5 pt-3">
-                  Posted by {item.created_by?.full_name || item.created_by?.username || 'Admin'}
-                </p>
-              )}
             </motion.article>
           ))}
         </div>
       ) : (
-        <div className="rounded-xl border border-white/10 bg-surface p-10 text-center">
-          <Megaphone size={48} className="mx-auto mb-3 text-gray-400" />
-          <p className="font-medium text-gray-400">No announcements yet</p>
-          <p className="text-sm text-gray-400 mt-1">Check back later for updates from your instructors.</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative overflow-hidden rounded-xl border border-white/10 bg-surface p-12 text-center"
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-[#f89f29]/[0.02] to-transparent" />
+          <div className="relative">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#f89f29]/10 to-[#f07000]/10 border border-[#f89f29]/20 mb-4">
+              <Megaphone size={32} className="text-[#f89f29]/50" />
+            </div>
+            <h3 className="text-lg font-black text-white mb-1">No announcements yet</h3>
+            <p className="text-sm text-gray-400 max-w-xs mx-auto">Check back later for updates from your instructors and administrators.</p>
+          </div>
+        </motion.div>
       )}
     </motion.section>
   );
