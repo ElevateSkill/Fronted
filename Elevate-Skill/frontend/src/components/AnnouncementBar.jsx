@@ -9,30 +9,40 @@ export default function AnnouncementBar({ onAnnouncements }) {
   const innerRef = useRef(null);
   const [measuredHeight, setMeasuredHeight] = useState(0);
 
-  // ——— Load announcements (now public, no auth needed) ———
+  // ——— Load announcements ———
   useEffect(() => {
-    function load() {
-      api.get('/announcements/')
-        .then((res) => {
-          const data = unwrapResults(res.data);
-          const has = data?.length > 0;
-          if (has) {
-            setAnnouncements(data);
-            // Double rAF: wait one frame for DOM render, then trigger animation
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => setVisible(true));
-            });
-          } else {
-            setAnnouncements([]);
-            setVisible(false);
+    async function load() {
+      try {
+        const token = localStorage.getItem('access_token');
+        let data = [];
+        if (token) {
+          try {
+            const res = await api.get('/announcements/');
+            data = unwrapResults(res.data);
+          } catch {
+            const res = await api.get('/admin/announcements/');
+            data = unwrapResults(res.data).filter(a => a.is_published);
           }
-          onAnnouncements?.(has);
-        })
-        .catch(() => {
+        } else {
+          const res = await api.get('/announcements/');
+          data = unwrapResults(res.data);
+        }
+        const has = data?.length > 0;
+        if (has) {
+          setAnnouncements(data);
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => setVisible(true));
+          });
+        } else {
           setAnnouncements([]);
           setVisible(false);
-          onAnnouncements?.(false);
-        });
+        }
+        onAnnouncements?.(has);
+      } catch {
+        setAnnouncements([]);
+        setVisible(false);
+        onAnnouncements?.(false);
+      }
     }
 
     load();
