@@ -23,6 +23,7 @@ import alpha from '../assets/partners/alpha.png'
 import hachalu_protocol from '../assets/partners/hachalu-protocol.jpg'
 import skillnet_ethiopia from '../assets/partners/skillnet-ethiopia.JPG'
 import VFE from '../assets/partners/VFE.jpg'
+import telecom from '../assets/partners/telecom.png'
 
 const partners = [
   {
@@ -75,6 +76,10 @@ const partners = [
   {
     name: "VFE",
     logo: VFE
+  },
+  {
+    name: "TELECOM",
+    logo: telecom
   }
 ];
 
