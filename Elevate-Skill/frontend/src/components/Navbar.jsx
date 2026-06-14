@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, Code2, Palette, BrainCircuit, Rocket, LogOut, User, Shield } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import logoJpg from '../assets/logo.jpg';
+const logoJpg = '/logo.jpg';
 
 export default function Navbar({ hasAnnouncements }) {
   const [isScrolled, setIsScrolled] = useState(false);

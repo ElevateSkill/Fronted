@@ -7,7 +7,7 @@ import {
 
 // import { Telegram } from 'lucide-react'
 
-import logoJpg from '../assets/logo.jpg';
+const logoJpg = '/logo.jpg';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

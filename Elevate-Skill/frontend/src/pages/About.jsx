@@ -9,7 +9,7 @@ import heroMain from '../assets/elevat.jpg';
 import aboutImg from '../assets/grad2.jpg';
 import gr1 from '../assets/gr1.jpg';
 import gr3 from '../assets/gr3.jpg';
-import logoImg from '../assets/logo.jpg';
+const logoImg = '/logo.jpg';
 
 
 import meeting from '../assets/gallery/meeting.jpg';
