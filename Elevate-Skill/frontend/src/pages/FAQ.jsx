@@ -55,21 +55,13 @@ export default function FAQ({ faqs = [] }) {
   }, [displayFaqs, search, activeCategory]);
 
   return (
-    <div id="faq" className="relative w-full bg-black py-16 md:py-24 px-6 transition-colors duration-500 overflow-hidden">
+    <div id="faq" className="relative w-full bg-black md:py-24 px-6 transition-colors duration-500 overflow-hidden">
       <div className="absolute top-1/3 left-0 w-72 h-72 bg-[#f89f29]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-0 w-80 h-80 bg-[#15c8fb]/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="relative z-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[#f89f29] text-[10px] font-black uppercase tracking-widest mb-4"
-          >
-            <HelpCircle size={12} /> FAQ
-          </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -78,14 +70,6 @@ export default function FAQ({ faqs = [] }) {
           >
             Got <span className="bg-gradient-to-r from-[#f89f29] to-[#fb7d15] bg-clip-text text-transparent">QUESTIONS?</span>
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="text-gray-400 text-sm max-w-lg mx-auto"
-          >
-            Everything you need to know about the platform. Can't find what you're looking for? Drop us a message.
-          </motion.p>
         </div>
 
         {/* Search + Category filter */}
@@ -121,20 +105,6 @@ export default function FAQ({ faqs = [] }) {
             ))}
           </div>
         </motion.div>
-
-        {/* Results count */}
-        {filtered.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-16"
-          >
-            <HelpCircle size={40} className="mx-auto text-white/20 mb-3" />
-            <p className="text-white/40 text-sm">No questions match your search.</p>
-          </motion.div>
-        ) : (
-          <motion.p className="text-[11px] text-white/30 mb-4 font-medium">{filtered.length} result{filtered.length !== 1 ? 's' : ''}</motion.p>
-        )}
 
         {/* Accordion */}
         <div className="space-y-3">
@@ -209,7 +179,6 @@ export default function FAQ({ faqs = [] }) {
           <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-[#f89f29]/10 blur-[100px] rounded-full" />
 
           <div className="relative z-10">
-            <HelpCircle size={32} className="mx-auto text-white/20 mb-3" />
             <h4 className="text-xl md:text-2xl font-black text-white mb-1">
               Still have a question?
             </h4>
