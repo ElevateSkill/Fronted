@@ -16,13 +16,13 @@ import graduate from '../assets/people/elevate-graduate.jpg'
 import staff from '../assets/people/elevate-staff.jpg'
 import prof from '../assets/people/prof-melaku.jpg'
 
-const AIG = "https://placehold.co/200x100/1a1a1a/fba613?text=AIG"
-const alpha_code = "https://placehold.co/200x100/1a1a1a/fba613?text=ALPHA+CODE"
-const alpha_soln = "https://placehold.co/200x100/1a1a1a/fba613?text=ALPHA+TECH"
-const alpha = "https://placehold.co/200x100/1a1a1a/fba613?text=ALPHA"
-const hachalu_protocol = "https://placehold.co/200x100/1a1a1a/fba613?text=HACHALU"
-const skillnet_ethiopia = "https://placehold.co/200x100/1a1a1a/fba613?text=SKILLNET"
-const VFE = "https://placehold.co/200x100/1a1a1a/fba613?text=VFE"
+import AIG from '../assets/partners/AIG.jpg'
+import alpha_code from '../assets/partners/alpha-code.png'
+import alpha_soln from '../assets/partners/alpha-tech-solutions.png'
+import alpha from '../assets/partners/alpha.png'
+import hachalu_protocol from '../assets/partners/hachalu-protocol.jpg'
+import skillnet_ethiopia from '../assets/partners/skillnet-ethiopia.JPG'
+import VFE from '../assets/partners/VFE.jpg'
 
 const partners = [
   {
