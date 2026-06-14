@@ -49,20 +49,10 @@ export default function AnnouncementBar({ onAnnouncements }) {
               requestAnimationFrame(() => setVisible(true));
             });
             onAnnouncements?.(true);
-          } else {
-            setAnnouncements([]);
-            setVisible(false);
-            onAnnouncements?.(false);
           }
         } catch {
-          setAnnouncements([]);
-          setVisible(false);
-          onAnnouncements?.(false);
+          // ignore bad localStorage data
         }
-      } else {
-        setAnnouncements([]);
-        setVisible(false);
-        onAnnouncements?.(false);
       }
     };
     window.addEventListener('announcements-updated', handler);

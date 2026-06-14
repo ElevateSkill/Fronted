@@ -92,8 +92,8 @@ export default function App() {
 
           <Route path="/" element={<Layout />}>
             <Route index element={<MainView />} />
+            <Route path="about" element={<About />} />
           </Route>
-          <Route path="/about" element={<About />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
