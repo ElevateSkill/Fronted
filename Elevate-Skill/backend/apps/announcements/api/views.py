@@ -25,9 +25,9 @@ class StudentAnnouncementListView(generics.ListAPIView):
 @extend_schema(tags=["Announcements"])
 class StudentAnnouncementDetailView(generics.RetrieveAPIView):
     """
-    GET /api/v1/announcements/{id}/ - Retrieve detail of a published announcement (public, no auth required).
+    GET /api/v1/announcements/{id}/ - Retrieve detail of a published announcement (requires JWT).
     """
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = AnnouncementSerializer
 
     def get_queryset(self):
