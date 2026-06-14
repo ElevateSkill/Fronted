@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, Bell, BookOpen, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
+  ArrowLeft, Bell, BookOpen, Building, CheckCircle, Clock, CreditCard, FileText, GraduationCap,
   Home, Loader, LogOut, Mail, Megaphone, Menu, MessageCircle, Phone,
   RefreshCw, Save, Send, Settings, Shield, Upload, User, X, AlertTriangle,
   Calendar, BarChart3, ExternalLink, Filter, Download, Eye, EyeOff
@@ -732,6 +732,28 @@ export default function UserDashboard() {
         </div>
       </motion.div>
 
+      {bankAccounts.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.03 }}
+          className="rounded-xl border border-[#f89f29]/20 bg-gradient-to-br from-[#f89f29]/5 via-surface to-[#f07000]/5 p-5 shadow-sm"
+        >
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-black text-white">
+            <Building size={16} className="text-[#f89f29]" /> Bank Accounts for Payment
+          </h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {bankAccounts.map((acc) => (
+              <div key={acc.id} className="rounded-xl border border-white/10 bg-charcoal/80 p-4">
+                <p className="text-xs font-bold text-[#f89f29] uppercase tracking-wider">{acc.bank_name}</p>
+                <p className="mt-1.5 text-lg font-black text-white tracking-wider select-all">{acc.account_number}</p>
+                {acc.account_holder && <p className="mt-1 text-sm font-bold text-white">Account holder: {acc.account_holder}</p>}
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-[400px_1fr]">
         <motion.div
           initial={{ opacity: 0, x: -16 }}
@@ -1074,8 +1096,20 @@ export default function UserDashboard() {
                   <input required value={enrollForm.full_name} onChange={(e) => setEnrollForm({ ...enrollForm, full_name: e.target.value })} placeholder="Full name" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
                   <input required type="email" value={enrollForm.email} onChange={(e) => setEnrollForm({ ...enrollForm, email: e.target.value })} placeholder="Email address" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
                   <input required value={enrollForm.phone} onChange={(e) => setEnrollForm({ ...enrollForm, phone: e.target.value })} placeholder="Phone number" className="w-full rounded-xl border border-white/10 bg-charcoal px-4 py-3 text-sm text-white outline-none placeholder:text-gray-500 transition-all focus:border-[#f89f29]/50 focus:ring-4 focus:ring-[#f89f29]/10" />
+                  {bankAccounts.length > 0 && (
+                    <div className="rounded-xl border border-[#f89f29]/20 bg-[#f89f29]/5 p-3 space-y-2">
+                      <p className="text-xs font-bold text-[#f89f29] uppercase tracking-wider">Bank Accounts</p>
+                      {bankAccounts.map((acc) => (
+                        <div key={acc.id} className="rounded-lg border border-white/10 bg-charcoal/80 p-3">
+                          <p className="text-xs font-bold text-[#f89f29]">{acc.bank_name}</p>
+                          <p className="text-base font-black text-white tracking-wider select-all">{acc.account_number}</p>
+                          {acc.account_holder && <p className="text-xs font-bold text-white mt-0.5">Holder: {acc.account_holder}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <div>
-                    <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-400">Bank Account</label>
+                    <label className="mb-1.5 block text-[11px] font-black uppercase tracking-wider text-gray-400">Select Bank Account Used</label>
                     <select
                       required
                       value={selectedBankId}
