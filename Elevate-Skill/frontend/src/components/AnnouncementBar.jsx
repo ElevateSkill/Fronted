@@ -103,28 +103,32 @@ export default function AnnouncementBar({ onAnnouncements }) {
                   Update
                 </span>
 
-                <div className="h-6 overflow-hidden flex items-center flex-1 min-w-0">
+                <div className="h-7 overflow-hidden flex items-center flex-1 min-w-0">
                   {announcements.length === 1 ? (
-                    <div className="truncate">
-                      <span className="text-xs sm:text-sm font-black text-white drop-shadow-sm">
+                    <div className="truncate flex items-center gap-2">
+                      <span className="inline-flex h-2 w-2 rounded-full bg-white animate-pulse shrink-0 shadow-sm shadow-white/50" />
+                      <span className="text-xs sm:text-sm font-black text-white drop-shadow-md tracking-wide">
                         {item?.title}
                       </span>
-                      <span className="hidden sm:inline text-xs text-white/80 ml-2 font-medium drop-shadow-sm">
-                        — {item?.content}
+                      <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-white/90 ml-1 font-medium drop-shadow-sm bg-white/10 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                        <span className="text-[10px]">✦</span>
+                        {item?.content}
                       </span>
                     </div>
                   ) : (
                     <div
-                      className="announcement-marquee flex min-w-max items-center gap-6 whitespace-nowrap"
+                      className="announcement-marquee flex min-w-max items-center gap-5 whitespace-nowrap"
                       style={{ '--announcement-duration': `${Math.max(18, announcements.length * 8)}s` }}
                     >
                       {[...announcements, ...announcements].map((ann, idx) => (
-                        <span key={`${ann.id || ann.title}-${idx}`} className="inline-flex items-center gap-2">
-                          <span className="text-xs sm:text-sm font-black text-white drop-shadow-sm">{ann.title}</span>
-                          <span className="hidden sm:inline text-xs text-white/80 max-w-[52ch] truncate font-medium drop-shadow-sm">
+                        <span key={`${ann.id || ann.title}-${idx}`} className="inline-flex items-center gap-3">
+                          <span className="inline-flex h-1.5 w-1.5 rounded-full bg-white/80 shadow-sm shadow-white/30" />
+                          <span className="text-xs sm:text-sm font-black text-white drop-shadow-md tracking-wide">{ann.title}</span>
+                          <span className="hidden sm:inline-flex items-center gap-1 text-xs text-white/85 max-w-[40ch] truncate font-medium bg-white/10 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                            <span className="text-[10px]">✦</span>
                             {ann.content}
                           </span>
-                          <span className="h-1.5 w-1.5 rounded-full bg-white/60" />
+                          <span className="h-px w-4 bg-white/20" />
                         </span>
                       ))}
                     </div>
