@@ -23,8 +23,8 @@ export default function AnnouncementBar({ onAnnouncements }) {
             data = unwrapResults(res.data).filter(a => a.is_published);
           }
         } else {
-          const res = await api.get('/announcements/');
-          data = unwrapResults(res.data);
+          const res = await api.get('/news/');
+          data = unwrapResults(res.data).filter(n => n.status === 'published' || n.is_published !== false);
         }
         const has = data?.length > 0;
         if (has) {

@@ -3,7 +3,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Layout from "./components/Layout";
 import MainView from "./pages/MainView";
 import About from "./pages/About";
-import PublicAnnouncements from "./pages/PublicAnnouncements";
+import News from "./pages/News";
 
 // auth
 import Login from "./pages/auth/Login";
@@ -94,7 +94,7 @@ export default function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<MainView />} />
             <Route path="about" element={<About />} />
-            <Route path="announcements" element={<PublicAnnouncements />} />
+            <Route path="news" element={<News />} />
           </Route>
         </Routes>
       </AuthProvider>

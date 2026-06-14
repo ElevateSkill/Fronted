@@ -85,8 +85,9 @@ export function useAnnouncements() {
             data = allData.filter(a => a.is_published);
           }
         } else {
-          const res = await api.get('/announcements/');
+          const res = await api.get('/news/');
           data = Array.isArray(res.data) ? res.data : res.data?.results || [];
+          data = data.filter(n => n.status === 'published' || n.is_published !== false);
         }
 
         if (data && data.length > 0) {

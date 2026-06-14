@@ -48,7 +48,7 @@ export default function Navbar({ hasAnnouncements }) {
       ] 
     },
     { name: 'Services', href: '#services' },
-    { name: 'Announcements', href: '/announcements' },
+    { name: 'News', href: '/news' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '#contact' },
   ];
